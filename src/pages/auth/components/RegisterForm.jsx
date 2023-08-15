@@ -3,17 +3,11 @@ import { Formik } from "formik";
 import AuthInput from "./AuthInput";
 import { useNavigate } from "react-router";
 
-function RegisterForm() {
+function RegisterForm({ onSubmit }) {
   const navigate = useNavigate();
   return (
-    <div
-      className="border-blue-400 rounded-3xl p-6"
-      style={{
-        width: 450,
-        boxShadow: "0 0 30px rgb(216, 180, 254)",
-      }}
-    >
-      <h1 className="text-purple-500 text-3xl text-center">Register</h1>
+    <>
+      <h2 className="text-purple-500 text-3xl text-center">Register</h2>
       <Formik
         initialValues={{
           name: "",
@@ -47,10 +41,8 @@ function RegisterForm() {
           return errors;
         }}
         onSubmit={(values, { setSubmitting }) => {
-          setTimeout(() => {
-            alert(JSON.stringify(values, null, 2));
-            setSubmitting(false);
-          }, 400);
+          setSubmitting(false);
+          onSubmit(values);
         }}
       >
         {({
@@ -62,7 +54,7 @@ function RegisterForm() {
           handleSubmit,
           isSubmitting,
         }) => (
-          <form onSubmit={handleSubmit} className="mt-6">
+          <form onSubmit={handleSubmit} className="mt-6" method="post">
             <AuthInput
               type={"name"}
               name={"name"}
@@ -123,7 +115,7 @@ function RegisterForm() {
           </form>
         )}
       </Formik>
-    </div>
+    </>
   );
 }
 
