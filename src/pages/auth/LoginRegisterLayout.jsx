@@ -2,11 +2,16 @@ import React, { useState } from "react";
 import graphic1 from "../../assets/images/personal-finance-graphics.png";
 import graphic2 from "../../assets/images/personal-finance-graphics-1.jpg";
 import graphic3 from "../../assets/images/personal-finance-graphics-2.jpg";
+import logo from "../../assets/images/logo-money-master.png";
+import logoText from "../../assets/images/name-money-master.png";
 import { useNavigate } from "react-router";
+import "../../styles/auth.css";
+import Benefits from "./components/Benefits";
 
 function LoginRegisterLayout({ children }) {
   const images = [graphic1, graphic2, graphic3];
   const [currentImage, setCurrentImage] = useState(0);
+  const [shownBenefits, setShownBenefits] = useState(false);
   const navigate = useNavigate();
 
   setTimeout(() => {
@@ -15,13 +20,20 @@ function LoginRegisterLayout({ children }) {
 
   return (
     <div className="flex h-screen">
-      <div className="w-1/2 grow h-100 flex flex-col items-center justify-center gap-2">
+      <div className="w-1/2 grow h-100 flex flex-col items-center justify-start">
+        <div className="flex gap-2 items-center justify-start w-full px-6 py-2">
+          <img src={logo} alt="" width={70} height={70} />
+          <img src={logoText} alt="" style={{ height: 50 }} />
+        </div>
         <div className="mb-4 bg-purple-400 py-5 px-12 rounded-tr-full rounded-br-full relative">
-          <h2 className="w-full text-4xl text-white mb-2">
+          <h2 className="w-full text-4xl text-white mb-2 leading-tight">
             We help you to manage your finance efficiently!
           </h2>
           <h5 className="text-white text-2xl">Let's join.</h5>
-          <button className="bg-purple-600 py-2 px-6 text-white rounded-full absolute right-16 bottom-4 hover:bg-purple-700">
+          <button
+            className="bg-purple-600 py-2 px-6 text-white rounded-full absolute right-16 bottom-4 hover:bg-purple-700"
+            onClick={() => setShownBenefits(!shownBenefits)}
+          >
             See what you can benefit
           </button>
         </div>
@@ -43,7 +55,8 @@ function LoginRegisterLayout({ children }) {
           })}
         </div>
       </div>
-      <div className="w-1/2 grow flex flex-col">
+
+      <div className="w-1/2 grow flex flex-col relative overflow-hidden">
         <div
           className="flex gap-2 justify-end py-3 pe-8"
           style={{
@@ -64,8 +77,48 @@ function LoginRegisterLayout({ children }) {
             Login
           </button>
         </div>
-        <div className="w-full flex items-center justify-center grow">
-          {children}
+
+        <div
+          className="w-full flex items-center justify-center grow h-full"
+          style={{
+            backgroundImage:
+              "linear-gradient(to top left, rgb(233, 213, 255), #ffffff)",
+            perspective: 1000,
+          }}
+        >
+          {/* Circles to make beautiful */}
+          <div
+            className="absolute rounded-full bg-purple-300 opacity-50 bottom-10 -right-20 z-0"
+            style={{ width: 400, height: 400 }}
+          ></div>
+          <div
+            className="absolute rounded-full bg-purple-300 opacity-50 -bottom-32 left-20 z-0"
+            style={{ width: 200, height: 200 }}
+          ></div>
+
+          <div
+            style={{ width: 450 }}
+            className={`flip-card flex items-center ${
+              shownBenefits == true ? "active" : ""
+            }`}
+          >
+            <div
+              className="border-blue-400 rounded-3xl p-6 bg-white form-card w-full"
+              style={{
+                boxShadow: "0 0 30px rgb(216, 180, 254)",
+              }}
+            >
+              {children}
+            </div>
+            <div
+              className="border-blue-400 rounded-3xl p-6 bg-white benefits-card w-full"
+              style={{
+                boxShadow: "0 0 30px rgb(216, 180, 254)",
+              }}
+            >
+              <Benefits setShownBenefits={setShownBenefits}/>
+            </div>
+          </div>
         </div>
       </div>
     </div>
