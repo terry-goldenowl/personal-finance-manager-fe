@@ -7,14 +7,8 @@ function RegisterForm() {
   const navigate = useNavigate();
 
   return (
-    <div
-      className="border-blue-400 rounded-3xl p-6"
-      style={{
-        width: 450,
-        boxShadow: "0 0 30px rgb(216, 180, 254)",
-      }}
-    >
-      <h1 className="text-purple-500 text-3xl text-center">Login</h1>
+    <>
+      <h2 className="text-purple-500 text-3xl text-center">Login</h2>
       <Formik
         initialValues={{
           email: "",
@@ -52,7 +46,7 @@ function RegisterForm() {
           handleSubmit,
           isSubmitting,
         }) => (
-          <form onSubmit={handleSubmit} className="mt-6">
+          <form onSubmit={handleSubmit} className="mt-6" method="post">
             <AuthInput
               type={"email"}
               name={"email"}
@@ -91,7 +85,7 @@ function RegisterForm() {
           </form>
         )}
       </Formik>
-    </div>
+    </>
   );
 }
 
