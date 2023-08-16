@@ -3,8 +3,9 @@ import { Formik } from "formik";
 import AuthInput from "./AuthInput";
 import { useNavigate } from "react-router";
 
-function RegisterForm({ onSubmit }) {
+function RegisterForm({ onSubmit, submitting, error, setError }) {
   const navigate = useNavigate();
+  console.log(error);
   return (
     <>
       <h2 className="text-purple-500 text-3xl text-center">Register</h2>
@@ -17,6 +18,7 @@ function RegisterForm({ onSubmit }) {
         }}
         validate={(values) => {
           const errors = {};
+          setError(null);
 
           if (!values.name) {
             errors.name = "Required";
@@ -41,7 +43,7 @@ function RegisterForm({ onSubmit }) {
           return errors;
         }}
         onSubmit={(values, { setSubmitting }) => {
-          setSubmitting(false);
+          // setSubmitting(submitting);
           onSubmit(values);
         }}
       >
@@ -62,7 +64,10 @@ function RegisterForm({ onSubmit }) {
               onBlur={handleBlur}
               value={values.name}
               label={"Name"}
-              error={errors.name && touched.name && errors.name}
+              error={
+                (errors.name && touched.name && errors.name) ||
+                (error && error.name)
+              }
             />
             <AuthInput
               type={"email"}
@@ -71,7 +76,10 @@ function RegisterForm({ onSubmit }) {
               onBlur={handleBlur}
               value={values.email}
               label={"Email"}
-              error={errors.email && touched.email && errors.email}
+              error={
+                (errors.email && touched.email && errors.email) ||
+                (error && error.email)
+              }
             />
 
             <AuthInput
@@ -81,7 +89,10 @@ function RegisterForm({ onSubmit }) {
               onBlur={handleBlur}
               value={values.password}
               label={"Password"}
-              error={errors.password && touched.password && errors.password}
+              error={
+                (errors.password && touched.password && errors.password) ||
+                (error && error.password)
+              }
             />
             <AuthInput
               type={"password"}
@@ -98,10 +109,10 @@ function RegisterForm({ onSubmit }) {
             />
             <button
               type="submit"
-              disabled={isSubmitting}
+              disabled={submitting}
               className="bg-purple-600 text-white py-2 w-full rounded-lg mt-8 text-xl hover:bg-purple-700"
             >
-              Submit
+              {submitting ? "Submitting...." : "Submit"}
             </button>
             <p className="text-center mt-2 text-md">
               Already have account?{" "}

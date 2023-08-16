@@ -1,9 +1,18 @@
 import React from "react";
 
-function AuthInput({ type, name, onChange, onBlur, value, label, error }) {
+function AuthInput({
+  type,
+  name,
+  onChange = null,
+  onBlur = null,
+  value = "",
+  label,
+  error,
+}) {
   return (
     <div className="mb-3">
-      <label htmlFor={name}>{label}</label>
+      {label && <label htmlFor={name}>{label}</label>}
+
       <input
         type={type}
         name={name}

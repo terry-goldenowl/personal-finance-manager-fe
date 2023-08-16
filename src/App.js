@@ -4,6 +4,7 @@ import HomePage from "./pages/home/HomePage";
 import Layout from "./components/layout/Layout";
 import RegisterPage from "./pages/auth/RegisterPage";
 import LoginPage from "./pages/auth/LoginPage";
+import ResetPasswordPage from "./pages/auth/ResetPasswordPage";
 
 function App() {
   const router = createBrowserRouter([
@@ -24,6 +25,10 @@ function App() {
     {
       path: "login",
       element: <LoginPage />,
+    },
+    {
+      path: "reset-password",
+      element: <ResetPasswordPage />,
     },
   ]);
 
