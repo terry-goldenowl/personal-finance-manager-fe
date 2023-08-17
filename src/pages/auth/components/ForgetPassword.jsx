@@ -2,27 +2,27 @@ import React, { useState } from "react";
 import Modal from "../../../components/modal/Modal";
 import AuthInput from "./AuthInput";
 
-function ForgetPassword({ handleAccept, setShow, error, setError }) {
+function ForgetPassword({ onAccept, onClose, error, setError }) {
   const [email, setEmail] = useState("");
 
   const handleEmailChange = (e) => {
     const value = e.target.value;
     setEmail(value);
 
-    if (
-      value.length > 0 &&
-      !/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(value)
-    ) {
+    if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(value)) {
       setError("Email is not valid!");
     } else setError(null);
   };
 
+  const acceptHandle = () => {
+    if (email.length === 0) setError("Please enter your email!");
+    if (!error) {
+      onAccept(email);
+    }
+  };
+
   return (
-    <Modal
-      title={"Password reset"}
-      onAccept={handleAccept}
-      setIsShown={setShow}
-    >
+    <Modal title={"Password reset"} onAccept={acceptHandle} onClose={onClose}>
       <AuthInput
         type={"email"}
         name={"email"}

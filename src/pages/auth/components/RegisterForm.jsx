@@ -5,7 +5,7 @@ import { useNavigate } from "react-router";
 
 function RegisterForm({ onSubmit, submitting, error, setError }) {
   const navigate = useNavigate();
-  console.log(error);
+  // console.log(error);
   return (
     <>
       <h2 className="text-purple-500 text-3xl text-center">Register</h2>

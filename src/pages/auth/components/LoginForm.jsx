@@ -2,14 +2,26 @@ import React from "react";
 import { Formik } from "formik";
 import AuthInput from "./AuthInput";
 import { useNavigate } from "react-router";
+import AuthService from "../../../services/auth";
 
-function LoginForm({ onForgetting, onLogin, submitting, error }) {
+function LoginForm({ onForgetting, onLogin, onVerify, submitting, error }) {
   const navigate = useNavigate();
 
   return (
     <>
       <h2 className="text-purple-500 text-3xl text-center mb-6">Login</h2>
-      {error && <p className="text-red-500 mt-3">{error}</p>}
+      <div className="flex gap-2 items-center mt-3">
+        {error && <p className="text-red-500">{error}</p>}
+        {error === "Email hasn't been verified yet!" && (
+          <button
+            className="text-blue-700 hover:underline"
+            onClick={onVerify}
+          >
+            Verify now
+          </button>
+        )}
+      </div>
+
       <Formik
         initialValues={{
           email: "",
@@ -88,7 +100,7 @@ function LoginForm({ onForgetting, onLogin, submitting, error }) {
             </div>
             <button
               type="submit"
-              disabled={isSubmitting}
+              disabled={submitting}
               className="bg-purple-600 text-white py-2 w-full rounded-lg mt-12 text-xl hover:bg-purple-700"
             >
               {submitting ? "Logining...." : "Login"}
