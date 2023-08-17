@@ -27,11 +27,24 @@ function RegisterPage() {
       setIsSubmitting(true);
       const responseData = await AuthService.register(values);
       setIsSubmitting(false);
-      if (!responseData.error) {
-        setShowEmailVerification(true);
-        setIsVerifyingEmail(true);
 
-        setEmail(values.email);
+      if (responseData.status === "success") {
+        setIsSubmitting(true);
+        const responseData1 = await AuthService.sendVerificationCode({
+          email: values.email,
+        });
+        setIsSubmitting(false);
+
+        if (responseData1.status === "success") {
+          // console.log(responseData1);
+
+          setShowEmailVerification(true);
+          setIsVerifyingEmail(true);
+
+          setEmail(values.email);
+        } else {
+          setError(responseData.error);
+        }
       } else {
         setError(responseData.error);
       }
@@ -40,28 +53,10 @@ function RegisterPage() {
     }
   };
 
-  const handleSubmitCode = async (code) => {
-    try {
-      const responseData = await AuthService.verifyEmail({
-        email: email,
-        verification_code: code,
-      });
-
-      if (!responseData.error) {
-        setShowEmailVerification(false);
-        setIsVerifyingEmail(false);
-        setIsVerified(true);
-      } else {
-        setShowEmailVerification(true);
-        setError(responseData.message);
-      }
-    } catch (error) {
-      setError(error.error);
-    }
-  };
-
-  const handleAccept = () => {
-    navigate("/login");
+  const handleVerifySuccess = () => {
+    setShowEmailVerification(false);
+    setIsVerifyingEmail(false);
+    setIsVerified(true);
   };
 
   return (
@@ -74,16 +69,13 @@ function RegisterPage() {
       />
       {showEmailVerification && (
         <EmailVerification
-          handleSubmit={handleSubmitCode}
-          setShow={setShowEmailVerification}
-          error={error}
+          onSuccess={handleVerifySuccess}
+          onClose={() => setShowEmailVerification(false)}
+          email={email}
         />
       )}
       {isVerified && (
-        <SuccessfulVerification
-          handleAccept={handleAccept}
-          setShow={setIsVerified}
-        />
+        <SuccessfulVerification onClose={() => setIsVerified(false)} />
       )}
     </LoginRegisterLayout>
   );

@@ -813,6 +813,10 @@ video {
   max-width: 48rem;
 }
 
+.max-w-2xl {
+  max-width: 42rem;
+}
+
 .flex-auto {
   flex: 1 1 auto;
 }
@@ -1179,10 +1183,6 @@ video {
   line-height: 1.25;
 }
 
-.tracking-wider {
-  letter-spacing: 0.05em;
-}
-
 .text-black {
   --tw-text-opacity: 1;
   color: rgb(0 0 0 / var(--tw-text-opacity));
@@ -1191,6 +1191,11 @@ video {
 .text-blue-400 {
   --tw-text-opacity: 1;
   color: rgb(96 165 250 / var(--tw-text-opacity));
+}
+
+.text-blue-700 {
+  --tw-text-opacity: 1;
+  color: rgb(29 78 216 / var(--tw-text-opacity));
 }
 
 .text-gray-500 {

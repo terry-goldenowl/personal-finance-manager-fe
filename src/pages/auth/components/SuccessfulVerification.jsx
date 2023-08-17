@@ -1,12 +1,15 @@
 import React from "react";
 import Modal from "../../../components/modal/Modal";
+import { useNavigate } from "react-router";
 
-function SuccessfulVerification({ handleAccept, setShow }) {
+function SuccessfulVerification({ onAccept, onClose }) {
+  const navigate = useNavigate();
+
   return (
     <Modal
       title={"Email verification successfully"}
-      onAccept={handleAccept}
-      setIsShown={setShow}
+      onAccept={onAccept}
+      onClose={onClose}
     >
       <p>Your email is verified! Please login to continue.</p>
     </Modal>

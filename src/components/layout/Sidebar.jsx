@@ -9,7 +9,7 @@ import expenses from "../../assets/images/spending.png";
 import avatar from "../../assets/images/profile.png";
 import AccountPopup from "./AccountPopup";
 
-function Sidebar() {
+function Sidebar({ onLogout }) {
   const [isAccountPopupShown, setIsAccountPopupShown] = useState(false);
 
   return (
@@ -23,7 +23,10 @@ function Sidebar() {
             <FontAwesomeIcon icon={faEllipsis} />
           </button>
           {isAccountPopupShown && (
-            <AccountPopup setIsShown={setIsAccountPopupShown} />
+            <AccountPopup
+              setIsShown={setIsAccountPopupShown}
+              onLogout={onLogout}
+            />
           )}
         </div>
 
