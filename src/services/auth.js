@@ -1,27 +1,22 @@
 import axios from "axios";
+import instance, { notAuthInstance } from "../utils/axiosConfig";
 
 export default class AuthService {
   static async register(data) {
-    const response = await axios.post(
-      process.env.REACT_APP_API_URL + "/register",
-      data
-    );
+    const response = await notAuthInstance.post("/register", data);
 
     return response.data;
   }
 
   static async verifyEmail(data) {
-    const response = await axios.post(
-      process.env.REACT_APP_API_URL + "/verify",
-      data
-    );
+    const response = await notAuthInstance.post("/verify", data);
 
     return response.data;
   }
 
   static async sendVerificationCode(data) {
-    const response = await axios.post(
-      process.env.REACT_APP_API_URL + "/send-verification-code",
+    const response = await notAuthInstance.post(
+      "/send-verification-code",
       data
     );
 
@@ -29,28 +24,25 @@ export default class AuthService {
   }
 
   static async login(data) {
-    const response = await axios.post(
-      process.env.REACT_APP_API_URL + "/login",
-      data
-    );
+    const response = await notAuthInstance.post("/login", data);
 
     return response.data;
   }
 
   static async forgetPassword(data) {
-    const response = await axios.post(
-      process.env.REACT_APP_API_URL + "/forget-password",
-      data
-    );
+    const response = await notAuthInstance.post("/forget-password", data);
 
     return response.data;
   }
 
   static async resetPassword(data) {
-    const response = await axios.post(
-      process.env.REACT_APP_API_URL + "/reset-password",
-      data
-    );
+    const response = await notAuthInstance.post("/reset-password", data);
+
+    return response.data;
+  }
+
+  static async logout() {
+    const response = await instance.post("/logout");
 
     return response.data;
   }

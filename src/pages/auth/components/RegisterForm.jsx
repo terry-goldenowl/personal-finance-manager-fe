@@ -1,7 +1,7 @@
 import React from "react";
 import { Formik } from "formik";
-import AuthInput from "./AuthInput";
 import { useNavigate } from "react-router";
+import Input from "../../../components/elements/Input";
 
 function RegisterForm({ onSubmit, submitting, error, setError }) {
   const navigate = useNavigate();
@@ -57,7 +57,7 @@ function RegisterForm({ onSubmit, submitting, error, setError }) {
           isSubmitting,
         }) => (
           <form onSubmit={handleSubmit} className="mt-6" method="post">
-            <AuthInput
+            <Input
               type={"name"}
               name={"name"}
               onChange={handleChange}
@@ -69,7 +69,7 @@ function RegisterForm({ onSubmit, submitting, error, setError }) {
                 (error && error.name)
               }
             />
-            <AuthInput
+            <Input
               type={"email"}
               name={"email"}
               onChange={handleChange}
@@ -82,7 +82,7 @@ function RegisterForm({ onSubmit, submitting, error, setError }) {
               }
             />
 
-            <AuthInput
+            <Input
               type={"password"}
               name={"password"}
               onChange={handleChange}
@@ -94,7 +94,7 @@ function RegisterForm({ onSubmit, submitting, error, setError }) {
                 (error && error.password)
               }
             />
-            <AuthInput
+            <Input
               type={"password"}
               name={"password_confirmation"}
               onChange={handleChange}

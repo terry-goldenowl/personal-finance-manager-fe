@@ -25,7 +25,7 @@ function LoginRegisterLayout({ children }) {
           <img src={logo} alt="" width={70} height={70} />
           <img src={logoText} alt="" style={{ height: 50 }} />
         </div>
-        <div className="mb-4 bg-purple-400 py-5 px-12 rounded-tr-full rounded-br-full relative">
+        <div className="mb-4 w-full bg-purple-400 py-5 px-12 rounded-tr-full rounded-br-full relative">
           <h2 className="w-full text-4xl text-white mb-2 leading-tight">
             We help you to manage your finance efficiently!
           </h2>

@@ -3,6 +3,7 @@ import { Formik } from "formik";
 import AuthInput from "./AuthInput";
 import { useNavigate } from "react-router";
 import AuthService from "../../../services/auth";
+import Input from "../../../components/elements/Input";
 
 function LoginForm({ onForgetting, onLogin, onVerify, submitting, error }) {
   const navigate = useNavigate();
@@ -12,11 +13,8 @@ function LoginForm({ onForgetting, onLogin, onVerify, submitting, error }) {
       <h2 className="text-purple-500 text-3xl text-center mb-6">Login</h2>
       <div className="flex gap-2 items-center mt-3">
         {error && <p className="text-red-500">{error}</p>}
-        {error === "Email hasn't been verified yet!" && (
-          <button
-            className="text-blue-700 hover:underline"
-            onClick={onVerify}
-          >
+        {error && error.includes("verified") && (
+          <button className="text-blue-700 hover:underline" onClick={onVerify}>
             Verify now
           </button>
         )}
@@ -58,7 +56,7 @@ function LoginForm({ onForgetting, onLogin, onVerify, submitting, error }) {
           isSubmitting,
         }) => (
           <form onSubmit={handleSubmit} className="mt-3" method="post">
-            <AuthInput
+            <Input
               type={"email"}
               name={"email"}
               onChange={handleChange}
@@ -68,7 +66,7 @@ function LoginForm({ onForgetting, onLogin, onVerify, submitting, error }) {
               error={errors.email && touched.email && errors.email}
             />
 
-            <AuthInput
+            <Input
               type={"password"}
               name={"password"}
               onChange={handleChange}
