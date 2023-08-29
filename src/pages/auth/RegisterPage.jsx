@@ -75,7 +75,10 @@ function RegisterPage() {
         />
       )}
       {isVerified && (
-        <SuccessfulVerification onClose={() => setIsVerified(false)} />
+        <SuccessfulVerification
+          onAccept={() => navigate("/login")}
+          onClose={() => setIsVerified(false)}
+        />
       )}
     </LoginRegisterLayout>
   );

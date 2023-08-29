@@ -3,8 +3,6 @@ import Modal from "../../../components/modal/Modal";
 import { useNavigate } from "react-router";
 
 function SuccessfulVerification({ onAccept, onClose }) {
-  const navigate = useNavigate();
-
   return (
     <Modal
       title={"Email verification successfully"}
