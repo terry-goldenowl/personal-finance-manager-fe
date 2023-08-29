@@ -31,7 +31,7 @@ function TransactionItem({ transaction, index, onModifySuccess }) {
       >
         <div className="w-16 h-16 overflow-hidden rounded-md shadow-sm">
           <img
-            src={transaction.category.image}
+            src={process.env.REACT_APP_API_HOST + transaction.category.image}
             alt=""
             className="object-cover w-full h-full"
           />
@@ -78,7 +78,9 @@ function TransactionItem({ transaction, index, onModifySuccess }) {
           onClose={() => {
             setIsDeleting(false);
           }}
-          name={"category"}
+          message={
+            "Are you sure to delete this transaction? This action can not be undone!"
+          }
         />
       )}
     </>

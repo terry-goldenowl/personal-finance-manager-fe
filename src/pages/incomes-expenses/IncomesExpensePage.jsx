@@ -101,14 +101,14 @@ function IncomesExpensePage() {
             id="hovering-block"
           ></div> */}
           <button
-            className="py-2 text-center rounded-xl font-semibold bg-purple-500 text-white px-8 hover:bg-purple-600 z-10"
+            className="py-2 text-center rounded-xl font-semibold bg-purple-500 text-white px-8 hover:bg-purple-600"
             id="add-expense-btn"
             onClick={() => handleClickAddTx("expenses")}
           >
             Add expense
           </button>
           <button
-            className="py-2 px-8 rounded-xl font-semibold text-purple-600 z-10"
+            className="py-2 px-8 rounded-xl font-semibold text-purple-600"
             id="add-income-btn"
             onClick={() => handleClickAddTx("incomes")}
           >
