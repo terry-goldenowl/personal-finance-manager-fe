@@ -9,6 +9,7 @@ import ProtectedRoute from "./components/routes/ProtectedRoute";
 import GuessRoute from "./components/routes/GuessRoute";
 import IncomesExpensePage from "./pages/incomes-expenses/IncomesExpensePage";
 import ReportsPage from "./pages/reports/ReportsPage";
+import CategoriesPage from "./pages/categories/CategoriesPage";
 
 function App() {
   const router = createBrowserRouter([
@@ -26,6 +27,10 @@ function App() {
             {
               path: "/reports",
               element: <ReportsPage />,
+            },
+            {
+              path: "/categories",
+              element: <CategoriesPage />,
             },
           ],
         },

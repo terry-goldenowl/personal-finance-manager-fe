@@ -6,6 +6,8 @@ import CategoriesService from "../../../services/categories";
 import Input from "../../../components/elements/Input";
 import format from "date-fns/format";
 import TransactionsService from "../../../services/transactions";
+import { motion } from "framer-motion";
+import ImageChoserPreview from "../../../components/others/ImageChoserPreview";
 
 function AddTransaction({
   isAdding,
@@ -26,7 +28,6 @@ function AddTransaction({
   const [date, setDate] = useState(new Date());
   const [description, setDescription] = useState("");
   const [errors, setErrors] = useState(null);
-  const [preview, setPreview] = useState();
 
   useEffect(() => {
     getWallets();
@@ -35,9 +36,11 @@ function AddTransaction({
 
   useEffect(() => {
     if (transaction) {
+      console.log(categories);
+      console.log(transaction);
       setCategorySelected(
         categories.length > 0 &&
-          categories.find((cate) => cate.id == transaction.category_id)
+          categories.find((cate) => cate.name == transaction.category.name)
       );
       setWalletSelected(
         wallets.length > 0 &&
@@ -47,7 +50,6 @@ function AddTransaction({
       setAmount(transaction.amount);
       setDate(new Date(transaction.date));
       setDescription(transaction.description || "");
-      setPreview(process.env.REACT_APP_API_HOST + transaction.image);
     } else {
       setWalletSelected(
         wallets.find((wallet) => wallet.default == 1) || wallets[0]
@@ -66,7 +68,7 @@ function AddTransaction({
     setCategories(data.data.categories);
   };
 
-  const saveTransaction = async (type) => {
+  const saveTransaction = async (action) => {
     setErrors(null);
 
     if (!title || title.length === 0) {
@@ -93,7 +95,7 @@ function AddTransaction({
       };
 
       let responseData;
-      if (type === "create") {
+      if (action === "create") {
         responseData = await TransactionsService.createTransaction(data);
       } else {
         responseData = await TransactionsService.updateTransaction(
@@ -119,39 +121,6 @@ function AddTransaction({
   const handleCancel = () => {
     // ...
     setIsAdding(false);
-  };
-
-  const handleFileChange = (event) => {
-    // CLEAR ANY PHOTO STATE BEFORE
-    setPhoto(null);
-
-    const file = event.target.files[0];
-
-    setErrors((prev) => {
-      if (prev && prev.image) delete prev.image;
-      return prev;
-    });
-
-    if (file) {
-      const fileName = file.name;
-      const fileExtension = fileName.split(".").pop().toLowerCase();
-      const imageExtensions = ["jpg", "jpeg", "png", "gif"];
-
-      if (!imageExtensions.includes(fileExtension)) {
-        setPreview(null);
-        setErrors((prev) => {
-          return { ...prev, image: "Must be an image!" };
-        });
-        return;
-      }
-
-      setPhoto(file);
-
-      const objectUrl = URL.createObjectURL(file);
-      setPreview(objectUrl);
-
-      return () => URL.revokeObjectURL(objectUrl);
-    }
   };
 
   const handleUpdateTransaction = async () => {
@@ -181,9 +150,18 @@ function AddTransaction({
                 setSelected={setWalletSelected}
               />
               <SelectWithImage
-                data={categories}
+                data={categories.map((category) => {
+                  return {
+                    ...category,
+                    image: process.env.REACT_APP_API_HOST + category.image,
+                  };
+                })}
                 label={"Category"}
-                selected={categorySelected}
+                selected={{
+                  ...categorySelected,
+                  image:
+                    process.env.REACT_APP_API_HOST + categorySelected?.image,
+                }}
                 setSelected={setCategorySelected}
               />
               <Input
@@ -216,23 +194,16 @@ function AddTransaction({
 
             {/* RIGHT SIDE INPUTS (OPTIONAL)*/}
             <div className="p-3 w-1/2">
-              {/* PHOTO PICKER */}
-              <Input
-                label={"Image"}
-                type={"file"}
-                name={"image"}
-                size="small"
-                accept={"image/*"}
-                onChange={handleFileChange}
-                error={(errors && errors.image) || null}
+              <ImageChoserPreview
+                setImage={setPhoto}
+                errors={errors}
+                setErrors={setErrors}
+                defaultPreview={
+                  transaction
+                    ? process.env.REACT_APP_API_HOST + transaction.image
+                    : ""
+                }
               />
-
-              {/* PHOTO PREVIEW */}
-              {preview && (
-                <div className="rounded-lg overflow-hidden mb-3 max-h-56">
-                  <img src={preview} alt="" className="object-cover" />
-                </div>
-              )}
 
               {/* DESCRIPTION */}
               <div>
@@ -255,7 +226,7 @@ function AddTransaction({
         {/*FOOTER*/}
         <div
           className={
-            "flex items-center p-6 border-t border-solid border-slate-200 rounded-b " +
+            "flex items-center px-6 py-4 border-t border-solid border-slate-200 rounded-b " +
             (transaction ? "justify-between" : "justify-end")
           }
         >

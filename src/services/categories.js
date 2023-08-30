@@ -6,4 +6,34 @@ export default class CategoriesService {
 
     return responseData.data;
   }
+
+  static async createCategory(data) {
+    const responseData = await instance.post("/categories", data, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+
+    return responseData.data;
+  }
+
+  static async updateCategory(data, id) {
+    const responseData = await instance.post(
+      "/categories/" + id + "?_method=PATCH",
+      data,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      }
+    );
+
+    return responseData.data;
+  }
+
+  static async deleteCategory(id) {
+    const responseData = await instance.delete("/categories/" + id);
+
+    return responseData.data;
+  }
 }
