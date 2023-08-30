@@ -3,6 +3,7 @@ import CategoriesService from "../../services/categories";
 import DefaultCategories from "./components/DefaultCategories";
 import UserCategories from "./components/UserCategories";
 import AddCategories from "./components/AddCategories";
+import { toast } from "react-toastify";
 
 function CategoriesPage() {
   const [defaultCategories, setDefaultCategories] = useState([]);
@@ -29,9 +30,14 @@ function CategoriesPage() {
     getUserCategories();
   }, []);
 
-  const handleUpdateSuccess = async () => {
+  const handleUpdateSuccess = async (action) => {
     setisAddingCategory(false);
     getUserCategories();
+
+    toast.success("Category is " + action + "d successfully", {
+      position: toast.POSITION.TOP_CENTER,
+      autoClose: 4000,
+    });
   };
 
   return (

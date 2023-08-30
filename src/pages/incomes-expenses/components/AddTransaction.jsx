@@ -8,6 +8,8 @@ import format from "date-fns/format";
 import TransactionsService from "../../../services/transactions";
 import { motion } from "framer-motion";
 import ImageChoserPreview from "../../../components/others/ImageChoserPreview";
+import { toast } from "react-toastify";
+import formatCurrency from "../../../utils/currencyFormatter";
 
 function AddTransaction({
   isAdding,
@@ -23,7 +25,8 @@ function AddTransaction({
   const [categorySelected, setCategorySelected] = useState({});
   const [walletSelected, setWalletSelected] = useState({});
   const [title, setTitle] = useState("");
-  const [amount, setAmount] = useState(0);
+  const [amount, setAmount] = useState();
+  const [formattedAmount, setFormattedAmount] = useState("");
   const [photo, setPhoto] = useState(null);
   const [date, setDate] = useState(new Date());
   const [description, setDescription] = useState("");
@@ -36,8 +39,6 @@ function AddTransaction({
 
   useEffect(() => {
     if (transaction) {
-      console.log(categories);
-      console.log(transaction);
       setCategorySelected(
         categories.length > 0 &&
           categories.find((cate) => cate.name == transaction.category.name)
@@ -68,7 +69,7 @@ function AddTransaction({
     setCategories(data.data.categories);
   };
 
-  const saveTransaction = async (action) => {
+  const saveTransaction = async () => {
     setErrors(null);
 
     if (!title || title.length === 0) {
@@ -95,7 +96,7 @@ function AddTransaction({
       };
 
       let responseData;
-      if (action === "create") {
+      if (!transaction) {
         responseData = await TransactionsService.createTransaction(data);
       } else {
         responseData = await TransactionsService.updateTransaction(
@@ -104,32 +105,41 @@ function AddTransaction({
         );
       }
 
-      console.log(responseData);
       if (responseData.status === "success") {
         setIsAdding(false);
-        onAddingSuccess();
+        onAddingSuccess(transaction ? "update" : "create");
       } else {
         setErrors(responseData.error);
       }
     }
   };
 
-  const handleAddTransaction = async () => {
-    saveTransaction("create");
-  };
-
   const handleCancel = () => {
-    // ...
     setIsAdding(false);
   };
 
-  const handleUpdateTransaction = async () => {
-    saveTransaction("update");
+  const handleAmountChange = (event) => {
+    setErrors((prev) => {
+      if (prev && prev.amount) delete prev.amount;
+      return prev;
+    });
+
+    const { value } = event.target;
+    const cleanAmount = value.replace(/[^0-9]/g, "");
+
+    if (value.length > 0 && isNaN(parseInt(value))) {
+      setErrors((prev) => {
+        return { ...prev, amount: "Invalid amount!" };
+      });
+    } else {
+      setFormattedAmount(cleanAmount.replace(/\B(?=(\d{3})+(?!\d))/g, ","));
+      setAmount(cleanAmount);
+    }
   };
 
   return (
     <>
-      <ModalWithNothing onClose={handleCancel}>
+      <ModalWithNothing onClose={handleCancel} width={"w-1/2"}>
         {/*HEADER*/}
         <div className="flex items-start justify-center p-5 border-b border-solid border-slate-200 rounded-t max-h-screen">
           <h3 className="text-2xl text-center">
@@ -148,6 +158,7 @@ function AddTransaction({
                 label={"Wallets"}
                 selected={walletSelected}
                 setSelected={setWalletSelected}
+                required
               />
               <SelectWithImage
                 data={categories.map((category) => {
@@ -163,6 +174,7 @@ function AddTransaction({
                     process.env.REACT_APP_API_HOST + categorySelected?.image,
                 }}
                 setSelected={setCategorySelected}
+                required
               />
               <Input
                 label={"Title"}
@@ -171,15 +183,17 @@ function AddTransaction({
                 size="small"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
+                required
                 error={(errors && errors.title) || null}
               />
               <Input
                 label={"Amount"}
-                type={"number"}
+                type={"text"}
                 name={"amount"}
                 size="small"
-                value={amount}
-                onChange={(e) => setAmount(e.target.value)}
+                value={formattedAmount}
+                onChange={handleAmountChange}
+                required
                 error={(errors && errors.amount) || null}
               />
               <Input
@@ -189,12 +203,14 @@ function AddTransaction({
                 size="small"
                 value={format(new Date(date), "yyyy-MM-dd")}
                 onChange={(e) => setDate(e.target.value)}
+                required
               />
             </div>
 
             {/* RIGHT SIDE INPUTS (OPTIONAL)*/}
             <div className="p-3 w-1/2">
               <ImageChoserPreview
+                image={photo}
                 setImage={setPhoto}
                 errors={errors}
                 setErrors={setErrors}
@@ -251,9 +267,7 @@ function AddTransaction({
             <button
               className="bg-purple-500 text-white active:bg-purple-600 font-bold uppercase text-sm px-6 py-2 rounded-full shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
               type="button"
-              onClick={
-                !transaction ? handleAddTransaction : handleUpdateTransaction
-              }
+              onClick={saveTransaction}
             >
               {!transaction ? "Add transaction" : "Update transaction"}
             </button>

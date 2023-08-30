@@ -19,11 +19,13 @@ function AddCategories({ onClose, onAddSuccess, category = null }) {
   useEffect(() => {
     if (category) {
       setName(category.name);
-      setType(types.find((t) => (t.name === category.type)));
+      setType(types.find((t) => t.name === category.type));
     }
   }, []);
 
   const saveCategory = async () => {
+    setErrors(null);
+
     if (name.length === 0) {
       setErrors((prev) => {
         return { ...prev, name: "Name is required!" };
@@ -53,7 +55,7 @@ function AddCategories({ onClose, onAddSuccess, category = null }) {
       }
 
       if (responseData.status === "success") {
-        onAddSuccess();
+        onAddSuccess(category ? "update" : "create");
       } else {
         setErrors(responseData.error);
       }
@@ -75,6 +77,7 @@ function AddCategories({ onClose, onAddSuccess, category = null }) {
           value={name}
           onChange={(e) => setName(e.target.value)}
           error={(errors && errors.name) || null}
+          required
         />
 
         <Select
@@ -82,6 +85,7 @@ function AddCategories({ onClose, onAddSuccess, category = null }) {
           selected={type}
           setSelected={setType}
           data={types}
+          required
         />
 
         <ImageChoserPreview
@@ -92,6 +96,7 @@ function AddCategories({ onClose, onAddSuccess, category = null }) {
           defaultPreview={
             category && process.env.REACT_APP_API_HOST + category.image
           }
+          required
         />
       </div>
     </Modal>

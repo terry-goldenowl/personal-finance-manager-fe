@@ -12,6 +12,7 @@ function Input({
   size = "medium",
   placeholder = "",
   accept = "*",
+  required = null,
 }) {
   const sizeStyle =
     size === "medium"
@@ -20,7 +21,11 @@ function Input({
 
   return (
     <div className="mb-3">
-      {label && <label htmlFor={name}>{label}</label>}
+      {label && (
+        <label htmlFor={name} className="flex items-center">
+          {label} <span className="text-red-600 text-2xl">{required && "*"}</span>
+        </label>
+      )}
 
       <input
         type={type}

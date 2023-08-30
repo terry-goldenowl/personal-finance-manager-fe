@@ -1,19 +1,20 @@
 import React, { useState } from "react";
 import Input from "../elements/Input";
+import { FileUploader } from "react-drag-drop-files";
 
 function ImageChoserPreview({
+  image,
   setImage,
   errors,
   setErrors,
   defaultPreview = "",
+  required,
 }) {
   const [preview, setPreview] = useState(defaultPreview);
 
-  const handleFileChange = (event) => {
+  const handleFileChange = (file) => {
     // CLEAR ANY PHOTO STATE BEFORE
     setImage(null);
-
-    const file = event.target.files[0];
 
     setErrors((prev) => {
       if (prev && prev.image) delete prev.image;
@@ -44,15 +45,26 @@ function ImageChoserPreview({
 
   return (
     <>
-      <Input
-        label={"Image"}
-        type={"file"}
-        name={"image"}
-        size="small"
-        accept={"image/*"}
-        onChange={handleFileChange}
-        error={(errors && errors.image) || null}
-      />
+      <div className="mb-3">
+        <label htmlFor={"image"} className="flex items-center">
+          Image <span className="text-red-600 text-2xl">{required && "*"}</span>
+        </label>
+
+        <FileUploader
+          multiple={false}
+          handleChange={handleFileChange}
+          name="image"
+          types={["JPG", "JPEG", "PNG", "GIF"]}
+        />
+
+        <p className="text-red-500 text-end italic text-sm mt-1">
+          {errors && errors.image}
+        </p>
+
+        <p className="text-xs">
+          {image ? `File name: ${image.name}` : "No files uploaded yet"}
+        </p>
+      </div>
 
       {/* PHOTO PREVIEW */}
       {preview && (

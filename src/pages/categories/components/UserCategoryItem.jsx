@@ -16,7 +16,7 @@ function UserCategoryItem({ category, onUpdateSuccess }) {
     const data = await CategoriesService.deleteCategory(category.id);
     if (data.status === "success") {
       setisDeletingCategory(false);
-      onUpdateSuccess();
+      onUpdateSuccess("delete");
     }
   };
 
@@ -70,8 +70,8 @@ function UserCategoryItem({ category, onUpdateSuccess }) {
       {isUpdatingCategory && (
         <AddCategories
           onClose={() => setisUpdatingCategory(false)}
-          onAddSuccess={() => {
-            onUpdateSuccess();
+          onAddSuccess={(action) => {
+            onUpdateSuccess(action);
             setisUpdatingCategory(false);
           }}
           category={category}
