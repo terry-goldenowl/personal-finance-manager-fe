@@ -3,7 +3,7 @@ import {
   faChevronRight,
   faStar,
 } from "@fortawesome/free-solid-svg-icons";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import formatCurrency from "../../../utils/currencyFormatter";
 import {
   CircularProgressbarWithChildren,
@@ -11,15 +11,43 @@ import {
 } from "react-circular-progressbar";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { formatMonth } from "../../../utils/dateFormatter";
+import PlansService from "../../../services/plans";
+import AddMonthPlan from "../../plans/components/AddMonthPlan";
 
 function Report({ month, year, decreaseMonth, increaseMonth, report }) {
-  let percentage;
+  const [plan, setPlan] = useState();
+  const [isAddingPlan, setIsAddingPlan] = useState(false);
+
+  const getPlan = async () => {
+    const responseData = await PlansService.getPlans({
+      type: "month",
+      month,
+      year,
+    });
+
+    if (responseData.status === "success") {
+      if (responseData.data.plans.length > 0)
+        setPlan(responseData.data.plans[0]);
+      else setPlan(null);
+    }
+  };
+
+  useEffect(() => {
+    getPlan();
+  }, [month, year]);
+
+  let percentageReport;
   if (report) {
     if (report.incomes === 0) {
-      percentage = 100;
+      percentageReport = 100;
     } else {
-      percentage = (report.expenses / report.incomes) * 100;
+      percentageReport = Math.round((report.expenses / report.incomes) * 100);
     }
+  }
+
+  let percentagePlan;
+  if (report && plan) {
+    percentagePlan = Math.round((report.expenses / plan.amount) * 100);
   }
 
   return (
@@ -66,7 +94,7 @@ function Report({ month, year, decreaseMonth, increaseMonth, report }) {
           <div className="flex flex-col items-center justify-center mb-6">
             <div className="w-72 mb-4">
               <CircularProgressbarWithChildren
-                value={percentage}
+                value={percentageReport}
                 counterClockwise={true}
                 styles={buildStyles({
                   pathColor: "#F97315",
@@ -78,7 +106,7 @@ function Report({ month, year, decreaseMonth, increaseMonth, report }) {
                   className="w-32 h-32"
                   src="https://png.pngtree.com/png-vector/20190411/ourlarge/pngtree-vector-wallet-icon-png-image_924644.jpg"
                 />
-                <p className="text-3xl">{Math.floor(percentage) + "%"}</p>
+                <p className="text-3xl">{percentageReport + "%"}</p>
               </CircularProgressbarWithChildren>
             </div>
             <p className="text-xl">
@@ -90,12 +118,45 @@ function Report({ month, year, decreaseMonth, increaseMonth, report }) {
           </div>
 
           <div className="text-center flex flex-col items-center">
+            {!plan && (
+              <button
+                className="py-2 px-8 rounded-lg bg-transparent text-purple-500 font-semibold hover:bg-white mb-3"
+                onClick={() => setIsAddingPlan(true)}
+              >
+                Set up plan for this month
+              </button>
+            )}
+            {plan && (
+              <div className="mb-3 bg-purple-200 rounded-xl py-2 px-4">
+                <div className="mb-2 flex justify-between items-end">
+                  <p className="text-md text-start">
+                    Your budget for this month:{" "}
+                    <span className="font-bold text-xl">
+                      {formatCurrency(plan.amount)}
+                    </span>
+                  </p>
+                  <p className="text-md text-end">
+                    Budget left until 31 August:{" "}
+                    <span className="font-bold text-xl">
+                      {formatCurrency(plan.amount - report.expenses)}
+                    </span>
+                  </p>
+                </div>
+                <div className="flex gap-3 items-center">
+                  <div className="h-3 bg-white rounded-full grow shadow-sm">
+                    <div
+                      className="h-full bg-purple-500 rounded-full"
+                      style={{ width: percentagePlan + "%" }}
+                    ></div>
+                  </div>
+                  <p className="text-xl text-purple-500 font-bold">
+                    {percentagePlan + "%"}
+                  </p>
+                </div>
+              </div>
+            )}
             <button className="py-2 px-8 rounded-lg bg-purple-500 text-white text-sm font-semibold uppercase mb-3 hover:bg-purple-600">
               View report
-            </button>
-
-            <button className="py-2 px-8 rounded-lg bg-transparent text-purple-500 font-semibold hover:bg-white">
-              Set up plan for this month
             </button>
           </div>
         </>
@@ -107,6 +168,15 @@ function Report({ month, year, decreaseMonth, increaseMonth, report }) {
             You didn't make any transactions in this period!
           </p>
         </>
+      )}
+
+      {isAddingPlan && (
+        <AddMonthPlan
+          onClose={() => setIsAddingPlan(false)}
+          onAddingSuccess={() => getPlan()}
+          _month={month}
+          _year={year}
+        />
       )}
     </div>
   );

@@ -24,7 +24,7 @@ function Layout() {
       <div className="grow min-h-screen h-fit">
         <Outlet />
       </div>
-      <ToastContainer />
+      <ToastContainer position="top-center" autoClose="4000" />
     </div>
   );
 }

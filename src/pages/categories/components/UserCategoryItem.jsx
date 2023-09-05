@@ -1,15 +1,40 @@
 import { faPen, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { motion } from "framer-motion";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import IconButton from "../../../components/elements/IconButton";
 import AddCategories from "./AddCategories";
 import ConfirmDeleteModal from "../../../components/modal/ConfirmDeleteModal";
 import CategoriesService from "../../../services/categories";
+import PlansService from "../../../services/plans";
+import AddCategoryPlan from "../../plans/components/AddCategoryPlan";
+import AdjustBudget from "../../plans/components/AdjustBudget";
 
 function UserCategoryItem({ category, onUpdateSuccess }) {
   const [isHover, setIsHover] = useState(false);
   const [isUpdatingCategory, setisUpdatingCategory] = useState(false);
   const [isDeletingCategory, setisDeletingCategory] = useState(false);
+  const [isAddingPlan, setIsAddingPlan] = useState(false);
+  const [isAdjustingPlan, setIsAdjustingPlan] = useState(false);
+  const [plan, setPlan] = useState();
+
+  const getPlan = async () => {
+    const responseData = await PlansService.getPlans({
+      type: "categories",
+      month: new Date().getMonth() + 1,
+      year: new Date().getFullYear(),
+      category_id: category.id,
+    });
+
+    if (responseData.status === "success") {
+      if (responseData.data.plans.length > 0)
+        setPlan(responseData.data.plans[0]);
+      else setPlan(null);
+    }
+  };
+
+  useEffect(() => {
+    getPlan();
+  }, []);
 
   const handleDeleteCategory = async () => {
     // Send request
@@ -38,7 +63,7 @@ function UserCategoryItem({ category, onUpdateSuccess }) {
       </div>
 
       <div className="flex justify-end grow items-center gap-1">
-        {isHover && (
+        {isHover && category.type === "expenses" && (
           <motion.div
             initial={{ rotate: -90, scale: 0 }}
             animate={{ rotate: 0, scale: 1 }}
@@ -46,9 +71,28 @@ function UserCategoryItem({ category, onUpdateSuccess }) {
               type: "spring",
             }}
           >
-            <button className="bg-blue-600 text-white py-1 px-4 rounded-xl shadow-sm shadow-blue-300 text-sm">
-              Set plan this month
-            </button>
+            {!plan && (
+              <button
+                className="bg-blue-600 text-white py-1 px-4 rounded-xl shadow-sm shadow-blue-300 text-sm"
+                onClick={() => {
+                  setIsAddingPlan(true);
+                  setIsHover(false);
+                }}
+              >
+                Set plan this month
+              </button>
+            )}
+            {plan && (
+              <button
+                className="bg-blue-600 text-white py-1 px-4 rounded-xl shadow-sm shadow-blue-300 text-sm"
+                onClick={() => {
+                  setIsAdjustingPlan(true);
+                  setIsHover(false);
+                }}
+              >
+                Adjust plan this month
+              </button>
+            )}
           </motion.div>
         )}
         <IconButton
@@ -84,6 +128,22 @@ function UserCategoryItem({ category, onUpdateSuccess }) {
           }
           onAccept={handleDeleteCategory}
           onClose={() => setisDeletingCategory(false)}
+        />
+      )}
+      {isAddingPlan && (
+        <AddCategoryPlan
+          _month={new Date().getMonth() + 1}
+          _year={new Date().getFullYear()}
+          onClose={() => setIsAddingPlan(false)}
+          category={category}
+          onUpdateSuccess={() => getPlan()}
+        />
+      )}
+      {isAdjustingPlan && (
+        <AdjustBudget
+          plan={plan}
+          onClose={() => setIsAdjustingPlan(false)}
+          onUpdateSuccess={() => getPlan()}
         />
       )}
     </div>

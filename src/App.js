@@ -10,6 +10,7 @@ import GuessRoute from "./components/routes/GuessRoute";
 import IncomesExpensePage from "./pages/incomes-expenses/IncomesExpensePage";
 import ReportsPage from "./pages/reports/ReportsPage";
 import CategoriesPage from "./pages/categories/CategoriesPage";
+import PlansPage from "./pages/plans/PlansPage";
 
 function App() {
   const router = createBrowserRouter([
@@ -31,6 +32,10 @@ function App() {
             {
               path: "/categories",
               element: <CategoriesPage />,
+            },
+            {
+              path: "/plans",
+              element: <PlansPage />,
             },
           ],
         },

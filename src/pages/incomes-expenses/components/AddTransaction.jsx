@@ -10,6 +10,10 @@ import { motion } from "framer-motion";
 import ImageChoserPreview from "../../../components/others/ImageChoserPreview";
 import { toast } from "react-toastify";
 import formatCurrency from "../../../utils/currencyFormatter";
+import ReportsService from "../../../services/reports";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faInfoCircle } from "@fortawesome/free-solid-svg-icons";
+import PlansService from "../../../services/plans";
 
 function AddTransaction({
   isAdding,
@@ -31,11 +35,19 @@ function AddTransaction({
   const [date, setDate] = useState(new Date());
   const [description, setDescription] = useState("");
   const [errors, setErrors] = useState(null);
+  const [currentTotalOfCategory, setCurrentTotalOfCategory] = useState(0);
+  const [plannedAmount, setPlannedAmount] = useState(null);
 
   useEffect(() => {
     getWallets();
     getCategories();
   }, []);
+
+  useEffect(() => {
+    if (categorySelected && walletSelected) {
+      getTotalOfCategory();
+    }
+  }, [walletSelected, categorySelected, date]);
 
   useEffect(() => {
     if (transaction) {
@@ -49,6 +61,9 @@ function AddTransaction({
       );
       setTitle(transaction.title);
       setAmount(transaction.amount);
+      setFormattedAmount(
+        (transaction.amount + "").replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+      );
       setDate(new Date(transaction.date));
       setDescription(transaction.description || "");
     } else {
@@ -67,6 +82,32 @@ function AddTransaction({
   const getCategories = async () => {
     const data = await CategoriesService.getCategories({ type });
     setCategories(data.data.categories);
+  };
+
+  const getTotalOfCategory = async () => {
+    const reportData = await ReportsService.getReports({
+      year: new Date(date).getFullYear(),
+      month: new Date(date).getMonth() + 1,
+      report_type: "categories",
+      wallet: walletSelected.id,
+    });
+
+    const planData = await PlansService.getPlans({
+      year: new Date(date).getFullYear(),
+      month: new Date(date).getMonth() + 1,
+      type: "category",
+      category_id: categorySelected.id,
+    });
+
+    if (reportData.data.reports[categorySelected.id + ""]) {
+      setCurrentTotalOfCategory(
+        reportData.data.reports[categorySelected.id + ""]
+      );
+    } else setCurrentTotalOfCategory(0);
+
+    if (planData.data.plans[0]) {
+      setPlannedAmount(planData.data.plans[0].amount);
+    } else setPlannedAmount(null);
   };
 
   const saveTransaction = async () => {
@@ -186,6 +227,23 @@ function AddTransaction({
                 required
                 error={(errors && errors.title) || null}
               />
+
+              {plannedAmount && (
+                <div className="flex items-center gap-2">
+                  <FontAwesomeIcon
+                    icon={faInfoCircle}
+                    className="text-blue-600"
+                  />
+                  <p className="text-sm text-blue-600 italic">
+                    As you planned, the remaining of expenses for this category
+                    this month is{" "}
+                    <span className="font-bold">
+                      {formatCurrency(plannedAmount - currentTotalOfCategory)}
+                    </span>
+                  </p>
+                </div>
+              )}
+
               <Input
                 label={"Amount"}
                 type={"text"}
