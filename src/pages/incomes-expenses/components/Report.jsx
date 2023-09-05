@@ -14,10 +14,12 @@ import { formatMonth } from "../../../utils/dateFormatter";
 
 function Report({ month, year, decreaseMonth, increaseMonth, report }) {
   let percentage;
-  if (report.incomes === 0) {
-    percentage = 100;
-  } else {
-    percentage = (report.expenses / report.incomes) * 100;
+  if (report) {
+    if (report.incomes === 0) {
+      percentage = 100;
+    } else {
+      percentage = (report.expenses / report.incomes) * 100;
+    }
   }
 
   return (

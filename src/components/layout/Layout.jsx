@@ -3,6 +3,7 @@ import Sidebar from "./Sidebar";
 import Cookies from "js-cookie";
 import { Outlet, useNavigate } from "react-router";
 import AuthService from "../../services/auth";
+import { ToastContainer } from "react-toastify";
 
 function Layout() {
   console.log(Cookies.get("user"));
@@ -23,6 +24,7 @@ function Layout() {
       <div className="grow min-h-screen h-fit">
         <Outlet />
       </div>
+      <ToastContainer />
     </div>
   );
 }

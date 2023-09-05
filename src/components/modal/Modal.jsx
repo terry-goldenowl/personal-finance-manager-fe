@@ -3,10 +3,10 @@ import { createPortal } from "react-dom";
 import ModalWithNothing from "./ModalWithNothing";
 import { motion } from "framer-motion";
 
-export default function Modal({ title, onAccept, onClose, children }) {
+export default function Modal({ title, onAccept, onClose, children, width }) {
   return createPortal(
     <div className="justify-center items-center flex overflow-x-hidden overflow-y-auto fixed inset-0 outline-none focus:outline-none">
-      <div className={"relative w-auto my-6 mx-auto max-w-2xl z-50"}>
+      <div className={"relative my-6 mx-auto max-w-2xl z-50 " + width}>
         {/*content*/}
         <motion.div
           initial={{ scaleX: 0, opacity: 0.5 }}

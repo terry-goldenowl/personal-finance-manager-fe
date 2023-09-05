@@ -4,6 +4,8 @@ import ReportsService from "../../services/reports";
 import AddTransaction from "./components/AddTransaction";
 import Report from "./components/Report";
 import RecentTransactions from "./components/RecentTransactions";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 function IncomesExpensePage() {
   const [transactions, setTransactions] = useState([]);
@@ -57,7 +59,6 @@ function IncomesExpensePage() {
       year,
       // wallet: 2,
     });
-
     setReport(responseData.data.reports[month + ""]);
   };
 
@@ -66,9 +67,14 @@ function IncomesExpensePage() {
     setTypeAddTx(type);
   };
 
-  const handleModifySuccess = () => {
+  const handleModifySuccess = (action) => {
     getTransactions();
     getReport();
+
+    toast.success("Transaction is " + action + "d successfully", {
+      position: toast.POSITION.TOP_CENTER,
+      autoClose: 4000,
+    });
   };
 
   useEffect(() => {

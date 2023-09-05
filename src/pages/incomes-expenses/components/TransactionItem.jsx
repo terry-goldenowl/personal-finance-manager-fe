@@ -4,6 +4,7 @@ import { shorten } from "../../../utils/stringFormatter";
 import AddTransaction from "./AddTransaction";
 import ConfirmDeleteModal from "../../../components/modal/ConfirmDeleteModal";
 import TransactionsService from "../../../services/transactions";
+import { toast } from "react-toastify";
 
 function TransactionItem({ transaction, index, onModifySuccess }) {
   const [isViewingDetail, setIsViewingDetail] = useState(false);
@@ -16,7 +17,7 @@ function TransactionItem({ transaction, index, onModifySuccess }) {
     if (data.status === "success") {
       setIsDeleting(false);
       setIsViewingDetail(false);
-      onModifySuccess();
+      onModifySuccess('delete');
     }
   };
 
