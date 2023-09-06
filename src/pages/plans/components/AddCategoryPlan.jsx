@@ -60,7 +60,9 @@ function AddCategoryPlan({
       report_type: "categories",
       // wallet: 2,
     });
-    setLastMonthValue(responseData.data.reports[categoryChosen.id + ""]);
+
+    if (responseData.data.reports[categoryChosen.name])
+      setLastMonthValue(responseData.data.reports[categoryChosen.name].amount);
   };
 
   useEffect(() => {

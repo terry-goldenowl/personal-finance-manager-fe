@@ -7,29 +7,9 @@ import PlansService from "../../../services/plans";
 import { toast } from "react-toastify";
 
 function MonthPlanItem({ monthPlan, onUpdateSuccess, onSeeCategoryPlans }) {
-  const [currentTotal, setCurrentTotal] = useState(0);
   const [isAdjusting, setIsAdjusting] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
-  const percentage = Math.round((currentTotal / monthPlan.amount) * 100);
-
-  const getTotal = async () => {
-    // Return a list of expenses and incomes of months
-    const responseData = await ReportsService.getReports({
-      year: monthPlan.year,
-      report_type: "expenses-incomes",
-      // wallet: 2,
-    });
-
-    if (responseData.data.reports[monthPlan.month + ""]) {
-      setCurrentTotal(responseData.data.reports[monthPlan.month + ""].expenses);
-    } else {
-      setCurrentTotal(0);
-    }
-  };
-
-  useEffect(() => {
-    getTotal();
-  }, []);
+  const [percentage, setPercentage] = useState();
 
   const handleClickSeeCategoryPlans = () => {
     onSeeCategoryPlans(monthPlan.month, monthPlan.year);
@@ -45,6 +25,14 @@ function MonthPlanItem({ monthPlan, onUpdateSuccess, onSeeCategoryPlans }) {
       toast.error(responseData.error);
     }
   };
+
+  useEffect(() => {
+    if (monthPlan.currentTotal) {
+      setPercentage(
+        Math.round((monthPlan.currentTotal / monthPlan.amount) * 100)
+      );
+    }
+  }, [monthPlan]);
 
   return (
     <div
@@ -89,7 +77,7 @@ function MonthPlanItem({ monthPlan, onUpdateSuccess, onSeeCategoryPlans }) {
           <p className="text-sm">
             Budget left until 31 August:{" "}
             <span className="font-bold text-xl">
-              {formatCurrency(monthPlan.amount - currentTotal)}
+              {formatCurrency(monthPlan.amount - monthPlan.currentTotal)}
             </span>
           </p>
         </div>

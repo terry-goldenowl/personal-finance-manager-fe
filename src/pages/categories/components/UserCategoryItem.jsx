@@ -16,14 +16,17 @@ function UserCategoryItem({ category, onUpdateSuccess }) {
   const [isAddingPlan, setIsAddingPlan] = useState(false);
   const [isAdjustingPlan, setIsAdjustingPlan] = useState(false);
   const [plan, setPlan] = useState();
+  const [loading, setLoading] = useState(false);
 
   const getPlan = async () => {
+    setLoading(true);
     const responseData = await PlansService.getPlans({
       type: "categories",
       month: new Date().getMonth() + 1,
       year: new Date().getFullYear(),
       category_id: category.id,
     });
+    setTimeout(() => setLoading(false), 200);
 
     if (responseData.status === "success") {
       if (responseData.data.plans.length > 0)
@@ -71,28 +74,17 @@ function UserCategoryItem({ category, onUpdateSuccess }) {
               type: "spring",
             }}
           >
-            {!plan && (
-              <button
-                className="bg-blue-600 text-white py-1 px-4 rounded-xl shadow-sm shadow-blue-300 text-sm"
-                onClick={() => {
-                  setIsAddingPlan(true);
-                  setIsHover(false);
-                }}
-              >
-                Set plan this month
-              </button>
-            )}
-            {plan && (
-              <button
-                className="bg-blue-600 text-white py-1 px-4 rounded-xl shadow-sm shadow-blue-300 text-sm"
-                onClick={() => {
-                  setIsAdjustingPlan(true);
-                  setIsHover(false);
-                }}
-              >
-                Adjust plan this month
-              </button>
-            )}
+            <button
+              className="bg-blue-600 text-white py-1 px-4 rounded-xl shadow-sm shadow-blue-300 text-sm"
+              onClick={() => {
+                !plan ? setIsAddingPlan(true) : setIsAdjustingPlan(true);
+                setIsHover(false);
+              }}
+            >
+              {loading && "Loading..."}
+              {!loading &&
+                (!plan ? "Set plan this month" : "Adjust plan this month")}
+            </button>
           </motion.div>
         )}
         <IconButton

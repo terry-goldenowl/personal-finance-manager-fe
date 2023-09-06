@@ -14,6 +14,7 @@ import ReportsService from "../../../services/reports";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faInfoCircle } from "@fortawesome/free-solid-svg-icons";
 import PlansService from "../../../services/plans";
+import Loading from "../../../components/others/Loading";
 
 function AddTransaction({
   isAdding,
@@ -37,6 +38,7 @@ function AddTransaction({
   const [errors, setErrors] = useState(null);
   const [currentTotalOfCategory, setCurrentTotalOfCategory] = useState(0);
   const [plannedAmount, setPlannedAmount] = useState(null);
+  const [loadingPlan, setLoadingPlan] = useState(false);
 
   useEffect(() => {
     getWallets();
@@ -85,6 +87,7 @@ function AddTransaction({
   };
 
   const getTotalOfCategory = async () => {
+    setLoadingPlan(true);
     const reportData = await ReportsService.getReports({
       year: new Date(date).getFullYear(),
       month: new Date(date).getMonth() + 1,
@@ -99,15 +102,17 @@ function AddTransaction({
       category_id: categorySelected.id,
     });
 
-    if (reportData.data.reports[categorySelected.id + ""]) {
+    if (reportData.data.reports[categorySelected.name]) {
       setCurrentTotalOfCategory(
-        reportData.data.reports[categorySelected.id + ""]
+        reportData.data.reports[categorySelected.name].amount
       );
     } else setCurrentTotalOfCategory(0);
 
     if (planData.data.plans[0]) {
       setPlannedAmount(planData.data.plans[0].amount);
     } else setPlannedAmount(null);
+    
+    setLoadingPlan(false);
   };
 
   const saveTransaction = async () => {
@@ -228,7 +233,8 @@ function AddTransaction({
                 error={(errors && errors.title) || null}
               />
 
-              {plannedAmount && (
+              {loadingPlan && <Loading size="small" />}
+              {!loadingPlan && plannedAmount && (
                 <div className="flex items-center gap-2">
                   <FontAwesomeIcon
                     icon={faInfoCircle}

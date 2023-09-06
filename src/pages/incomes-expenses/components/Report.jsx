@@ -13,10 +13,13 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { formatMonth } from "../../../utils/dateFormatter";
 import PlansService from "../../../services/plans";
 import AddMonthPlan from "../../plans/components/AddMonthPlan";
+import { useNavigate } from "react-router";
 
 function Report({ month, year, decreaseMonth, increaseMonth, report }) {
   const [plan, setPlan] = useState();
   const [isAddingPlan, setIsAddingPlan] = useState(false);
+
+  const navigate = useNavigate();
 
   const getPlan = async () => {
     const responseData = await PlansService.getPlans({
@@ -49,6 +52,10 @@ function Report({ month, year, decreaseMonth, increaseMonth, report }) {
   if (report && plan) {
     percentagePlan = Math.round((report.expenses / plan.amount) * 100);
   }
+
+  const handleClickViewReport = () => {
+    navigate("/reports", { state: { month, year } });
+  };
 
   return (
     <div className="w-5/12 border-r border-r-blue-400 py-2 px-6">
@@ -155,7 +162,10 @@ function Report({ month, year, decreaseMonth, increaseMonth, report }) {
                 </div>
               </div>
             )}
-            <button className="py-2 px-8 rounded-lg bg-purple-500 text-white text-sm font-semibold uppercase mb-3 hover:bg-purple-600">
+            <button
+              className="py-2 px-8 rounded-lg bg-purple-500 text-white text-sm font-semibold uppercase mb-3 hover:bg-purple-600"
+              onClick={handleClickViewReport}
+            >
               View report
             </button>
           </div>

@@ -5,6 +5,7 @@ import MonthPlanItem from "./MonthPlanItem";
 import yearsGetter from "../../../utils/yearsGetter";
 import Select from "../../../components/elements/Select";
 import Loading from "../../../components/others/Loading";
+import ReportsService from "../../../services/reports";
 
 function MonthPlans({ onSeeCategoryPlans }) {
   const [isAddingPlan, setIsAddingPlan] = useState(false);
@@ -21,9 +22,26 @@ function MonthPlans({ onSeeCategoryPlans }) {
       year: year.id,
     });
 
+    let responsePlans = responseData.data.plans;
+    responsePlans = await Promise.all(
+      responsePlans.map(async (plan) => {
+        const responseReportData = await ReportsService.getReports({
+          year: plan.year,
+          report_type: "expenses-incomes",
+          wallet: 1,
+        });
+
+        const monthReport = responseReportData.data.reports[plan.month + ""];
+        return {
+          ...plan,
+          currentTotal: monthReport ? monthReport.expenses : 0,
+        };
+      })
+    );
+
     setLoading(false);
 
-    setMonthPlans(responseData.data.plans);
+    setMonthPlans(responsePlans);
   };
 
   useEffect(() => {

@@ -65,7 +65,7 @@ function LoginPage() {
         Cookies.set("token", responseData.data.token);
         Cookies.set("user", JSON.stringify(responseData.data.user));
 
-        navigate("/");
+        navigate("/transactions");
       } else {
         console.log(responseData.error);
         setError(responseData.error);

@@ -1,12 +1,12 @@
 import { faChevronRight } from "@fortawesome/free-solid-svg-icons";
 import React, { useEffect, useState } from "react";
-import formatCurrency from "../../../utils/currencyFormatter";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import TransactionsService from "../../../services/transactions";
+import formatCurrency from "../../../utils/currencyFormatter";
 import { format } from "date-fns";
 import { shorten } from "../../../utils/stringFormatter";
+import TransactionsService from "../../../services/transactions";
 
-function CategoryItem({ item, index, month, year, wallet, percentage }) {
+function TransactionItem({ item, index, day, month, year, wallet }) {
   const [showDropdown, setShowDropdown] = useState(false);
   const [transactions, setTransactions] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -15,14 +15,13 @@ function CategoryItem({ item, index, month, year, wallet, percentage }) {
     setLoading(true);
 
     let params = {
+      month,
       year,
       wallet,
-      category: item.id,
+      day,
     };
 
-    if (month) {
-      params = { ...params, month };
-    }
+    if (day) params = { ...params, day };
 
     const responseData = await TransactionsService.getTransactions(params);
     setLoading(false);
@@ -42,30 +41,23 @@ function CategoryItem({ item, index, month, year, wallet, percentage }) {
     <div>
       <div
         key={Math.random()}
-        className={`flex gap-3 p-2 items-center rounded-lg hover:bg-purple-200 cursor-pointer ${
+        className={`flex gap-3 p-3 items-center rounded-lg hover:bg-purple-200 cursor-pointer ${
           index % 2 === 0 ? "bg-gray-200" : ""
         }`}
         onClick={() => setShowDropdown(!showDropdown)}
       >
-        <div className="w-14 h-14 flex justify-center items-center overflow-hidden rounded-md">
-          <img
-            src={process.env.REACT_APP_API_HOST + item.image}
-            alt=""
-            className="shrink-0 h-"
-          />
-        </div>
-        <p className="w-1/3">{item.name}</p>
-        <p className="font-semibold text-purple-600 w-1/6">
-          {percentage + "%"}
+        {day && (
+          <p className="text-md me-10 w-1/3">
+            {day + "/" + month + "/" + year}
+          </p>
+        )}
+        {!day && <p className="text-md me-10 w-1/3">{month + "/" + year}</p>}
+
+        <p className="w-1/3 text-lg font-bold text-red-500">
+          {"-" + formatCurrency(item.expenses)}
         </p>
-        <p
-          className={`font-semibold text-end grow ${
-            item.type === "incomes" ? "text-green-600" : "text-red-600"
-          } w-1/5`}
-        >
-          {`${item.type === "incomes" ? "+" : "-"}  ${formatCurrency(
-            item.amount
-          )}`}
+        <p className="w-1/3 text-lg font-bold text-green-500">
+          {"+" + formatCurrency(item.incomes)}
         </p>
         <div className="grow flex justify-end pe-4">
           <FontAwesomeIcon
@@ -107,4 +99,4 @@ function CategoryItem({ item, index, month, year, wallet, percentage }) {
   );
 }
 
-export default CategoryItem;
+export default TransactionItem;

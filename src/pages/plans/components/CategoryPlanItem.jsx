@@ -10,35 +10,14 @@ import { toast } from "react-toastify";
 
 function CategoryPlanItem({ categoryPlan, onUpdateSuccess }) {
   const [isHovering, setIsHovering] = useState(false);
-  const [currentTotal, setCurrentTotal] = useState();
   const [percentage, setPercentage] = useState(0);
   const [isDeleting, setIsDeleting] = useState(false);
 
-  const getReport = async () => {
-    // Return a list of expenses and incomes of months
-    const responseData = await ReportsService.getReports({
-      year: categoryPlan.year,
-      month: categoryPlan.month,
-      report_type: "categories",
-      // wallet: 2,
-    });
-
-    if (!responseData.data.reports[categoryPlan.category_id + ""]) {
-      setCurrentTotal(0);
-    } else {
-      setCurrentTotal(responseData.data.reports[categoryPlan.category_id + ""]);
-    }
-  };
-
   useEffect(() => {
-    getReport();
-  }, []);
-
-  useEffect(() => {
-    if (currentTotal) {
-      setPercentage((currentTotal / categoryPlan.amount) * 100);
+    if (categoryPlan.currentTotal) {
+      setPercentage((categoryPlan.currentTotal / categoryPlan.amount) * 100);
     }
-  }, [currentTotal]);
+  }, [categoryPlan]);
 
   const handleClickDelete = () => {
     setIsDeleting(true);
@@ -105,14 +84,18 @@ function CategoryPlanItem({ categoryPlan, onUpdateSuccess }) {
             <div className="flex justify-between mb-1">
               <p>Actual: </p>
 
-              <p className="font-bold">{formatCurrency(currentTotal)}</p>
+              <p className="font-bold">
+                {formatCurrency(categoryPlan.currentTotal)}
+              </p>
             </div>
             <hr className="h-0.5 bg-gray-300 mb-2" />
             <div className="flex justify-between mb-1">
               <p>Remaining: </p>
 
               <p className="font-bold text-blue-600">
-                {formatCurrency(categoryPlan.amount - currentTotal)}
+                {formatCurrency(
+                  categoryPlan.amount - categoryPlan.currentTotal
+                )}
               </p>
             </div>
             <div className="flex justify-end">

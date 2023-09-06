@@ -9,6 +9,7 @@ import Select from "../../../components/elements/Select";
 import monthsGetter from "../../../utils/monthsGetter";
 import yearsGetter from "../../../utils/yearsGetter";
 import Loading from "../../../components/others/Loading";
+import ReportsService from "../../../services/reports";
 
 function CategoryPlans({ _month, _year }) {
   const [isAddingPlan, setIsAddingPlan] = useState(false);
@@ -33,8 +34,24 @@ function CategoryPlans({ _month, _year }) {
       month: month.id + 1,
     });
 
+    let responsePlans = responseData.data.plans;
+    responsePlans = await Promise.all(
+      responsePlans.map(async (plan) => {
+        const responseReportData = await ReportsService.getReports({
+          year: plan.year,
+          month: plan.month,
+          report_type: "categories",
+          wallet: 1,
+        });
+
+        const categoryReport =
+          responseReportData.data.reports[plan.category.name];
+        return { ...plan, currentTotal: categoryReport ? categoryReport.amount : 0 };
+      })
+    );
+
     setLoading(false);
-    setCategoryPlans(responseData.data.plans);
+    setCategoryPlans(responsePlans);
   };
 
   useEffect(() => {
@@ -98,8 +115,8 @@ function CategoryPlans({ _month, _year }) {
         <AddCategoryPlan
           onClose={() => setIsAddingPlan(false)}
           onUpdateSuccess={handleUpdateSuccess}
-          _month={_month}
-          _year={_year}
+          _month={month.id + 1}
+          _year={year.id}
         />
       )}
     </div>
