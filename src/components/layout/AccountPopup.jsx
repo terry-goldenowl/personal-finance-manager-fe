@@ -1,9 +1,9 @@
-import React from "react";
+import React, { useState } from "react";
 import Popover from "../modal/Popover";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUser, faWallet } from "@fortawesome/free-solid-svg-icons";
 
-function AccountPopup({ setIsShown, onLogout }) {
+function AccountPopup({ setIsShown, onLogout, onClickWallets }) {
   return (
     <Popover setIsShown={setIsShown} top={0} left={40}>
       <div className="flex flex-col gap-2">
@@ -14,7 +14,10 @@ function AccountPopup({ setIsShown, onLogout }) {
           />
           View profile
         </button>
-        <button className="bg-blue-100 py-2 w-52 rounded-md whitespace-nowrap hover:bg-blue-200 hover:font-semibold">
+        <button
+          className="bg-blue-100 py-2 w-52 rounded-md whitespace-nowrap hover:bg-blue-200 hover:font-semibold"
+          onClick={() => onClickWallets()}
+        >
           <FontAwesomeIcon
             icon={faWallet}
             className="text-xl me-2 text-blue-400"

@@ -2,11 +2,13 @@ import React from "react";
 import TransactionList from "./TransactionList";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSearch } from "@fortawesome/free-solid-svg-icons";
+import Loading from "../../../components/others/Loading";
 
 function RecentTransactions({
   transactions,
   handleModifySuccess,
   handleSearch,
+  loading,
 }) {
   return (
     <div className="w-7/12">
@@ -26,10 +28,13 @@ function RecentTransactions({
         </div>
       </div>
 
-      <TransactionList
-        transactions={transactions}
-        onModifySuccess={handleModifySuccess}
-      />
+      {loading && <Loading />}
+      {!loading && (
+        <TransactionList
+          transactions={transactions}
+          onModifySuccess={handleModifySuccess}
+        />
+      )}
     </div>
   );
 }

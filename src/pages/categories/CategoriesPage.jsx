@@ -9,18 +9,24 @@ function CategoriesPage() {
   const [defaultCategories, setDefaultCategories] = useState([]);
   const [userCategories, setUserCategories] = useState([]);
   const [isAddingCategory, setisAddingCategory] = useState(false);
+  const [loadingDefault, setLoadingDefault] = useState(false);
+  const [loadingUser, setLoadingUser] = useState(false);
 
   const getDefaultCategories = async () => {
+    setLoadingDefault(true);
     const data = await CategoriesService.getCategories({
       default: true,
     });
+    setLoadingDefault(false);
 
     setDefaultCategories(data.data.categories);
   };
   const getUserCategories = async () => {
+    setLoadingUser(true);
     const data = await CategoriesService.getCategories({
       default: false,
     });
+    setLoadingUser(false);
 
     setUserCategories(data.data.categories);
   };
@@ -63,13 +69,17 @@ function CategoriesPage() {
 
       <div className="flex gap-8">
         {/* DEFAULT CATEGORIES */}
-        <DefaultCategories categories={defaultCategories} />
+        <DefaultCategories
+          categories={defaultCategories}
+          loading={loadingDefault}
+        />
 
         {/* USER'S CATEGORIES */}
         {userCategories && (
           <UserCategories
             categories={userCategories}
             onUpdateSuccess={handleUpdateSuccess}
+            loading={loadingUser}
           />
         )}
       </div>

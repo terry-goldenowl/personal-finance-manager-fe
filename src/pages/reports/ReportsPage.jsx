@@ -1,211 +1,281 @@
 import React, { useEffect, useState } from "react";
-import { Bar } from "react-chartjs-2";
+import { Bar, Doughnut } from "react-chartjs-2";
 import { Chart, registerables } from "chart.js";
-import { Link, useSearchParams } from "react-router-dom";
-import formatCurrency from "../../utils/currencyFormatter";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faChevronRight, faSearch } from "@fortawesome/free-solid-svg-icons";
-import { chartData, expensesByCategoriesData } from "../../utils/sampleData";
+import { useLocation } from "react-router-dom";
 import CategoryItem from "./components/CategoryItem";
+import Select from "../../components/elements/Select";
+import yearsGetter from "../../utils/yearsGetter";
+import monthsGetter from "../../utils/monthsGetter";
+import ReportsService from "../../services/reports";
+import getDaysInMonth from "../../utils/getDaysOfMonth";
+import TransactionItem from "./components/TransactionItem";
+import Loading from "../../components/others/Loading";
 
 function ReportsPage() {
+  const location = useLocation();
+
+  const [month, setMonth] = useState(
+    monthsGetter().find(
+      (month) =>
+        month.id === (location.state.month - 1 || new Date().getMonth())
+    )
+  );
+  const [year, setYear] = useState(
+    yearsGetter(20).find(
+      (year) => year.id === (location.state.year || new Date().getFullYear())
+    )
+  );
+  const [wallet, setWallet] = useState();
+  const [transactionType, setTransactionType] = useState("total");
+  const [reportType, setReportType] = useState("expenses-incomes");
+  const [search, setSearch] = useState();
+  const [period, setPeriod] = useState("month");
+  const [reports, setReports] = useState();
+  const [filledReports, setFilledReports] = useState();
+  const [chartLabels, setChartLabels] = useState([]);
+  const [datasets, setDatasets] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [totalAmount, setTotalAmount] = useState(null);
+
   // Chqrt configurations
   Chart.register(...registerables);
   Chart.defaults.font.family = "Raleway";
   Chart.defaults.color = "#000000";
   Chart.defaults.font.size = 14;
 
-  const [searchParams, setSearchParams] = useSearchParams();
-  const [typeTime, setTypeTime] = useState("month");
-  const [typeChart, setTypeChart] = useState("total");
-  const [chosenMonth, setChosenMonth] = useState("");
-  const [chosenYear, setChosenYear] = useState(""); // Default year is current year
-  const [datasets, setDatasets] = useState([]);
-  const [typeList, setTypeList] = useState("categories");
-  const [expensesCategoryData, setExpensesCategoryData] = useState(
-    expensesByCategoriesData
-  );
+  // Button styles
+  const periodStyle = (_period) => {
+    return (
+      "grow py-2 text-center rounded-xl font-semibold " +
+      (period === _period
+        ? "bg-purple-500 text-white"
+        : "bg-transparent text-purple-500")
+    );
+  };
 
-  // Buttons styles
-  const typeTimeActiveStyle =
-    "grow py-2 text-center rounded-xl font-semibold bg-purple-500 text-white";
-  const typeTimeNormalStyle =
-    "grow py-2 text-center rounded-xl font-semibold bg-transparent text-purple-500";
-  const typeChartActiveStyle =
-    "grow py-1 text-center rounded-xl font-semibold bg-purple-500 text-white";
-  const typeChartNormalStyle =
-    "grow py-1 text-center rounded-xl font-semibold bg-purple-100 text-purple-500";
-  const typeListActiveStyle =
-    "py-3 px-6 border-b-4 border-b-purple-500 text-purple-600 font-semibold";
-  const typeListNormalStyle =
-    "py-3 px-6 border-b-4 border-b-purple-200 hover:font-semibold";
+  const transactionTypeStyle = (_transactionType) => {
+    return (
+      "grow py-1 text-center rounded-xl font-semibold " +
+      (transactionType === _transactionType
+        ? "bg-purple-500 text-white"
+        : "bg-purple-100 text-purple-500")
+    );
+  };
 
-  // Trigger search when search params change
+  const reportTypeStyle = (_reportType) => {
+    return (
+      "py-3 px-6 border-b-4 " +
+      (reportType === _reportType
+        ? "border-b-purple-500 text-purple-600 font-semibold"
+        : "border-b-purple-200 hover:font-semibold")
+    );
+  };
+
+  const getReports = async (params) => {
+    setLoading(true);
+    const responseData = await ReportsService.getReports(params);
+
+    if (responseData.status === "success") {
+      setReports(responseData.data.reports);
+    }
+    setLoading(false);
+  };
+
+  // Fill reports with empty month/day
+  const fillReports = (labels) => {
+    if (filledReports) {
+      const names = Object.keys(reports);
+
+      labels.forEach((label) => {
+        if (!names.includes(label + "")) {
+          setFilledReports((prev) => {
+            return { ...prev, [label + ""]: { expenses: 0, incomes: 0 } };
+          });
+        }
+      });
+    }
+  };
+
   useEffect(() => {
-    console.log(typeTime);
-    searchParams.set("time", typeTime);
-    searchParams.set("type", typeChart);
+    let params = {
+      year: year.id,
+      transaction_type: transactionType,
+      report_type: reportType,
+      wallet: 1,
+    };
 
-    if (typeTime === "month") {
-      searchParams.set("month", chosenMonth);
+    if (period === "month") {
+      params = { ...params, month: month.id + 1 };
+    }
+
+    getReports(params);
+
+    if (reportType === "expenses-incomes") {
+      if (period === "month") {
+        // console.log(getDaysInMonth(year, month));
+        setChartLabels(getDaysInMonth(year.id, month.id + 1));
+      } else {
+        setChartLabels([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
+      }
+    }
+  }, [transactionType, reportType, period, month, year]);
+
+  useEffect(() => {
+    // console.log(reports);
+    if (reports) {
+      setFilledReports(reports);
+      if (reportType === "expenses-incomes") {
+        fillReports(chartLabels);
+      }
+    }
+  }, [reports, chartLabels]);
+
+  useEffect(() => {
+    if (reportType === "expenses-incomes") {
+      const expensesDataset = {
+        label: "Total expenses",
+        data:
+          filledReports &&
+          Object.values(filledReports).map((report) => report.expenses),
+        borderRadius: 10,
+        backgroundColor: "#09234899",
+        //   barThickness: 30,
+      };
+
+      const incomesDataset = {
+        label: "Total incomes",
+        data:
+          filledReports &&
+          Object.values(filledReports).map((report) => report.incomes),
+        borderRadius: 10,
+        backgroundColor: "#ffaa2390",
+        //   barThickness: 30,
+      };
+
+      if (transactionType === "total") {
+        setDatasets([incomesDataset, expensesDataset]);
+      }
+
+      if (transactionType === "incomes") {
+        setDatasets([incomesDataset]);
+      }
+      if (transactionType === "expenses") {
+        setDatasets([expensesDataset]);
+      }
     } else {
-      searchParams.delete("month");
+      setDatasets([
+        {
+          data: Object.values(filledReports).map((report) => report.amount),
+        },
+      ]);
+
+      setTotalAmount(
+        Object.values(filledReports).reduce(
+          (prev, curr) => prev + curr.amount,
+          0
+        )
+      );
     }
-
-    searchParams.set("year", chosenYear);
-    setSearchParams(searchParams);
-  }, [typeChart, typeTime, chosenMonth, chosenYear]);
-
-  useEffect(() => {
-    const expensesDataset = {
-      label: "Total expenses",
-      data: chartData.map((d) => d.total_expenses),
-      borderRadius: 10,
-      backgroundColor: "#09234899",
-      //   barThickness: 30,
-    };
-    const incomesDataset = {
-      label: "Total incomes",
-      data: chartData.map((d) => d.total_incomes),
-      borderRadius: 10,
-      backgroundColor: "#ffaa2390",
-      //   barThickness: 30,
-    };
-
-    if (typeChart === "total") {
-      setDatasets([expensesDataset, incomesDataset]);
-    }
-
-    if (typeChart === "incomes") {
-      setDatasets([incomesDataset]);
-    }
-    if (typeChart === "expenses") {
-      setDatasets([expensesDataset]);
-    }
-
-    console.log(datasets);
-  }, [typeChart]);
+  }, [transactionType, filledReports]);
 
   return (
     <div className="p-8">
       {/* Header */}
-      <div className="mb-8 flex justify-between">
+      <div className="mb-8">
         <h2 className="text-4xl">Reports</h2>
-        <div className="flex border-2 border-purple-500 rounded-2xl">
-          <button className="py-2 text-center rounded-xl font-semibold bg-purple-500 text-white px-8 hover:bg-purple-600">
-            Add expense
-          </button>
-          <button className="py-2 px-8 rounded-xl font-semibold text-purple-600">
-            Add incomes
-          </button>
-        </div>
       </div>
 
       {/* Content */}
       <div className="flex gap-8">
         {/* Charts */}
-        <div className="w-1/2">
+        <div className="w-7/12">
           <div className="mb-3">
-            <form action="" method="get" className="flex justify-end gap-2">
-              {typeTime === "month" && (
-                <select
-                  name="month"
-                  id="period"
-                  className="py-1 px-4 rounded-xl border border-purple-300 outline-none"
-                  value={chosenMonth}
-                  onChange={(e) => setChosenMonth(e.target.value)}
-                >
-                  <option value={""}>Select month</option>
-                  <option value="1">1</option>
-                  <option value="2">2</option>
-                  <option value="2">3</option>
-                  <option value="2">4</option>
-                  <option value="2">5</option>
-                  <option value="2">6</option>
-                  <option value="2">7</option>
-                </select>
+            <div className="flex justify-end gap-3">
+              {period === "month" && (
+                <div className="w-1/6">
+                  <Select
+                    selected={month}
+                    setSelected={setMonth}
+                    data={monthsGetter()}
+                  />
+                </div>
               )}
-
-              <select
-                name="year"
-                id="period"
-                className="py-1 px-4 rounded-xl border border-purple-300 outline-none"
-                value={chosenYear}
-                onChange={(e) => setChosenYear(e.target.value)}
-              >
-                <option value={""}>Select year</option>
-                <option value="2020">2020</option>
-                <option value="2021">2021</option>
-                <option value="2022">2022</option>
-                <option value="2023">2023</option>
-              </select>
-            </form>
+              <div className="w-1/6">
+                <Select
+                  selected={year}
+                  setSelected={setYear}
+                  data={yearsGetter(20)}
+                />
+              </div>
+            </div>
           </div>
-
+          {loading && <Loading />}
           <div className="mb-5">
-            <Bar
-              height={400}
-              width={600}
-              data={{
-                labels: chartData.map((d) => "Tháng " + d.month),
-                datasets: datasets,
-              }}
-              options={{
-                maintainAspectRatio: false,
-              }}
-            />
+            {!loading && reportType === "expenses-incomes" && (
+              <Bar
+                height={400}
+                width={600}
+                data={{
+                  labels: chartLabels,
+                  datasets: datasets,
+                }}
+                options={{
+                  maintainAspectRatio: false,
+                  // scales: {
+                  //   x: {
+                  //     stacked: true,
+                  //   },
+                  // },
+                }}
+              />
+            )}
+            {!loading && reportType === "categories" && (
+              <Doughnut
+                height={400}
+                width={400}
+                options={{
+                  maintainAspectRatio: false,
+                }}
+                data={{
+                  labels: Object.values(filledReports).map(
+                    (report) => report.name
+                  ),
+                  datasets: datasets,
+                }}
+              />
+            )}
           </div>
           <div>
             <div className="flex gap-2 mb-2 p-2 rounded-xl bg-purple-100">
               <button
-                onClick={() => setTypeTime("month")}
-                className={
-                  typeTime === "month"
-                    ? typeTimeActiveStyle
-                    : typeTimeNormalStyle
-                }
+                onClick={() => setPeriod("month")}
+                className={periodStyle("month")}
               >
                 Month
               </button>
               <button
-                onClick={() => setTypeTime("year")}
-                className={
-                  typeTime === "year"
-                    ? typeTimeActiveStyle
-                    : typeTimeNormalStyle
-                }
+                onClick={() => setPeriod("year")}
+                className={periodStyle("year")}
               >
                 Year
               </button>
             </div>
             <div className="flex gap-2">
               <button
-                onClick={() => setTypeChart("total")}
-                className={
-                  typeChart === "total"
-                    ? typeChartActiveStyle
-                    : typeChartNormalStyle
-                }
+                onClick={() => setTransactionType("total")}
+                className={transactionTypeStyle("total")}
               >
                 Total
               </button>
               <button
-                onClick={() => setTypeChart("incomes")}
-                className={
-                  typeChart === "incomes"
-                    ? typeChartActiveStyle
-                    : typeChartNormalStyle
-                }
+                onClick={() => setTransactionType("incomes")}
+                className={transactionTypeStyle("incomes")}
               >
                 Incomes
               </button>
               <button
-                onClick={() => setTypeChart("expenses")}
-                className={
-                  typeChart === "expenses"
-                    ? typeChartActiveStyle
-                    : typeChartNormalStyle
-                }
+                onClick={() => setTransactionType("expenses")}
+                className={transactionTypeStyle("expenses")}
               >
                 Expenses
               </button>
@@ -213,44 +283,64 @@ function ReportsPage() {
           </div>
         </div>
         {/* Categories and expenses/incomes (transactions) */}
-        <div className="w-1/2">
-          <div className="flex border-b border-b-purple-200">
+        <div className="w-5/12">
+          <div className="flex border-b border-b-purple-200 items-center">
             <button
-              className={
-                typeList === "categories"
-                  ? typeListActiveStyle
-                  : typeListNormalStyle
-              }
-              onClick={() => setTypeList("categories")}
+              className={reportTypeStyle("expenses-incomes")}
+              onClick={() => setReportType("expenses-incomes")}
+            >
+              By transactions
+            </button>
+            <button
+              className={reportTypeStyle("categories")}
+              onClick={() => setReportType("categories")}
             >
               By categories
             </button>
-            <button
-              className={
-                typeList === "expenses"
-                  ? typeListActiveStyle
-                  : typeListNormalStyle
-              }
-              onClick={() => setTypeList("expenses")}
-            >
-              By expenses/incomes
-            </button>
 
-            <div className="flex grow items-center bg-white py-2 px-4 ms-6 rounded-xl my-1 gap-2">
+            {/* <div className="flex grow items-center bg-white py-2 px-4 ms-6 rounded-xl my-1 gap-2">
               <input type="text" name="search" className="grow outline-none" />
               <FontAwesomeIcon
                 icon={faSearch}
                 className="text-gray-400 text-xl"
               />
-            </div>
+            </div> */}
           </div>
-          {typeList === "categories" && (
+          {loading && <Loading />}
+          {!loading && filledReports && reportType === "categories" && (
             <div className="mt-4 overflow-y-scroll" style={{ height: 600 }}>
-              {expensesByCategoriesData.map((item, index) => {
+              {Object.values(filledReports).map((item, index) => {
                 return (
-                  <CategoryItem key={Math.random()} item={item} index={index} />
+                  <CategoryItem
+                    key={Math.random()}
+                    item={item}
+                    index={index}
+                    month={period === "month" ? month.id + 1 : null}
+                    year={year.id}
+                    wallet={1}
+                    percentage={
+                      totalAmount
+                        ? Math.round((item.amount / totalAmount) * 100)
+                        : 0
+                    }
+                  />
                 );
               })}
+            </div>
+          )}
+          {!loading && reports && reportType === "expenses-incomes" && (
+            <div className="mt-3">
+              {Object.keys(reports).map((key, index) => (
+                <TransactionItem
+                  item={reports[key]}
+                  day={period === "month" ? key : null}
+                  index={index}
+                  month={period === "year" ? key : month.id + 1}
+                  year={year.id}
+                  wallet={1}
+                  key={Math.random()}
+                />
+              ))}
             </div>
           )}
         </div>

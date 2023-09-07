@@ -10,12 +10,19 @@ import avatar from "../../assets/images/profile.png";
 import AccountPopup from "./AccountPopup";
 import { Link } from "react-router-dom";
 import Cookies from "js-cookie";
+import Wallets from "../../pages/wallets/components/Wallets";
 
 function Sidebar({ onLogout }) {
   const [isAccountPopupShown, setIsAccountPopupShown] = useState(false);
+  const [isWalletsShown, setIsWalletsShown] = useState(false);
+
+  const handleClickWallets = () => {
+    setIsAccountPopupShown(false);
+    setIsWalletsShown(true);
+  };
 
   return (
-    <div className="sidebar bg-white w-40 px-5 py-5 shadow-lg flex flex-col items-center rounded-tr-3xl rounded-br-3xl h-fit">
+    <div className="sidebar bg-white w-40 px-5 py-5 shadow-lg flex flex-col items-center rounded-tr-3xl rounded-br-3xl h-fit sticky top-0 left-0">
       <div className="mb-6 flex flex-col items-center relative">
         <div className="absolute top-0 right-0">
           <button
@@ -28,6 +35,7 @@ function Sidebar({ onLogout }) {
             <AccountPopup
               setIsShown={setIsAccountPopupShown}
               onLogout={onLogout}
+              onClickWallets={handleClickWallets}
             />
           )}
         </div>
@@ -66,6 +74,8 @@ function Sidebar({ onLogout }) {
           Help?
         </a>
       </div>
+
+      {isWalletsShown && <Wallets onClose={() => setIsWalletsShown(false)} />}
     </div>
   );
 }

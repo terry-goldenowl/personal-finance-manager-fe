@@ -15,6 +15,7 @@ function IncomesExpensePage() {
   const [search, setSearch] = useState("");
   const [isAddingTx, setIsAddingTx] = useState(false);
   const [typeAddTx, setTypeAddTx] = useState("expense");
+  const [loading, setLoading] = useState(false);
 
   const increaseMonth = () => {
     if (year >= new Date().getFullYear() && month > new Date().getMonth()) {
@@ -43,12 +44,14 @@ function IncomesExpensePage() {
   };
 
   const getTransactions = async () => {
+    setLoading(true);
     const responseData = await TransactionsService.getTransactions({
       month,
       year,
       search,
-      // wallet: 2,
+      wallet: 1,
     });
+    setLoading(false);
 
     setTransactions(responseData.data.transactions);
   };
@@ -136,6 +139,7 @@ function IncomesExpensePage() {
           transactions={transactions}
           handleModifySuccess={handleModifySuccess}
           handleSearch={handleSearchChange}
+          loading={loading}
         />
       </div>
 

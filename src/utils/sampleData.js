@@ -143,3 +143,76 @@ export const expensesByCategoriesData = [
     type: "expenses",
   },
 ];
+
+export const categoryPlans = [
+  {
+    id: 1,
+    category: {
+      image:
+        "/storage/images/categories/2thZuCMfXbMHOhOnVwkiNYAjLrkNQN0dYPKo0jDV.jpg",
+      name: "Health & Medicine",
+    },
+    amount: Math.round(Math.random() * 1000000 - 100000),
+    actual: Math.round(Math.random() * 1000000 - 100000),
+  },
+  {
+    id: 2,
+    category: {
+      image:
+        "/storage/images/categories/2thZuCMfXbMHOhOnVwkiNYAjLrkNQN0dYPKo0jDV.jpg",
+      name: "Education",
+    },
+    amount: Math.round(Math.random() * 1000000 - 100000),
+    actual: Math.round(Math.random() * 1000000 - 100000),
+  },
+  {
+    id: 3,
+    category: {
+      image:
+        "/storage/images/categories/2thZuCMfXbMHOhOnVwkiNYAjLrkNQN0dYPKo0jDV.jpg",
+      name: "Food & Drink",
+    },
+    amount: Math.round(Math.random() * 1000000 - 100000),
+    actual: Math.round(Math.random() * 1000000 - 100000),
+  },
+  {
+    id: 4,
+    category: {
+      image:
+        "/storage/images/categories/2thZuCMfXbMHOhOnVwkiNYAjLrkNQN0dYPKo0jDV.jpg",
+      name: "Beauty",
+    },
+    amount: Math.round(Math.random() * 1000000 - 100000),
+    actual: Math.round(Math.random() * 1000000 - 100000),
+  },
+  {
+    id: 5,
+    category: {
+      image:
+        "/storage/images/categories/2thZuCMfXbMHOhOnVwkiNYAjLrkNQN0dYPKo0jDV.jpg",
+      name: "Entertainment",
+    },
+    amount: Math.round(Math.random() * 1000000 - 100000),
+    actual: Math.round(Math.random() * 1000000 - 100000),
+  },
+  {
+    id: 6,
+    category: {
+      image:
+        "/storage/images/categories/2thZuCMfXbMHOhOnVwkiNYAjLrkNQN0dYPKo0jDV.jpg",
+      name: "Bills",
+    },
+    amount: Math.round(Math.random() * 1000000 - 100000),
+    actual: Math.round(Math.random() * 1000000 - 100000),
+  },
+  {
+    id: 7,
+    category: {
+      image:
+        "/storage/images/categories/2thZuCMfXbMHOhOnVwkiNYAjLrkNQN0dYPKo0jDV.jpg",
+      name: "Transportation",
+    },
+    amount: Math.round(Math.random() * 1000000 - 100000),
+    actual: Math.round(Math.random() * 1000000 - 100000),
+  },
+];

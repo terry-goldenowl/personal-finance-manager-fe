@@ -5,7 +5,6 @@ export default function ModalWithNothing({ onClose, children, width }) {
     <div className="justify-center items-center flex overflow-x-hidden overflow-y-auto fixed inset-0 outline-none focus:outline-none">
       <div className={"relative my-6 mx-auto max-w-3xl z-50 " + width}>
         <div className="border-0 rounded-xl shadow-lg relative flex flex-col w-full bg-white outline-none focus:outline-none">
-          {/*content*/}
           {children}
         </div>
       </div>

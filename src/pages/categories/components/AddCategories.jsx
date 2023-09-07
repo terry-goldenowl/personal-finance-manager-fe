@@ -67,6 +67,7 @@ function AddCategories({ onClose, onAddSuccess, category = null }) {
       title={category ? "Update category" : "Add new categories"}
       onClose={onClose}
       onAccept={saveCategory}
+      width={"w-1/4"}
     >
       <div className="">
         <Input
