@@ -6,6 +6,7 @@ import yearsGetter from "../../../utils/yearsGetter";
 import Select from "../../../components/elements/Select";
 import Loading from "../../../components/others/Loading";
 import ReportsService from "../../../services/reports";
+import { useSelector } from "react-redux";
 
 function MonthPlans({ onSeeCategoryPlans }) {
   const [isAddingPlan, setIsAddingPlan] = useState(false);
@@ -14,21 +15,24 @@ function MonthPlans({ onSeeCategoryPlans }) {
     yearsGetter(20).find((year) => year.id === new Date().getFullYear())
   );
   const [loading, setLoading] = useState(false);
+  const walletChosen = useSelector((state) => state.wallet.walletChosen);
 
   const getMonthPlans = async () => {
     setLoading(true);
     const responseData = await PlansService.getPlans({
       type: "month",
       year: year.id,
+      wallet_id: walletChosen?.id,
     });
 
     let responsePlans = responseData.data.plans;
+
     responsePlans = await Promise.all(
       responsePlans.map(async (plan) => {
         const responseReportData = await ReportsService.getReports({
           year: plan.year,
           report_type: "expenses-incomes",
-          wallet: 1,
+          wallet_id: walletChosen.id,
         });
 
         const monthReport = responseReportData.data.reports[plan.month + ""];
@@ -46,7 +50,7 @@ function MonthPlans({ onSeeCategoryPlans }) {
 
   useEffect(() => {
     getMonthPlans();
-  }, [year]);
+  }, [year, walletChosen]);
 
   return (
     <div>
@@ -76,6 +80,11 @@ function MonthPlans({ onSeeCategoryPlans }) {
               onSeeCategoryPlans={onSeeCategoryPlans}
             />
           ))}
+        {!loading && monthPlans.length === 0 && (
+          <p className="text-2xl text-center text-gray-600 py-4">
+            No plan has been set in the period!
+          </p>
+        )}
       </div>
 
       {isAddingPlan && (

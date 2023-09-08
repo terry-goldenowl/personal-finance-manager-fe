@@ -41,25 +41,33 @@ function TransactionItem({ item, index, day, month, year, wallet }) {
     <div>
       <div
         key={Math.random()}
-        className={`flex gap-3 p-3 items-center rounded-lg hover:bg-purple-200 cursor-pointer ${
+        className={`flex gap-3 p-3 justify-between items-center rounded-lg hover:bg-purple-200 cursor-pointer ${
           index % 2 === 0 ? "bg-gray-200" : ""
         }`}
         onClick={() => setShowDropdown(!showDropdown)}
       >
-        {day && (
-          <p className="text-md me-10 w-1/3">
-            {day + "/" + month + "/" + year}
-          </p>
-        )}
-        {!day && <p className="text-md me-10 w-1/3">{month + "/" + year}</p>}
+        <div className="flex grow justify-between">
+          {day && (
+            <p className="text-md me-10 w-1/3">
+              {day + "/" + month + "/" + year}
+            </p>
+          )}
+          {!day && <p className="text-md me-10 w-1/3">{month + "/" + year}</p>}
 
-        <p className="w-1/3 text-lg font-bold text-red-500">
-          {"-" + formatCurrency(item.expenses)}
-        </p>
-        <p className="w-1/3 text-lg font-bold text-green-500">
-          {"+" + formatCurrency(item.incomes)}
-        </p>
-        <div className="grow flex justify-end pe-4">
+          {item.expenses != undefined && (
+            <p className="w-1/3 text-lg font-bold text-red-500">
+              {"-" + formatCurrency(item.expenses)}
+            </p>
+          )}
+
+          {item.incomes != undefined && (
+            <p className="w-1/3 text-lg font-bold text-green-500">
+              {"+" + formatCurrency(item.incomes)}
+            </p>
+          )}
+        </div>
+
+        <div className="flex justify-end pe-4 w-1/6">
           <FontAwesomeIcon
             icon={faChevronRight}
             className={`text-gray-500 ${

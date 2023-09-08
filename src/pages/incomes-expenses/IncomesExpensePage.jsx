@@ -6,6 +6,8 @@ import Report from "./components/Report";
 import RecentTransactions from "./components/RecentTransactions";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import SelectWallet from "../wallets/components/SelectWallet";
+import { useSelector } from "react-redux";
 
 function IncomesExpensePage() {
   const [transactions, setTransactions] = useState([]);
@@ -16,6 +18,9 @@ function IncomesExpensePage() {
   const [isAddingTx, setIsAddingTx] = useState(false);
   const [typeAddTx, setTypeAddTx] = useState("expense");
   const [loading, setLoading] = useState(false);
+  const [day, setDay] = useState(null);
+
+  const walletChosen = useSelector((state) => state.wallet.walletChosen);
 
   const increaseMonth = () => {
     if (year >= new Date().getFullYear() && month > new Date().getMonth()) {
@@ -40,17 +45,31 @@ function IncomesExpensePage() {
   };
 
   const handleSearchChange = (event) => {
-    setSearch(event.target.value);
+    setTimeout(() => setSearch(event.target.value), 300);
+  };
+
+  const handleDateChange = (_day) => {
+    setDay(_day);
   };
 
   const getTransactions = async () => {
     setLoading(true);
-    const responseData = await TransactionsService.getTransactions({
+
+    let params = {
       month,
       year,
-      search,
-      wallet: 1,
-    });
+      wallet: walletChosen?.id,
+    };
+
+    if (day) {
+      params = { ...params, day };
+    }
+
+    if (search.length > 0) {
+      params = { ...params, search };
+    }
+
+    const responseData = await TransactionsService.getTransactions(params);
     setLoading(false);
 
     setTransactions(responseData.data.transactions);
@@ -60,7 +79,7 @@ function IncomesExpensePage() {
     // Return a list of expenses and incomes of months
     const responseData = await ReportsService.getReports({
       year,
-      // wallet: 2,
+      wallet: walletChosen?.id,
     });
     setReport(responseData.data.reports[month + ""]);
   };
@@ -83,23 +102,19 @@ function IncomesExpensePage() {
   useEffect(() => {
     getTransactions();
     getReport();
-  }, [month, year]);
+  }, [month, year, walletChosen]);
 
   useEffect(() => {
-    if (search.length > 0) {
-      getTransactions();
-    }
-  }, [search]);
+    getTransactions();
+  }, [search, day]);
 
   return (
     <div className="p-8">
       {/* Header */}
       <div className="mb-8 flex justify-between">
-        <div className="flex gap-4">
+        <div className="flex gap-4 items-center">
           <h2 className="text-4xl">Incomes & Expenses</h2>
-          {/* <select name="" id="">
-            <option className="flex" value={"1"}><p>Wallet 1</p><img src=""/></option>
-          </select> */}
+          <SelectWallet />
         </div>
         <div
           className="flex border-2 border-purple-500 rounded-2xl relative"
@@ -137,9 +152,10 @@ function IncomesExpensePage() {
 
         <RecentTransactions
           transactions={transactions}
-          handleModifySuccess={handleModifySuccess}
-          handleSearch={handleSearchChange}
+          onModifySuccess={handleModifySuccess}
+          onSearch={handleSearchChange}
           loading={loading}
+          onDateChange={handleDateChange}
         />
       </div>
 

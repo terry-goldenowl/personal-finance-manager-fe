@@ -5,6 +5,7 @@ import AdjustBudget from "./AdjustBudget";
 import ConfirmDeleteModal from "../../../components/modal/ConfirmDeleteModal";
 import PlansService from "../../../services/plans";
 import { toast } from "react-toastify";
+import { motion } from "framer-motion";
 
 function MonthPlanItem({ monthPlan, onUpdateSuccess, onSeeCategoryPlans }) {
   const [isAdjusting, setIsAdjusting] = useState(false);
@@ -35,13 +36,16 @@ function MonthPlanItem({ monthPlan, onUpdateSuccess, onSeeCategoryPlans }) {
   }, [monthPlan]);
 
   return (
-    <div
+    <motion.div
       className={
         "border-blue-400 rounded-xl p-4 bg-blue-200 mb-6 " +
         (monthPlan.month === new Date().getMonth() + 1
           ? "border-2 shadow-xl shadow-blue-200"
           : "border")
       }
+      whileHover={{
+        scale: 1.05,
+      }}
     >
       <div className="mb-3 flex justify-between items-center">
         <p className="text-4xl">{monthPlan.month + "/" + monthPlan.year}</p>
@@ -109,7 +113,7 @@ function MonthPlanItem({ monthPlan, onUpdateSuccess, onSeeCategoryPlans }) {
           onClose={() => setIsDeleting(false)}
         />
       )}
-    </div>
+    </motion.div>
   );
 }
 

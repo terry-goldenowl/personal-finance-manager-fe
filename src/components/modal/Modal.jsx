@@ -3,7 +3,14 @@ import { createPortal } from "react-dom";
 import ModalWithNothing from "./ModalWithNothing";
 import { motion } from "framer-motion";
 
-export default function Modal({ title, onAccept, onClose, children, width }) {
+export default function Modal({
+  title,
+  onAccept,
+  onClose,
+  children,
+  width,
+  action = "yesno",
+}) {
   return createPortal(
     <div className="justify-center items-center flex overflow-x-hidden overflow-y-auto fixed inset-0 outline-none focus:outline-none">
       <div className={"relative my-6 mx-auto max-w-2xl z-50 " + width}>
@@ -34,20 +41,24 @@ export default function Modal({ title, onAccept, onClose, children, width }) {
           <div className="relative p-6 flex-auto">{children}</div>
           {/*footer*/}
           <div className="flex items-center justify-end px-6 py-4 border-t border-solid border-slate-200 rounded-b">
-            <button
-              className="text-gray-500 background-transparent font-bold uppercase px-6 py-2 text-sm outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
-              type="button"
-              onClick={onClose}
-            >
-              Cancle
-            </button>
-            <button
-              className="bg-purple-500 text-white active:bg-purple-600 font-bold uppercase text-sm px-6 py-2 rounded-full shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
-              type="button"
-              onClick={onAccept}
-            >
-              OK
-            </button>
+            {action.includes("no") && (
+              <button
+                className="text-gray-500 background-transparent font-bold uppercase px-6 py-2 text-sm outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
+                type="button"
+                onClick={onClose}
+              >
+                Cancle
+              </button>
+            )}
+            {action.includes("yes") && (
+              <button
+                className="bg-purple-500 text-white active:bg-purple-600 font-bold uppercase text-sm px-6 py-2 rounded-full shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
+                type="button"
+                onClick={onAccept}
+              >
+                OK
+              </button>
+            )}
           </div>
         </motion.div>
       </div>

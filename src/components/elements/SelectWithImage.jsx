@@ -26,7 +26,10 @@ export default function SelectWithImage({
               <Listbox.Button className="relative w-full cursor-default rounded-md bg-white py-1.5 pl-3 pr-10 text-left text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:outline-none focus:ring-2 focus:ring-purple-500 sm:text-sm sm:leading-6">
                 <span className="flex items-center">
                   <img
-                    src={selected && selected.image}
+                    src={
+                      selected &&
+                      process.env.REACT_APP_API_HOST + selected.image
+                    }
                     alt=""
                     className="h-5 w-5 flex-shrink-0 rounded-full"
                   />
@@ -68,7 +71,9 @@ export default function SelectWithImage({
                           <>
                             <div className="flex items-center">
                               <img
-                                src={item.image}
+                                src={
+                                  process.env.REACT_APP_API_HOST + item.image
+                                }
                                 alt=""
                                 className="h-5 w-5 flex-shrink-0 rounded-full"
                               />

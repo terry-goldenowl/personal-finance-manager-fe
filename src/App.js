@@ -11,6 +11,8 @@ import IncomesExpensePage from "./pages/incomes-expenses/IncomesExpensePage";
 import ReportsPage from "./pages/reports/ReportsPage";
 import CategoriesPage from "./pages/categories/CategoriesPage";
 import PlansPage from "./pages/plans/PlansPage";
+import { Provider } from "react-redux";
+import store from "./stores";
 
 function App() {
   const router = createBrowserRouter([
@@ -60,7 +62,11 @@ function App() {
     },
   ]);
 
-  return <RouterProvider router={router} />;
+  return (
+    <Provider store={store}>
+      <RouterProvider router={router} />;
+    </Provider>
+  );
 }
 
 export default App;

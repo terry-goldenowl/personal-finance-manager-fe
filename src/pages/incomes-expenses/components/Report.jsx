@@ -14,19 +14,28 @@ import { formatMonth } from "../../../utils/dateFormatter";
 import PlansService from "../../../services/plans";
 import AddMonthPlan from "../../plans/components/AddMonthPlan";
 import { useNavigate } from "react-router";
+import { useSelector } from "react-redux";
+import Loading from "../../../components/others/Loading";
 
 function Report({ month, year, decreaseMonth, increaseMonth, report }) {
   const [plan, setPlan] = useState();
   const [isAddingPlan, setIsAddingPlan] = useState(false);
+  const walletChosen = useSelector((state) => state.wallet.walletChosen);
+  const [loading, setLoading] = useState(false);
 
   const navigate = useNavigate();
 
   const getPlan = async () => {
+    setLoading(true);
     const responseData = await PlansService.getPlans({
       type: "month",
       month,
       year,
+      wallet_id: walletChosen?.id,
     });
+    setLoading(false);
+
+    console.log(responseData);
 
     if (responseData.status === "success") {
       if (responseData.data.plans.length > 0)
@@ -37,7 +46,7 @@ function Report({ month, year, decreaseMonth, increaseMonth, report }) {
 
   useEffect(() => {
     getPlan();
-  }, [month, year]);
+  }, [month, year, walletChosen]);
 
   let percentageReport;
   if (report) {
@@ -81,7 +90,9 @@ function Report({ month, year, decreaseMonth, increaseMonth, report }) {
         </button>
       </div>
 
-      {report && (
+      {loading && <Loading />}
+
+      {!loading && report && (
         <>
           <div className="mb-3">
             <p className="text-xl flex justify-between mb-1">
@@ -172,7 +183,7 @@ function Report({ month, year, decreaseMonth, increaseMonth, report }) {
         </>
       )}
 
-      {!report && (
+      {!loading && !report && (
         <>
           <p className="text-center text-3xl mt-12 text-gray-400 font-light">
             You didn't make any transactions in this period!

@@ -15,6 +15,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faInfoCircle } from "@fortawesome/free-solid-svg-icons";
 import PlansService from "../../../services/plans";
 import Loading from "../../../components/others/Loading";
+import { useSelector } from "react-redux";
 
 function AddTransaction({
   isAdding,
@@ -25,10 +26,12 @@ function AddTransaction({
   setIsDeleting,
   onAddingSuccess,
 }) {
+  const walletChosen = useSelector((state) => state.wallet.walletChosen);
+
   const [categories, setCategories] = useState([]);
   const [wallets, setWallets] = useState([]);
   const [categorySelected, setCategorySelected] = useState({});
-  const [walletSelected, setWalletSelected] = useState({});
+  const [walletSelected, setWalletSelected] = useState(walletChosen);
   const [title, setTitle] = useState("");
   const [amount, setAmount] = useState();
   const [formattedAmount, setFormattedAmount] = useState("");
@@ -69,9 +72,7 @@ function AddTransaction({
       setDate(new Date(transaction.date));
       setDescription(transaction.description || "");
     } else {
-      setWalletSelected(
-        wallets.find((wallet) => wallet.default == 1) || wallets[0]
-      );
+      setWalletSelected(walletChosen);
       setCategorySelected(categories[0]);
     }
   }, [wallets, categories]);
@@ -100,18 +101,20 @@ function AddTransaction({
       month: new Date(date).getMonth() + 1,
       type: "category",
       category_id: categorySelected.id,
+      wallet_id: walletSelected.id,
     });
 
     if (reportData.data.reports[categorySelected.name]) {
       setCurrentTotalOfCategory(
         reportData.data.reports[categorySelected.name].amount
       );
-    } else setCurrentTotalOfCategory(0);
+    } else setCurrentTotalOfCategory(null);
 
     if (planData.data.plans[0]) {
       setPlannedAmount(planData.data.plans[0].amount);
+      console.log(planData.data.plans[0].amount);
     } else setPlannedAmount(null);
-    
+
     setLoadingPlan(false);
   };
 
@@ -129,34 +132,31 @@ function AddTransaction({
         return { ...prev, amount: "Amount is invalid!" };
       });
     }
+    const data = {
+      wallet_id: walletSelected.id,
+      category_id: categorySelected.id,
+      title,
+      amount,
+      date: format(new Date(date), "yyyy/MM/dd"),
+      image: photo,
+      description,
+    };
 
-    if (!errors) {
-      const data = {
-        wallet_id: walletSelected.id,
-        category_id: categorySelected.id,
-        title,
-        amount,
-        date: format(new Date(date), "yyyy/MM/dd"),
-        image: photo,
-        description,
-      };
+    let responseData;
+    if (!transaction) {
+      responseData = await TransactionsService.createTransaction(data);
+    } else {
+      responseData = await TransactionsService.updateTransaction(
+        data,
+        transaction.id
+      );
+    }
 
-      let responseData;
-      if (!transaction) {
-        responseData = await TransactionsService.createTransaction(data);
-      } else {
-        responseData = await TransactionsService.updateTransaction(
-          data,
-          transaction.id
-        );
-      }
-
-      if (responseData.status === "success") {
-        setIsAdding(false);
-        onAddingSuccess(transaction ? "update" : "create");
-      } else {
-        setErrors(responseData.error);
-      }
+    if (responseData.status === "success") {
+      setIsAdding(false);
+      onAddingSuccess(transaction ? "update" : "create");
+    } else {
+      setErrors(responseData.error);
     }
   };
 
@@ -207,18 +207,9 @@ function AddTransaction({
                 required
               />
               <SelectWithImage
-                data={categories.map((category) => {
-                  return {
-                    ...category,
-                    image: process.env.REACT_APP_API_HOST + category.image,
-                  };
-                })}
+                data={categories}
                 label={"Category"}
-                selected={{
-                  ...categorySelected,
-                  image:
-                    process.env.REACT_APP_API_HOST + categorySelected?.image,
-                }}
+                selected={categorySelected}
                 setSelected={setCategorySelected}
                 required
               />
@@ -234,7 +225,7 @@ function AddTransaction({
               />
 
               {loadingPlan && <Loading size="small" />}
-              {!loadingPlan && plannedAmount && (
+              {!loadingPlan && plannedAmount && currentTotalOfCategory && (
                 <div className="flex items-center gap-2">
                   <FontAwesomeIcon
                     icon={faInfoCircle}

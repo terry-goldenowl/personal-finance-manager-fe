@@ -5,6 +5,7 @@ import AddTransaction from "./AddTransaction";
 import ConfirmDeleteModal from "../../../components/modal/ConfirmDeleteModal";
 import TransactionsService from "../../../services/transactions";
 import { toast } from "react-toastify";
+import { motion } from "framer-motion";
 
 function TransactionItem({ transaction, index, onModifySuccess }) {
   const [isViewingDetail, setIsViewingDetail] = useState(false);
@@ -17,18 +18,21 @@ function TransactionItem({ transaction, index, onModifySuccess }) {
     if (data.status === "success") {
       setIsDeleting(false);
       setIsViewingDetail(false);
-      onModifySuccess('delete');
+      onModifySuccess("delete");
     }
   };
 
   return (
     <>
-      <div
+      <motion.div
         className={
           "flex gap-3 p-2 pe-6 items-center rounded-lg hover:bg-purple-200 cursor-pointer " +
           (index % 2 === 0 ? "bg-gray-200" : "")
         }
         onClick={() => setIsViewingDetail(true)}
+        whileHover={{
+          scale: 1.05,
+        }}
       >
         <div className="w-16 h-16 overflow-hidden rounded-md shadow-sm">
           <img
@@ -59,7 +63,7 @@ function TransactionItem({ transaction, index, onModifySuccess }) {
           </p>
           <p className="text-sm text-end">{transaction.date}</p>
         </div>
-      </div>
+      </motion.div>
 
       {isViewingDetail && (
         <AddTransaction

@@ -64,7 +64,7 @@ function AddCategories({ onClose, onAddSuccess, category = null }) {
 
   return (
     <Modal
-      title={category ? "Update category" : "Add new categories"}
+      title={category ? "Update category" : "Add new category"}
       onClose={onClose}
       onAccept={saveCategory}
       width={"w-1/4"}

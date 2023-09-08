@@ -23,6 +23,14 @@ export default class AuthService {
     return response.data;
   }
 
+  static async initCSRF() {
+    const response = await axios.get(
+      "http://localhost:8000/sanctum/csrf-cookie"
+    );
+
+    return response.data;
+  }
+
   static async login(data) {
     const response = await notAuthInstance.post("/login", data);
 
