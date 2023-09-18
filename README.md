@@ -96,11 +96,12 @@ Here's how you can install the repository and run project locally:
    ```sh
    npm install
    ```
-3. Enter your API URL in .env file
+3. Use a code editor to open project folder
+4. Enter your API URL in .env file
    ```js
    REACT_APP_API_URL='ENTER YOUR API URL'
    ```
-4. Run project
+5. Run project
    ```sh
    npm start
    ```
