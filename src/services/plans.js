@@ -1,4 +1,4 @@
-import instance from "../utils/axiosConfig";
+import instance from "../config/axiosConfig";
 
 export default class PlansService {
   static async createMonthPlan(data) {
@@ -13,8 +13,32 @@ export default class PlansService {
     return response.data;
   }
 
-  static async getPlans(params) {
-    const response = await instance.get("/plans", {
+  static async getMonthPlans(params) {
+    const response = await instance.get("/plans/month", {
+      params,
+    });
+
+    return response.data;
+  }
+
+  static async getMonthPlansYears(params) {
+    const response = await instance.get("/plans/month/years", {
+      params,
+    });
+
+    return response.data;
+  }
+
+  static async getCategoryPlans(params) {
+    const response = await instance.get("/plans/category", {
+      params,
+    });
+
+    return response.data;
+  }
+
+  static async getCategoryPlansYears(params) {
+    const response = await instance.get("/plans/category/years", {
       params,
     });
 

@@ -3,7 +3,7 @@ import {
   faChevronRight,
   faStar,
 } from "@fortawesome/free-solid-svg-icons";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import formatCurrency from "../../../utils/currencyFormatter";
 import {
   CircularProgressbarWithChildren,
@@ -16,71 +16,85 @@ import AddMonthPlan from "../../plans/components/AddMonthPlan";
 import { useNavigate } from "react-router";
 import { useSelector } from "react-redux";
 import Loading from "../../../components/others/Loading";
+import getMonthName from "../../../utils/getMonthName";
+import { categoriesController } from "../../../services/categories";
 
-function Report({ month, year, decreaseMonth, increaseMonth, report }) {
+function Report({
+  month,
+  year,
+  decreaseMonth,
+  increaseMonth,
+  report,
+  loading,
+}) {
   const [plan, setPlan] = useState();
   const [isAddingPlan, setIsAddingPlan] = useState(false);
   const walletChosen = useSelector((state) => state.wallet.walletChosen);
-  const [loading, setLoading] = useState(false);
+  const [loadingPlan, setLoadingPlan] = useState(false);
 
   const navigate = useNavigate();
 
   const getPlan = async () => {
-    setLoading(true);
-    const responseData = await PlansService.getPlans({
-      type: "month",
+    setLoadingPlan(true);
+    const responseData = await PlansService.getMonthPlans({
       month,
       year,
       wallet_id: walletChosen?.id,
+      with_report: true,
     });
-    setLoading(false);
-
-    console.log(responseData);
 
     if (responseData.status === "success") {
       if (responseData.data.plans.length > 0)
         setPlan(responseData.data.plans[0]);
       else setPlan(null);
     }
+    setLoadingPlan(false);
   };
 
   useEffect(() => {
-    getPlan();
+    if (walletChosen) getPlan();
   }, [month, year, walletChosen]);
 
-  let percentageReport;
-  if (report) {
-    if (report.incomes === 0) {
-      percentageReport = 100;
-    } else {
-      percentageReport = Math.round((report.expenses / report.incomes) * 100);
+  let percentageReport = useMemo(() => {
+    if (report) {
+      if (report.incomes === 0) return 100;
+      return Math.round((report.expenses / report.incomes) * 100);
     }
-  }
+  }, [report]);
 
-  let percentagePlan;
-  if (report && plan) {
-    percentagePlan = Math.round((report.expenses / plan.amount) * 100);
-  }
+  let percentagePlan = useMemo(() => {
+    if (report && plan)
+      return Math.round((report.expenses / plan.amount) * 100);
+  }, [report, plan]);
 
   const handleClickViewReport = () => {
     navigate("/reports", { state: { month, year } });
   };
 
   return (
-    <div className="w-5/12 border-r border-r-blue-400 py-2 px-6">
+    <div className="lg:w-5/12 w-full rounded-2xl sm:px-6 px-3 bg-white py-6 shadow-lg">
       <div className="flex justify-between items-center mb-4 ">
         <button
           className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center hover:bg-purple-200 active:bg-purple-300"
           onClick={decreaseMonth}
         >
-          <FontAwesomeIcon className="text-gray-500" icon={faChevronLeft} />
+          <FontAwesomeIcon icon={faChevronLeft} />
         </button>
-        <div className="flex justify-center items-center gap-3">
-          <FontAwesomeIcon icon={faStar} className="text-gray-500" />
-          <h2 className="text-center text-4xl">
-            {formatMonth(month) + "/" + year}
-          </h2>
-          <FontAwesomeIcon icon={faStar} className="text-gray-500" />
+        <div className="gap-3 flex items-center justify-center">
+          <FontAwesomeIcon
+            icon={faStar}
+            className="text-gray-500 hidden sm:block lg:hidden xl:block"
+          />
+          <div
+            className="text-center text-xl font-bold uppercase bg-purple-500 text-white px-4 py-1 rounded-full"
+            id="monthYear"
+          >
+            {getMonthName(month - 1) + " " + year}
+          </div>
+          <FontAwesomeIcon
+            icon={faStar}
+            className="text-gray-500 hidden sm:block lg:hidden xl:block"
+          />
         </div>
         <button
           className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center hover:bg-purple-200 active:bg-purple-300"
@@ -94,19 +108,19 @@ function Report({ month, year, decreaseMonth, increaseMonth, report }) {
 
       {!loading && report && (
         <>
-          <div className="mb-3">
-            <p className="text-xl flex justify-between mb-1">
-              <span>Total incomes:</span>{" "}
-              <span className="text-2xl font-semibold text-green-500">
+          <div className="mb-8 py-2 sm:px-4 px-0 rounded-xl flex gap-1 flex-row lg:flex-col xl:flex-row">
+            <div className="bg-white sm:py-2 py-1 sm:px-4 px-2 rounded-xl w-1/2 xl:w-1/2 sm:w-full text-center shadow-lg">
+              <p className="text-md uppercase mb-1">Total incomes:</p>
+              <p className="text-2xl font-semibold text-green-500">
                 {formatCurrency(report.incomes)}
-              </span>
-            </p>
-            <p className="text-xl flex justify-between">
-              <span>Total expenses: </span>
-              <span className="text-2xl font-semibold text-orange-500">
+              </p>
+            </div>
+            <div className="bg-white py-1 px-2 sm:py-2 sm:px-4  rounded-xl w-1/2 xl:w-1/2 sm:w-full text-center shadow-lg">
+              <p className="text-md uppercase mb-1">Total expenses:</p>
+              <p className="text-2xl font-semibold text-orange-500">
                 {"-" + formatCurrency(report.expenses)}
-              </span>
-            </p>
+              </p>
+            </div>
           </div>
 
           <div className="flex flex-col items-center justify-center mb-6">
@@ -118,25 +132,39 @@ function Report({ month, year, decreaseMonth, increaseMonth, report }) {
                   pathColor: "#F97315",
                   trailColor: "#11111111",
                   pathTransitionDuration: 0.5,
+                  strokeLinecap: "round",
                 })}
               >
-                <img
-                  className="w-32 h-32"
-                  src="https://png.pngtree.com/png-vector/20190411/ourlarge/pngtree-vector-wallet-icon-png-image_924644.jpg"
-                />
-                <p className="text-3xl">{percentageReport + "%"}</p>
+                <div className="w-32 h-32 rounded-xl overflow-hidden mb-2">
+                  <img
+                    className="object-cover w-full h-full"
+                    src={process.env.REACT_APP_API_HOST + walletChosen?.image}
+                  />
+                </div>
+
+                <p className="text-2xl font-bold">{percentageReport + "%"}</p>
               </CircularProgressbarWithChildren>
             </div>
-            <p className="text-xl">
-              Remainder:{" "}
-              <span className="font-semibold text-purple-600 text-2xl">
-                {formatCurrency(report.incomes - report.expenses)}
-              </span>
-            </p>
+            {report.incomes - report.expenses >= 0 && (
+              <p className="text-xl">
+                Remainder:{" "}
+                <span className="font-semibold text-purple-600 text-2xl">
+                  {formatCurrency(report.incomes - report.expenses)}
+                </span>
+              </p>
+            )}
+            {report.incomes - report.expenses < 0 && (
+              <p className="text-xl">
+                Exceeding:{" "}
+                <span className="font-semibold text-red-600 text-2xl">
+                  {formatCurrency((report.incomes - report.expenses) * -1)}
+                </span>
+              </p>
+            )}
           </div>
 
           <div className="text-center flex flex-col items-center">
-            {!plan && (
+            {!loadingPlan && !plan && (
               <button
                 className="py-2 px-8 rounded-lg bg-transparent text-purple-500 font-semibold hover:bg-white mb-3"
                 onClick={() => setIsAddingPlan(true)}
@@ -144,27 +172,44 @@ function Report({ month, year, decreaseMonth, increaseMonth, report }) {
                 Set up plan for this month
               </button>
             )}
-            {plan && (
+            {!loadingPlan && plan && (
               <div className="mb-3 bg-purple-200 rounded-xl py-2 px-4">
                 <div className="mb-2 flex justify-between items-end">
-                  <p className="text-md text-start">
-                    Your budget for this month:{" "}
-                    <span className="font-bold text-xl">
+                  <div className="flex flex-col justify-center items-start text-md w-1/2 text-start">
+                    <p className="">Your budget for this month: </p>
+                    <p className="font-bold text-xl">
                       {formatCurrency(plan.amount)}
-                    </span>
-                  </p>
-                  <p className="text-md text-end">
-                    Budget left until 31 August:{" "}
-                    <span className="font-bold text-xl">
-                      {formatCurrency(plan.amount - report.expenses)}
-                    </span>
-                  </p>
+                    </p>
+                  </div>
+                  {percentagePlan <= 100 && (
+                    <div className="flex flex-col justify-center items-end text-md w-1/2 text-end">
+                      <p className="">
+                        Budget left until the end of{" "}
+                        {getMonthName(plan.month - 1)}:{" "}
+                      </p>
+
+                      <p className="font-bold text-xl">
+                        {formatCurrency(plan.amount - report.expenses)}
+                      </p>
+                    </div>
+                  )}
+                  {percentagePlan > 100 && (
+                    <div className="flex flex-col justify-center items-end text-md w-1/2 text-red font-bold text-end">
+                      <p className="">You have overspent your budget of: </p>
+                      <p className="text-xl">
+                        {formatCurrency((plan.amount - plan.expenses) * -1)}
+                      </p>
+                    </div>
+                  )}
                 </div>
                 <div className="flex gap-3 items-center">
                   <div className="h-3 bg-white rounded-full grow shadow-sm">
                     <div
                       className="h-full bg-purple-500 rounded-full"
-                      style={{ width: percentagePlan + "%" }}
+                      style={{
+                        width:
+                          (percentagePlan > 100 ? 100 : percentagePlan) + "%",
+                      }}
                     ></div>
                   </div>
                   <p className="text-xl text-purple-500 font-bold">
@@ -174,7 +219,7 @@ function Report({ month, year, decreaseMonth, increaseMonth, report }) {
               </div>
             )}
             <button
-              className="py-2 px-8 rounded-lg bg-purple-500 text-white text-sm font-semibold uppercase mb-3 hover:bg-purple-600"
+              className="py-2 px-8 rounded-lg bg-purple-500 text-white text-sm font-semibold uppercase mt-3 hover:bg-purple-600"
               onClick={handleClickViewReport}
             >
               View report

@@ -5,30 +5,42 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import TransactionsService from "../../../services/transactions";
 import { format } from "date-fns";
 import { shorten } from "../../../utils/stringFormatter";
+import { toast } from "react-toastify";
 
-function CategoryItem({ item, index, month, year, wallet, percentage }) {
+function TransactionsByCategoryItem({
+  item,
+  index,
+  month,
+  year,
+  wallet,
+  percentage,
+}) {
   const [showDropdown, setShowDropdown] = useState(false);
   const [transactions, setTransactions] = useState(null);
   const [loading, setLoading] = useState(false);
 
   const getTransactions = async () => {
-    setLoading(true);
+    try {
+      setLoading(true);
 
-    let params = {
-      year,
-      wallet,
-      category: item.id,
-    };
+      let params = {
+        year,
+        wallet,
+        category: item.id,
+      };
 
-    if (month) {
-      params = { ...params, month };
-    }
+      if (month) {
+        params = { ...params, month };
+      }
 
-    const responseData = await TransactionsService.getTransactions(params);
-    setLoading(false);
+      const responseData = await TransactionsService.getTransactions(params);
+      setLoading(false);
 
-    if (responseData.status === "success") {
-      setTransactions(responseData.data.transactions);
+      if (responseData.status === "success") {
+        setTransactions(responseData.data.transactions);
+      }
+    } catch (e) {
+      toast.error(e.response.data.message);
     }
   };
 
@@ -47,11 +59,11 @@ function CategoryItem({ item, index, month, year, wallet, percentage }) {
         }`}
         onClick={() => setShowDropdown(!showDropdown)}
       >
-        <div className="w-14 h-14 flex justify-center items-center overflow-hidden rounded-md">
+        <div className="w-14 h-14 flex justify-center items-center overflow-hidden rounded-md shrink-0">
           <img
             src={process.env.REACT_APP_API_HOST + item.image}
             alt=""
-            className="shrink-0 h-"
+            className="object-cover h-full w-full"
           />
         </div>
         <p className="w-1/3">{item.name}</p>
@@ -60,14 +72,14 @@ function CategoryItem({ item, index, month, year, wallet, percentage }) {
         </p>
         <p
           className={`font-semibold text-end grow ${
-            item.type === "incomes" ? "text-green-600" : "text-red-600"
+            item.type === "incomes" ? "text-green-600" : "text-orange-600"
           } w-1/5`}
         >
           {`${item.type === "incomes" ? "+" : "-"}  ${formatCurrency(
             item.amount
           )}`}
         </p>
-        <div className="grow flex justify-end pe-4">
+        <div className="grow flex justify-end sm:pe-4 pe-1 sm:w-1/6 w-1/10 shrink-0">
           <FontAwesomeIcon
             icon={faChevronRight}
             className={`text-gray-500 ${
@@ -83,17 +95,23 @@ function CategoryItem({ item, index, month, year, wallet, percentage }) {
           {!loading &&
             transactions &&
             transactions.map((transaction) => (
-              <div className="flex my-1 mx-6 gap-3 border-b border-b-purple-300">
-                <p className="w-1/5">
+              <div
+                key={transaction.id}
+                className="flex my-1 mx-6 gap-3 border-b border-b-purple-300"
+              >
+                <p className="w-1/5 overflow-clip sm:block hidden font-bold shrink-0">
                   {format(new Date(transaction.date), "dd/MM/yyyy")}
+                </p>
+                <p className="w-1/5 overflow-clip sm:hidden block font-bold shrink-0">
+                  {format(new Date(transaction.date), "dd/MM")}
                 </p>
                 <p className="grow">{shorten(transaction.title, 50)}</p>
                 <p
                   className={
                     "w-1/5 text-end " +
                     (transaction.category.type === "expenses"
-                      ? "text-red-500"
-                      : "text-green-500")
+                      ? "text-orange-600"
+                      : "text-green-600")
                   }
                 >
                   {transaction.category.type === "expenses" ? "-" : "+"}
@@ -107,4 +125,4 @@ function CategoryItem({ item, index, month, year, wallet, percentage }) {
   );
 }
 
-export default CategoryItem;
+export default TransactionsByCategoryItem;

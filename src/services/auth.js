@@ -1,5 +1,5 @@
 import axios from "axios";
-import instance, { notAuthInstance } from "../utils/axiosConfig";
+import instance, { notAuthInstance } from "../config/axiosConfig";
 
 export default class AuthService {
   static async register(data) {

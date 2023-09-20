@@ -5,7 +5,7 @@ import { useNavigate } from "react-router";
 import AuthService from "../../../services/auth";
 import Input from "../../../components/elements/Input";
 
-function LoginForm({ onForgetting, onLogin, onVerify, submitting, error }) {
+function LoginForm({ onForgetting, onLogin, submitting, error }) {
   const navigate = useNavigate();
 
   return (
@@ -13,11 +13,6 @@ function LoginForm({ onForgetting, onLogin, onVerify, submitting, error }) {
       <h2 className="text-purple-500 text-3xl text-center mb-6">Login</h2>
       <div className="flex gap-2 items-center mt-3">
         {error && <p className="text-red-500">{error}</p>}
-        {error && error.includes("verified") && (
-          <button className="text-blue-700 hover:underline" onClick={onVerify}>
-            Verify now
-          </button>
-        )}
       </div>
 
       <Formik

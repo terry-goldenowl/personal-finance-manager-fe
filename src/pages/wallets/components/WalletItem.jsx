@@ -8,19 +8,24 @@ import InfoModal from "../../../components/modal/InfoModal";
 import WalletsService from "../../../services/wallets";
 import { toast } from "react-toastify";
 import AddWallet from "./AddWallets";
+import formatCurrency from "../../../utils/currencyFormatter";
 
 function WalletItem({ wallet, onUpdateSuccess }) {
   const [isDeleting, setIsDeleting] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
 
   const handleDelete = async () => {
-    const responseData = await WalletsService.deleteWallet(wallet.id);
+    try {
+      const responseData = await WalletsService.deleteWallet(wallet.id);
 
-    if (responseData.status === "success") {
-      setIsDeleting(false);
-      onUpdateSuccess("delete");
-    } else {
-      toast.error(responseData.error);
+      if (responseData.status === "success") {
+        setIsDeleting(false);
+        onUpdateSuccess("delete");
+      } else {
+        toast.error(responseData.error);
+      }
+    } catch (e) {
+      toast.error(e.response.data.message);
     }
   };
 
@@ -33,21 +38,35 @@ function WalletItem({ wallet, onUpdateSuccess }) {
         rotate: 3 * Math.random() > 0.5 ? 1 : -1,
       }}
     >
-      <div className="w-14 h-14 rounded-full flex items-center justify-center overflow-hidden shadow-md bg-white">
+      <div className="w-14 h-14 rounded-full overflow-hidden shadow-md bg-white">
         <img
           src={process.env.REACT_APP_API_HOST + wallet.image}
           alt=""
-          className="object-contain"
+          className="object-cover h-full w-full"
         />
       </div>
-      <p className="text-lg text-white grow">{wallet.name}</p>
+      <div className="grow">
+        <p className="text-lg text-white">{wallet.name}</p>
+        <p className="text-white text-sm">
+          {" "}
+          Balance:{" "}
+          <span
+            className={
+              "font-bold " +
+              (wallet.balance >= 0 ? "text-green-300" : "text-orange-300")
+            }
+          >
+            {formatCurrency(wallet.balance)}
+          </span>
+        </p>
+      </div>
       <div className="w-1/5 flex justify-end relative">
         <Popover className={"flex justify-center"}>
           <Popover.Button>
             <IconButton icon={faEllipsis} size="small" />
           </Popover.Button>
 
-          <Popover.Panel className="absolute z-10 -top-8 shadow-lg">
+          <Popover.Panel className="absolute z-10 -top-8 right-0 sm:right-auto shadow-lg">
             <div className="flex overflow-hidden">
               <button
                 className="py-1 px-4 rounded-l-md bg-gray-100 hover:bg-purple-200"

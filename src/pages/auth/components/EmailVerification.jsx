@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import Modal from "../../../components/modal/Modal";
 import AuthService from "../../../services/auth";
 import AuthInput from "./AuthInput";
+import { toast } from "react-toastify";
 
 function EmailVerification({ onSuccess, onClose, email }) {
   const [code, setCode] = useState("");
@@ -20,7 +21,7 @@ function EmailVerification({ onSuccess, onClose, email }) {
         setError(responseData.error);
       }
     } catch (error) {
-      setError(error.error);
+      toast.error(error.response.data.message);
     }
   };
 
@@ -29,6 +30,7 @@ function EmailVerification({ onSuccess, onClose, email }) {
       title={"Email verification"}
       onAccept={handleAccept}
       onClose={onClose}
+      width={"sm:w-fit w-11/12"}
     >
       <AuthInput
         type={"text"}
@@ -38,7 +40,7 @@ function EmailVerification({ onSuccess, onClose, email }) {
         onBlur={(e) => setCode(e.target.value)}
         error={error}
         label={
-          "Your account haven't been verified yet! Please enter the code that we have sent to your email in mailtrap."
+          "Your email haven't been verified yet! Please enter the code that we have sent to your email in mailtrap to verify."
         }
         style="text-center"
       />

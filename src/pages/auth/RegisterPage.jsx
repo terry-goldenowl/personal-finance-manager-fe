@@ -5,79 +5,76 @@ import AuthService from "../../services/auth";
 import EmailVerification from "./components/EmailVerification";
 import SuccessfulVerification from "./components/SuccessfulVerification";
 import { useNavigate } from "react-router";
+import InfoModal from "../../components/modal/InfoModal";
+import { toast } from "react-toastify";
 
 function RegisterPage() {
-  const [showEmailVerification, setShowEmailVerification] = useState(false);
   const [isVerifyingEmail, setIsVerifyingEmail] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isVerified, setIsVerified] = useState(false);
-  const [email, setEmail] = useState("");
+  const [values, setValues] = useState([]);
   const [error, setError] = useState(null);
 
   const navigate = useNavigate();
 
-  const handleRegister = async (values) => {
-    // console.log(values)
+  const handleRegister = async (registerFields) => {
     try {
-      if (isVerifyingEmail) {
-        setShowEmailVerification(true);
-        return;
-      }
+      setValues(registerFields);
+      setIsSubmitting(true);
+      const responseData = await AuthService.sendVerificationCode({
+        email: registerFields.email,
+      });
 
+      setIsSubmitting(false);
+
+      if (responseData.status === "success") {
+        setIsVerifyingEmail(true);
+      } else {
+        toast.error(responseData.error);
+        setError(responseData.error);
+      }
+    } catch (error) {
+      toast.error(error.response.data.message);
+    }
+  };
+
+  const handleVerifySuccess = async () => {
+    try {
       setIsSubmitting(true);
       const responseData = await AuthService.register(values);
       setIsSubmitting(false);
 
       if (responseData.status === "success") {
-        setIsSubmitting(true);
-        const responseData1 = await AuthService.sendVerificationCode({
-          email: values.email,
-        });
-        setIsSubmitting(false);
-
-        if (responseData1.status === "success") {
-          // console.log(responseData1);
-
-          setShowEmailVerification(true);
-          setIsVerifyingEmail(true);
-
-          setEmail(values.email);
-        } else {
-          setError(responseData.error);
-        }
+        setIsVerifyingEmail(false);
+        setIsVerified(true);
       } else {
-        setError(responseData.error);
+        toast.error(responseData.error);
       }
-    } catch (error) {
-      setError(error.error);
+    } catch (e) {
+      toast.error(e.response.data.message);
     }
-  };
-
-  const handleVerifySuccess = () => {
-    setShowEmailVerification(false);
-    setIsVerifyingEmail(false);
-    setIsVerified(true);
   };
 
   return (
     <LoginRegisterLayout>
       <RegisterForm
-        onSubmit={handleRegister}
         submitting={isSubmitting}
         error={error}
         setError={setError}
+        onSubmit={handleRegister}
       />
-      {showEmailVerification && (
+      {isVerifyingEmail && (
         <EmailVerification
           onSuccess={handleVerifySuccess}
-          onClose={() => setShowEmailVerification(false)}
-          email={email}
+          onClose={() => setIsVerifyingEmail(false)}
+          email={values.email}
         />
       )}
       {isVerified && (
-        <SuccessfulVerification
-          onAccept={() => navigate("/login")}
-          onClose={() => setIsVerified(false)}
+        <InfoModal
+          title="Notification"
+          message={"Register user successfully! Please login to continue."}
+          onClose={() => navigate("/login")}
         />
       )}
     </LoginRegisterLayout>

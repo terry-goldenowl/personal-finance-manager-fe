@@ -1,56 +1,75 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import AddMonthPlan from "./AddMonthPlan";
 import PlansService from "../../../services/plans";
 import MonthPlanItem from "./MonthPlanItem";
-import yearsGetter from "../../../utils/yearsGetter";
 import Select from "../../../components/elements/Select";
 import Loading from "../../../components/others/Loading";
-import ReportsService from "../../../services/reports";
 import { useSelector } from "react-redux";
+import { toast } from "react-toastify";
 
 function MonthPlans({ onSeeCategoryPlans }) {
   const [isAddingPlan, setIsAddingPlan] = useState(false);
-  const [monthPlans, setMonthPlans] = useState([]);
-  const [year, setYear] = useState(
-    yearsGetter(20).find((year) => year.id === new Date().getFullYear())
-  );
+  const [year, setYear] = useState();
+  const [years, setYears] = useState();
   const [loading, setLoading] = useState(false);
   const walletChosen = useSelector((state) => state.wallet.walletChosen);
+  const [plans, setPlans] = useState(null);
+  const [loadingYears, setLoadingYears] = useState(false);
 
-  const getMonthPlans = async () => {
-    setLoading(true);
-    const responseData = await PlansService.getPlans({
-      type: "month",
-      year: year.id,
-      wallet_id: walletChosen?.id,
-    });
+  const getYearsBetween = async () => {
+    try {
+      setLoadingYears(true);
+      const responseData = await PlansService.getMonthPlansYears({
+        wallet_id: walletChosen?.id,
+      });
 
-    let responsePlans = responseData.data.plans;
+      if (responseData.status === "success") {
+        console.log(responseData);
 
-    responsePlans = await Promise.all(
-      responsePlans.map(async (plan) => {
-        const responseReportData = await ReportsService.getReports({
-          year: plan.year,
-          report_type: "expenses-incomes",
-          wallet_id: walletChosen.id,
+        const yearsBetween = responseData.data.years.map((y) => {
+          return { id: y, name: y };
         });
 
-        const monthReport = responseReportData.data.reports[plan.month + ""];
-        return {
-          ...plan,
-          currentTotal: monthReport ? monthReport.expenses : 0,
-        };
-      })
-    );
+        setYears(yearsBetween);
 
-    setLoading(false);
+        const currentYear = yearsBetween.find(
+          (y) => y.id === new Date().getFullYear()
+        );
 
-    setMonthPlans(responsePlans);
+        setYear(currentYear || yearsBetween[0]);
+      }
+      setLoadingYears(false);
+    } catch (e) {
+      toast.error(e.response.data.message);
+    }
+  };
+
+  const getMonthPlans = async () => {
+    try {
+      setLoading(true);
+      const responseData = await PlansService.getMonthPlans({
+        year: year.id,
+        wallet_id: walletChosen?.id,
+        with_report: true,
+      });
+
+      setPlans(responseData.data.plans);
+      setLoading(false);
+    } catch (e) {
+      toast.error(e.response.data.message);
+    }
   };
 
   useEffect(() => {
-    getMonthPlans();
+    if (year && walletChosen) {
+      getMonthPlans();
+    }
   }, [year, walletChosen]);
+
+  useEffect(() => {
+    setLoadingYears(true);
+    if (walletChosen) getYearsBetween();
+  }, [walletChosen]);
 
   return (
     <div>
@@ -59,7 +78,8 @@ function MonthPlans({ onSeeCategoryPlans }) {
           <Select
             selected={year}
             setSelected={setYear}
-            data={yearsGetter(20)}
+            data={years}
+            loading={loadingYears}
           />
         </div>
         <button
@@ -72,15 +92,20 @@ function MonthPlans({ onSeeCategoryPlans }) {
       <div>
         {loading && <Loading />}
         {!loading &&
-          monthPlans.map((monthPlan) => (
+          plans &&
+          plans.length > 0 &&
+          plans.map((monthPlan) => (
             <MonthPlanItem
               monthPlan={monthPlan}
               key={monthPlan.id}
-              onUpdateSuccess={() => getMonthPlans()}
+              onUpdateSuccess={() => {
+                getYearsBetween();
+                getMonthPlans();
+              }}
               onSeeCategoryPlans={onSeeCategoryPlans}
             />
           ))}
-        {!loading && monthPlans.length === 0 && (
+        {!loading && plans && plans.length === 0 && (
           <p className="text-2xl text-center text-gray-600 py-4">
             No plan has been set in the period!
           </p>
@@ -90,7 +115,10 @@ function MonthPlans({ onSeeCategoryPlans }) {
       {isAddingPlan && (
         <AddMonthPlan
           onClose={() => setIsAddingPlan(false)}
-          onAddingSuccess={() => getMonthPlans()}
+          onAddingSuccess={() => {
+            getYearsBetween();
+            getMonthPlans();
+          }}
         />
       )}
     </div>

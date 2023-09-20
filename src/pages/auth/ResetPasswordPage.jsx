@@ -4,6 +4,7 @@ import ResetPasswordForm from "./components/ResetPasswordForm";
 import { useNavigate, useParams } from "react-router";
 import AuthService from "../../services/auth";
 import SuccessfulResetPassword from "./components/SuccessfulResetPassword";
+import { toast } from "react-toastify";
 
 function ResetPasswordPage() {
   const params = useParams();
@@ -26,12 +27,11 @@ function ResetPasswordPage() {
       if (responseData.status === "success") {
         setShowSuccessful(true);
       } else {
-        console.log(responseData);
         setError(responseData.error);
       }
     } catch (error) {
       setIsSubmitting(false);
-      setError(error.error);
+      toast.error(error.response.data.message);
     }
   };
 

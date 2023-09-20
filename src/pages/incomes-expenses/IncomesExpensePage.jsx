@@ -4,20 +4,21 @@ import ReportsService from "../../services/reports";
 import AddTransaction from "./components/AddTransaction";
 import Report from "./components/Report";
 import RecentTransactions from "./components/RecentTransactions";
-import { ToastContainer, toast } from "react-toastify";
+import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import SelectWallet from "../wallets/components/SelectWallet";
 import { useSelector } from "react-redux";
 
 function IncomesExpensePage() {
-  const [transactions, setTransactions] = useState([]);
-  const [report, setReport] = useState({ incomes: 0, expenses: 0 });
+  const [transactions, setTransactions] = useState(null);
+  const [report, setReport] = useState(null);
   const [month, setMonth] = useState(new Date().getMonth() + 1);
   const [year, setYear] = useState(new Date().getFullYear());
   const [search, setSearch] = useState("");
   const [isAddingTx, setIsAddingTx] = useState(false);
   const [typeAddTx, setTypeAddTx] = useState("expense");
-  const [loading, setLoading] = useState(false);
+  const [loadingTransactions, setLoadingTransactions] = useState(false);
+  const [loadingReport, setLoadingReport] = useState(false);
   const [day, setDay] = useState(null);
 
   const walletChosen = useSelector((state) => state.wallet.walletChosen);
@@ -53,8 +54,6 @@ function IncomesExpensePage() {
   };
 
   const getTransactions = async () => {
-    setLoading(true);
-
     let params = {
       month,
       year,
@@ -69,19 +68,26 @@ function IncomesExpensePage() {
       params = { ...params, search };
     }
 
-    const responseData = await TransactionsService.getTransactions(params);
-    setLoading(false);
+    setLoadingTransactions(true);
 
+    const responseData = await TransactionsService.getTransactions(params);
     setTransactions(responseData.data.transactions);
+
+    setLoadingTransactions(false);
   };
 
   const getReport = async () => {
-    // Return a list of expenses and incomes of months
-    const responseData = await ReportsService.getReports({
-      year,
-      wallet: walletChosen?.id,
-    });
-    setReport(responseData.data.reports[month + ""]);
+    try {
+      setLoadingReport(true);
+      const responseData = await ReportsService.getReports({
+        year,
+        wallet: walletChosen?.id,
+      });
+      setReport(responseData.data.reports[month + ""]);
+      setLoadingReport(false);
+    } catch (e) {
+      toast.error(e.response.data.message);
+    }
   };
 
   const handleClickAddTx = (type) => {
@@ -100,39 +106,36 @@ function IncomesExpensePage() {
   };
 
   useEffect(() => {
-    getTransactions();
-    getReport();
+    setLoadingReport(true);
+    if (walletChosen) getReport();
   }, [month, year, walletChosen]);
 
   useEffect(() => {
-    getTransactions();
-  }, [search, day]);
+    setLoadingTransactions(true);
+    if (walletChosen) getTransactions();
+  }, [month, year, walletChosen, search, day]);
 
   return (
-    <div className="p-8">
+    <div className="lg:p-8 sm:p-14 p-2">
       {/* Header */}
-      <div className="mb-8 flex justify-between">
-        <div className="flex gap-4 items-center">
-          <h2 className="text-4xl">Incomes & Expenses</h2>
+      <div className="mb-4 flex justify-between items-center flex-col lg:flex-row gap-4">
+        <div className="flex gap-4 items-center justify-between lg:justify-start lg:w-3/5 w-full">
+          <h2 className="sm:text-4xl text-3xl">Transactions</h2>
           <SelectWallet />
         </div>
         <div
-          className="flex border-2 border-purple-500 rounded-2xl relative"
+          className="flex border-2 border-purple-500 rounded-2xl relative lg:w-1/3 md:w-1/2 w-4/5"
           id="add-transactions-container"
         >
-          {/* <div
-            className="absolute h-full w-1/2 rounded-xl bg-purple-500"
-            id="hovering-block"
-          ></div> */}
           <button
-            className="py-2 text-center rounded-xl font-semibold bg-purple-500 text-white px-8 hover:bg-purple-600"
+            className="py-2 xl:px-8 px-4 text-center rounded-xl font-semibold bg-purple-500 text-white hover:bg-purple-600 w-1/2"
             id="add-expense-btn"
             onClick={() => handleClickAddTx("expenses")}
           >
             Add expense
           </button>
           <button
-            className="py-2 px-8 rounded-xl font-semibold text-purple-600"
+            className="py-2 xl:px-8 px-4 rounded-xl font-semibold text-purple-600 w-1/2"
             id="add-income-btn"
             onClick={() => handleClickAddTx("incomes")}
           >
@@ -141,12 +144,13 @@ function IncomesExpensePage() {
         </div>
       </div>
 
-      <div className="flex gap-8">
+      <div className="flex gap-8 flex-col lg:flex-row">
         <Report
           month={month}
           year={year}
           increaseMonth={increaseMonth}
           decreaseMonth={decreaseMonth}
+          loading={loadingReport}
           report={report}
         />
 
@@ -154,7 +158,7 @@ function IncomesExpensePage() {
           transactions={transactions}
           onModifySuccess={handleModifySuccess}
           onSearch={handleSearchChange}
-          loading={loading}
+          loading={loadingTransactions}
           onDateChange={handleDateChange}
         />
       </div>

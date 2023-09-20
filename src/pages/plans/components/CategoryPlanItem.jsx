@@ -1,21 +1,20 @@
 import React, { useEffect, useState } from "react";
 import formatCurrency from "../../../utils/currencyFormatter";
 import { motion } from "framer-motion";
-import ReportsService from "../../../services/reports";
-import IconButton from "../../../components/elements/IconButton";
-import { faRemove, faTrash } from "@fortawesome/free-solid-svg-icons";
 import ConfirmDeleteModal from "../../../components/modal/ConfirmDeleteModal";
 import PlansService from "../../../services/plans";
 import { toast } from "react-toastify";
+import AdjustBudget from "./AdjustBudget";
 
 function CategoryPlanItem({ categoryPlan, onUpdateSuccess }) {
   const [isHovering, setIsHovering] = useState(false);
   const [percentage, setPercentage] = useState(0);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isUpdating, setIsUpdating] = useState(false);
 
   useEffect(() => {
-    if (categoryPlan.currentTotal) {
-      setPercentage((categoryPlan.currentTotal / categoryPlan.amount) * 100);
+    if (categoryPlan.actual) {
+      setPercentage((categoryPlan.actual / categoryPlan.amount) * 100);
     }
   }, [categoryPlan]);
 
@@ -24,12 +23,17 @@ function CategoryPlanItem({ categoryPlan, onUpdateSuccess }) {
     setIsHovering(false);
   };
 
+  const handleClickUpdate = () => {
+    setIsUpdating(true);
+    setIsHovering(false);
+  };
+
   const handleDelete = async () => {
     const responseData = await PlansService.deleteCategoryPlan(categoryPlan.id);
 
     if (responseData.status === "success") {
-      toast.success("Delete category plan successfully!");
       setIsDeleting(false);
+      toast.success("Delete category plan successfully!");
       onUpdateSuccess();
     } else {
       toast.error("Some thing went wrong when delete category plan!");
@@ -39,7 +43,7 @@ function CategoryPlanItem({ categoryPlan, onUpdateSuccess }) {
   return (
     <>
       <div
-        className="flex gap-3 items-center mb-1 py-1 px-4 rounded-xl hover:bg-white hover:bg-opacity-80 relative"
+        className="flex gap-3 items-center mb-1 py-1 sm:px-4 px-0 rounded-xl hover:bg-white hover:bg-opacity-80 relative"
         onMouseEnter={() => setIsHovering(true)}
         onMouseLeave={() => setIsHovering(false)}
       >
@@ -47,7 +51,7 @@ function CategoryPlanItem({ categoryPlan, onUpdateSuccess }) {
           <img
             src={process.env.REACT_APP_API_HOST + categoryPlan.category.image}
             alt=""
-            className="object-cover"
+            className="object-cover w-full h-full"
           />
         </div>
         <div className="w-1/4 overflow-hidden">
@@ -57,14 +61,25 @@ function CategoryPlanItem({ categoryPlan, onUpdateSuccess }) {
         </div>
         <div className="h-2 bg-blue-50 rounded-full grow shadow-sm overflow-hidden">
           <div
-            className="h-full bg-blue-700 rounded-full"
+            className={
+              "h-full rounded-full " +
+              (percentage > 100
+                ? "bg-red-600"
+                : percentage > 50
+                ? "bg-blue-600"
+                : "bg-blue-400")
+            }
             style={{
-              width: percentage > 100 ? 100 : percentage + "%",
+              width: (percentage > 100 ? 100 : Math.round(percentage)) + "%",
             }}
           ></div>
         </div>
         <div className="w-10">
-          <p className="text-lg text-orange-500 font-bold">
+          <p
+            className={`text-lg ${
+              percentage <= 100 ? "text-blue-600" : "text-red-600"
+            } font-bold`}
+          >
             {Math.round(percentage) + "%"}
           </p>
         </div>
@@ -73,7 +88,7 @@ function CategoryPlanItem({ categoryPlan, onUpdateSuccess }) {
             initial={{ translateY: 0, opacity: 0 }}
             animate={{ translateY: 10, opacity: 1 }}
             transition={{ type: "spring" }}
-            className="absolute bg-white px-6 py-3 rounded-xl bottom-12 right-36 shadow-md w-60"
+            className="absolute bg-white px-6 py-3 rounded-xl bottom-12 sm:right-36 right-16 shadow-md w-60"
           >
             <div className="flex justify-between mb-1">
               <p>Plan: </p>
@@ -84,22 +99,48 @@ function CategoryPlanItem({ categoryPlan, onUpdateSuccess }) {
             <div className="flex justify-between mb-1">
               <p>Actual: </p>
 
-              <p className="font-bold">
-                {formatCurrency(categoryPlan.currentTotal)}
-              </p>
+              <p className="font-bold">{formatCurrency(categoryPlan.actual)}</p>
             </div>
             <hr className="h-0.5 bg-gray-300 mb-2" />
-            <div className="flex justify-between mb-1">
-              <p>Remaining: </p>
+            {percentage <= 100 && (
+              <div className="flex justify-between mb-1">
+                <p>Remaining: </p>
 
-              <p className="font-bold text-blue-600">
-                {formatCurrency(
-                  categoryPlan.amount - categoryPlan.currentTotal
-                )}
-              </p>
-            </div>
-            <div className="flex justify-end">
-              <IconButton icon={faTrash} onClick={handleClickDelete} />
+                <p className="font-bold text-blue-600">
+                  {formatCurrency(categoryPlan.amount - categoryPlan.actual)}
+                </p>
+              </div>
+            )}
+            {percentage > 100 && (
+              <div className="flex justify-between mb-1">
+                <p>Overspend: </p>
+
+                <p className="font-bold text-red-600">
+                  {formatCurrency(
+                    (categoryPlan.amount - categoryPlan.actual) * -1
+                  )}
+                </p>
+              </div>
+            )}
+            <div className="flex gap-1">
+              <motion.button
+                className="py-1 px-2 bg-blue-500 hover:bg-blue-600 text-white rounded-md w-1/2 text-sm"
+                onClick={handleClickUpdate}
+                initial={{ scaleY: 0, translateY: 10, opacity: 0 }}
+                animate={{ scaleY: 1, translateY: 0, opacity: 1 }}
+                transition={{ type: "spring" }}
+              >
+                Update
+              </motion.button>
+              <motion.button
+                className="2y-1 px-2 bg-red-500 hover:bg-red-600 text-white rounded-md w-1/2 text-sm"
+                onClick={handleClickDelete}
+                initial={{ scaleY: 0, translateY: 10, opacity: 0 }}
+                animate={{ scaleY: 1, translateY: 0, opacity: 1 }}
+                transition={{ type: "spring" }}
+              >
+                Delete
+              </motion.button>
             </div>
           </motion.div>
         )}
@@ -111,6 +152,13 @@ function CategoryPlanItem({ categoryPlan, onUpdateSuccess }) {
           }
           onAccept={handleDelete}
           onClose={() => setIsDeleting(false)}
+        />
+      )}
+      {isUpdating && (
+        <AdjustBudget
+          plan={categoryPlan}
+          onClose={() => setIsUpdating(false)}
+          onUpdateSuccess={onUpdateSuccess}
         />
       )}
     </>

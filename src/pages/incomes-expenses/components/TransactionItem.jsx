@@ -13,7 +13,6 @@ function TransactionItem({ transaction, index, onModifySuccess }) {
 
   const handleDeleteTransaction = async () => {
     const data = await TransactionsService.deleteTransaction(transaction.id);
-    console.log(data);
 
     if (data.status === "success") {
       setIsDeleting(false);
@@ -27,23 +26,31 @@ function TransactionItem({ transaction, index, onModifySuccess }) {
       <motion.div
         className={
           "flex gap-3 p-2 pe-6 items-center rounded-lg hover:bg-purple-200 cursor-pointer " +
-          (index % 2 === 0 ? "bg-gray-200" : "")
+          (index % 2 === 0 ? "bg-gray-200" : "bg-white")
         }
         onClick={() => setIsViewingDetail(true)}
         whileHover={{
           scale: 1.05,
         }}
       >
-        <div className="w-16 h-16 overflow-hidden rounded-md shadow-sm">
+        <div className="w-16 h-16 overflow-hidden rounded-md shadow-sm flex-shrink-0 relative">
           <img
             src={process.env.REACT_APP_API_HOST + transaction.category.image}
             alt=""
             className="object-cover w-full h-full"
           />
+          <div
+            className="absolute w-full bottom-0 left-0 bg-purple-500 text-white uppercase text-center"
+            style={{ fontSize: 9 }}
+          >
+            {shorten(transaction.category.name, 6)}
+          </div>
         </div>
 
         <div className="grow">
-          <p className="text-md font-semibold">{transaction.title}</p>
+          <p className="text-md font-semibold">
+            {shorten(transaction.title, 40)}
+          </p>
           <p className="text-sm text-gray-500">
             {shorten(transaction.description, 50)}
           </p>

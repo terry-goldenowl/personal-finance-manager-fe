@@ -1,10 +1,25 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import WalletsService from "../services/wallets";
+import { toast } from "react-toastify";
+
+export const fetchWallets = createAsyncThunk(
+  "wallet/fetchWallets",
+  async (arg, thunkAPI) => {
+    try {
+      const responseData = await WalletsService.getWallets();
+      return responseData.data.wallets;
+    } catch (e) {
+      toast.error(e.response.data.message);
+    }
+  }
+);
 
 const walletsSlice = createSlice({
   name: "wallets",
   initialState: {
+    wallets: [],
     walletChosen: null,
-    haveDefaultWallet: false,
+    haveDefaultWallet: true,
     loadingWallets: false,
   },
   reducers: {
@@ -17,6 +32,25 @@ const walletsSlice = createSlice({
     setLoadingWallet: (state, action) => {
       state.loadingWallets = action.payload;
     },
+    resetWallets: (state, action) => {
+      state.wallets = [];
+      state.walletChosen = null;
+    },
+  },
+  extraReducers: (builder) => {
+    builder.addCase(fetchWallets.fulfilled, (state, action) => {
+      state.wallets = action.payload;
+
+      if (action.payload) {
+        state.haveDefaultWallet = action.payload.length > 0;
+
+        if (!state.walletChosen) {
+          state.walletChosen = action.payload.find(
+            (wallet) => wallet.default == 1
+          );
+        }
+      }
+    });
   },
 });
 

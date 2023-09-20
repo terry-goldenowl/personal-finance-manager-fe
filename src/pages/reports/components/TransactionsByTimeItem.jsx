@@ -5,29 +5,34 @@ import formatCurrency from "../../../utils/currencyFormatter";
 import { format } from "date-fns";
 import { shorten } from "../../../utils/stringFormatter";
 import TransactionsService from "../../../services/transactions";
+import { toast } from "react-toastify";
 
-function TransactionItem({ item, index, day, month, year, wallet }) {
+function TransactionByTimeItem({ item, index, day, month, year, wallet }) {
   const [showDropdown, setShowDropdown] = useState(false);
   const [transactions, setTransactions] = useState(null);
   const [loading, setLoading] = useState(false);
 
   const getTransactions = async () => {
-    setLoading(true);
+    try {
+      setLoading(true);
 
-    let params = {
-      month,
-      year,
-      wallet,
-      day,
-    };
+      let params = {
+        month,
+        year,
+        wallet,
+        day,
+      };
 
-    if (day) params = { ...params, day };
+      if (day) params = { ...params, day };
 
-    const responseData = await TransactionsService.getTransactions(params);
-    setLoading(false);
+      const responseData = await TransactionsService.getTransactions(params);
+      setLoading(false);
 
-    if (responseData.status === "success") {
-      setTransactions(responseData.data.transactions);
+      if (responseData.status === "success") {
+        setTransactions(responseData.data.transactions);
+      }
+    } catch (e) {
+      toast.error(e.response.data.message);
     }
   };
 
@@ -46,28 +51,29 @@ function TransactionItem({ item, index, day, month, year, wallet }) {
         }`}
         onClick={() => setShowDropdown(!showDropdown)}
       >
-        <div className="flex grow justify-between">
-          {day && (
-            <p className="text-md me-10 w-1/3">
-              {day + "/" + month + "/" + year}
+        <div className="flex grow">
+          <div className="sm:me-10 me-5 w-1/3 flex justify-start items-center">
+            <p className="text-sm bg-purple-500 text-white px-2 rounded-full">
+              {day ? day + "/" + month + "/" + year : month + "/" + year}
             </p>
-          )}
-          {!day && <p className="text-md me-10 w-1/3">{month + "/" + year}</p>}
+          </div>
 
-          {item.expenses != undefined && (
-            <p className="w-1/3 text-lg font-bold text-red-500">
-              {"-" + formatCurrency(item.expenses)}
-            </p>
-          )}
+          <div className="grow flex items-center justify-between">
+            {item.expenses != undefined && (
+              <p className="text-md font-bold text-orange-600">
+                {"-" + formatCurrency(item.expenses)}
+              </p>
+            )}
 
-          {item.incomes != undefined && (
-            <p className="w-1/3 text-lg font-bold text-green-500">
-              {"+" + formatCurrency(item.incomes)}
-            </p>
-          )}
+            {item.incomes != undefined && (
+              <p className="shrink-0 text-md font-bold text-green-600 text-end">
+                {"+" + formatCurrency(item.incomes)}
+              </p>
+            )}
+          </div>
         </div>
 
-        <div className="flex justify-end pe-4 w-1/6">
+        <div className="flex justify-end sm:pe-4 pe-0 sm:1/6 w-1/10">
           <FontAwesomeIcon
             icon={faChevronRight}
             className={`text-gray-500 ${
@@ -83,8 +89,11 @@ function TransactionItem({ item, index, day, month, year, wallet }) {
           {!loading &&
             transactions &&
             transactions.map((transaction) => (
-              <div className="flex my-1 mx-6 gap-3 border-b border-b-purple-300">
-                <p className="w-1/5">
+              <div
+                key={transaction.id}
+                className="flex my-1 sm:mx-6 mx-2 gap-3 border-b border-b-purple-300 items-center"
+              >
+                <p className="w-1/5 text-sm font-bold">
                   {format(new Date(transaction.date), "dd/MM/yyyy")}
                 </p>
                 <p className="grow">{shorten(transaction.title, 50)}</p>
@@ -92,8 +101,8 @@ function TransactionItem({ item, index, day, month, year, wallet }) {
                   className={
                     "w-1/5 text-end " +
                     (transaction.category.type === "expenses"
-                      ? "text-red-500"
-                      : "text-green-500")
+                      ? "text-orange-600"
+                      : "text-green-600")
                   }
                 >
                   {transaction.category.type === "expenses" ? "-" : "+"}
@@ -107,4 +116,4 @@ function TransactionItem({ item, index, day, month, year, wallet }) {
   );
 }
 
-export default TransactionItem;
+export default TransactionByTimeItem;

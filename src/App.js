@@ -1,6 +1,5 @@
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
 import "./App.css";
-import HomePage from "./pages/home/HomePage";
 import Layout from "./components/layout/Layout";
 import RegisterPage from "./pages/auth/RegisterPage";
 import LoginPage from "./pages/auth/LoginPage";
@@ -13,6 +12,11 @@ import CategoriesPage from "./pages/categories/CategoriesPage";
 import PlansPage from "./pages/plans/PlansPage";
 import { Provider } from "react-redux";
 import store from "./stores";
+import { ToastContainer, toast } from "react-toastify";
+import AdminPage from "./pages/admin/AdminPage";
+import DefaultCategoriesPage from "./pages/admin/DefaultCategoriesPage";
+import UsersPage from "./pages/admin/UsersPage";
+import AuthorizedRoute from "./components/routes/AuthorizedRoute";
 
 function App() {
   const router = createBrowserRouter([
@@ -20,24 +24,54 @@ function App() {
       element: <ProtectedRoute />,
       children: [
         {
-          path: "/",
           element: <Layout />,
           children: [
             {
-              path: "/transactions",
-              element: <IncomesExpensePage />,
+              element: <AuthorizedRoute allowedRoles={["admin"]} />,
+              children: [
+                {
+                  path: "/admin",
+                  children: [
+                    {
+                      index: true,
+                      element: <AdminPage />,
+                    },
+                    {
+                      path: "categories",
+                      element: <DefaultCategoriesPage />,
+                    },
+                    {
+                      path: "users",
+                      element: <UsersPage />,
+                    },
+                  ],
+                },
+              ],
             },
             {
-              path: "/reports",
-              element: <ReportsPage />,
-            },
-            {
-              path: "/categories",
-              element: <CategoriesPage />,
-            },
-            {
-              path: "/plans",
-              element: <PlansPage />,
+              element: <AuthorizedRoute allowedRoles={["user"]} />,
+              children: [
+                {
+                  path: "/reports",
+                  element: <ReportsPage />,
+                },
+                {
+                  path: "/",
+                  element: <IncomesExpensePage />,
+                },
+                {
+                  path: "/transactions",
+                  element: <IncomesExpensePage />,
+                },
+                {
+                  path: "/categories",
+                  element: <CategoriesPage />,
+                },
+                {
+                  path: "/plans",
+                  element: <PlansPage />,
+                },
+              ],
             },
           ],
         },
@@ -64,6 +98,7 @@ function App() {
 
   return (
     <Provider store={store}>
+      <ToastContainer position="top-center" autoClose="4000" />
       <RouterProvider router={router} />;
     </Provider>
   );

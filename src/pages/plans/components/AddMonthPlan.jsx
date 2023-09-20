@@ -12,10 +12,11 @@ import formatCurrency from "../../../utils/currencyFormatter";
 import WalletsService from "../../../services/wallets";
 import PlansService from "../../../services/plans";
 import { toast } from "react-toastify";
+import { useSelector } from "react-redux";
 
 function AddMonthPlan({ onClose, onAddingSuccess, _month, _year }) {
-  const [wallets, setWallets] = useState([]);
-  const [walletChosen, setWalletChosen] = useState();
+  const { wallets, walletChosen } = useSelector((state) => state.wallet);
+  const [walletSelected, setWalletSelected] = useState(walletChosen);
   const [amount, setAmount] = useState();
   const [formattedAmount, setFormattedAmount] = useState();
   const [month, setMonth] = useState(
@@ -30,38 +31,35 @@ function AddMonthPlan({ onClose, onAddingSuccess, _month, _year }) {
   );
   const [errors, setErrors] = useState(null);
   const [lastMonthValue, setLastMonthValue] = useState(null);
-
-  const getWallets = async () => {
-    const data = await WalletsService.getWallets();
-    setWallets(data.data.wallets);
-    setWalletChosen(data.data.wallets[0]);
-  };
+  const [loadingTotalLastMonth, setLoadingTotalLastMonth] = useState(false);
+  const [processingSave, setProcessingSave] = useState(false);
 
   const getReport = async () => {
-    // Return a list of expenses and incomes of months
-    const responseData = await ReportsService.getReports({
-      year: year.id,
-      report_type: "expenses-incomes",
-      // wallet: 2,
-    });
+    try {
+      setLoadingTotalLastMonth(true);
+      const responseData = await ReportsService.getReports({
+        year: year.id,
+        report_type: "expenses-incomes",
+        wallet: walletSelected?.id,
+      });
 
-    // return console.log(responseData);
-    if (responseData.data.reports[month.id + ""]) {
-      const lastMonthExpense =
-        responseData.data.reports[month.id + ""].expenses;
-      setLastMonthValue(lastMonthExpense);
-    } else {
-      setLastMonthValue(null);
+      if (responseData.data.reports[month.id + ""]) {
+        const lastMonthExpense =
+          responseData.data.reports[month.id + ""].expenses;
+        setLastMonthValue(lastMonthExpense);
+      } else {
+        setLastMonthValue(0);
+      }
+
+      setLoadingTotalLastMonth(false);
+    } catch (e) {
+      toast.error(e.response.data.message);
     }
   };
 
   useEffect(() => {
-    getWallets();
-  }, []);
-
-  useEffect(() => {
-    if (walletChosen) getReport();
-  }, [year, month, walletChosen]);
+    if (walletSelected) getReport();
+  }, [year, month, walletSelected]);
 
   const handleAmountChange = (event) => {
     setErrors((prev) => {
@@ -83,29 +81,34 @@ function AddMonthPlan({ onClose, onAddingSuccess, _month, _year }) {
   };
 
   const handleAddPlan = async () => {
-    setErrors(null);
+    try {
+      setErrors(null);
+      setProcessingSave(true);
 
-    if (!amount || amount.length === 0) {
-      return setErrors((prev) => {
-        return { ...prev, amount: "Amount is required!" };
-      });
-    }
+      if (!amount || amount.length === 0) {
+        return setErrors((prev) => {
+          return { ...prev, amount: "Amount is required!" };
+        });
+      }
 
-    const data = {
-      wallet_id: walletChosen.id,
-      month: month.id + 1,
-      year: year.id,
-      amount,
-    };
+      const data = {
+        wallet_id: walletSelected.id,
+        month: month.id + 1,
+        year: year.id,
+        amount,
+      };
 
-    const responseData = await PlansService.createMonthPlan(data);
+      const responseData = await PlansService.createMonthPlan(data);
 
-    if (responseData.status === "success") {
-      onClose();
-      onAddingSuccess();
-      toast.success("Create plan successfully!");
-    } else {
-      toast.error(responseData.error);
+      if (responseData.status === "success") {
+        onClose();
+        onAddingSuccess();
+        toast.success("Create plan successfully!");
+      }
+      setProcessingSave(false);
+    } catch (e) {
+      setProcessingSave(false);
+      toast.error(e.response.data.message);
     }
   };
 
@@ -114,12 +117,13 @@ function AddMonthPlan({ onClose, onAddingSuccess, _month, _year }) {
       onAccept={handleAddPlan}
       onClose={onClose}
       title={"Add month plan"}
-      width={"w-1/4"}
+      width={"lg:w-1/4 sm:w-1/2 w-11/12"}
+      processing={processingSave}
     >
       {month && year && (
         <div className="flex items-center gap-2">
           <FontAwesomeIcon icon={faInfoCircle} className="text-blue-600" />
-          {!isNaN(lastMonthValue) && lastMonthValue > 0 && (
+          {!loadingTotalLastMonth && lastMonthValue > 0 && (
             <p className="text-sm text-blue-600 italic">
               Total expenses of all transactions last month is{" "}
               <span className="font-bold">
@@ -127,18 +131,23 @@ function AddMonthPlan({ onClose, onAddingSuccess, _month, _year }) {
               </span>
             </p>
           )}
-          {(!lastMonthValue || isNaN(lastMonthValue)) && (
+          {!loadingTotalLastMonth && lastMonthValue === 0 && (
             <p className="text-sm text-blue-600 italic">
               You didn't spend anything last month!
+            </p>
+          )}
+          {loadingTotalLastMonth && (
+            <p className="text-sm text-blue-600 italic">
+              Loading total expenses last month ...
             </p>
           )}
         </div>
       )}
       <SelectWithImage
         data={wallets}
-        label={"Wallet:"}
-        selected={walletChosen}
-        setSelected={setWalletChosen}
+        label={"Wallet"}
+        selected={walletSelected}
+        setSelected={setWalletSelected}
         required
       />
       <div className="flex gap-2">

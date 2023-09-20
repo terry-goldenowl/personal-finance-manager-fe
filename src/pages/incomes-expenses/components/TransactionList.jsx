@@ -4,8 +4,8 @@ import TransactionItem from "./TransactionItem";
 function TransactionList({ transactions, onModifySuccess }) {
   return (
     <div
-      className="px-12 flex flex-col overflow-y-scroll"
-      style={{ height: 600 }}
+      className="sm:px-12 px-2 flex flex-col overflow-y-scroll"
+      style={{ maxHeight: 600 }}
     >
       <div>
         {transactions.map((transaction, index) => (
@@ -17,14 +17,6 @@ function TransactionList({ transactions, onModifySuccess }) {
           />
         ))}
       </div>
-
-      {transactions.length > 12 && (
-        <div className="flex justify-center mt-4">
-          <button className="rounded-full bg-gray-200 border-2 border-gray-300 px-6 hover:bg-gray-300">
-            See more
-          </button>
-        </div>
-      )}
     </div>
   );
 }

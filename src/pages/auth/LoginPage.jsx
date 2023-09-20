@@ -4,11 +4,10 @@ import LoginForm from "./components/LoginForm";
 import ForgetPassword from "./components/ForgetPassword";
 import AuthService from "../../services/auth";
 import NotifyLinkSent from "./components/NotifyLinkSent";
-import Cookies from "js-cookie";
 import { useNavigate } from "react-router";
-import EmailVerification from "./components/EmailVerification";
-import SuccessfulVerification from "./components/SuccessfulVerification";
 import { useDispatch } from "react-redux";
+import { authActions } from "../../stores/auth";
+import { toast } from "react-toastify";
 
 function LoginPage() {
   const [isForgetting, setIsForgetting] = useState(false);
@@ -17,11 +16,9 @@ function LoginPage() {
   const [isNotifyingSent, setIsNotifyingSent] = useState(false);
   const [error, setError] = useState(null);
   const [forgetError, setForgetError] = useState(null);
-  const [showEmailVerification, setShowEmailVerification] = useState(false);
-  const [showVerified, setShowVerified] = useState(false);
-  const [email, setEmail] = useState("");
 
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const handleForget = () => {
     setIsForgetting(true);
@@ -46,58 +43,38 @@ function LoginPage() {
       }
     } catch (error) {
       setIsSendingLink(false);
-      setForgetError(error.error);
+      toast.error(error.response.data.message);
     }
   };
 
   const handleLogin = async (values) => {
-    // console.log(values);
     try {
       setError(null);
-      setEmail(values.email);
-
       setIsSubmitting(true);
 
       const responseData = await AuthService.login(values);
+
       setIsSubmitting(false);
 
       if (responseData.status === "success") {
-        Cookies.set("token", responseData.data.token);
-        Cookies.set("user", JSON.stringify(responseData.data.user));
+        dispatch(authActions.login(responseData.data));
 
-        navigate("/transactions");
+        if (responseData.data.roles.includes("admin")) {
+          navigate("/admin");
+        } else {
+          navigate("/transactions");
+        }
       } else {
         setError(responseData.error);
       }
     } catch (error) {
       setIsSubmitting(false);
-      setError(error.response.data.message);
+      toast.error(error.response.data.message);
     }
   };
 
   const handleCloseSentLink = () => {
     setIsNotifyingSent(false);
-  };
-
-  const handleVerifySuccess = () => {
-    setShowEmailVerification(false);
-    setShowVerified(true);
-  };
-
-  const handleVerify = async () => {
-    const responseData1 = await AuthService.sendVerificationCode({ email });
-
-    if (responseData1.status === "success") {
-      setShowEmailVerification(true);
-    } else {
-      setError(responseData1.error);
-    }
-  };
-
-  const handleCloseVerifySucess = () => {
-    setShowVerified(false);
-    setError(null);
-    window.location.reload();
   };
 
   return (
@@ -107,7 +84,6 @@ function LoginPage() {
         onLogin={handleLogin}
         submitting={isSubmitting}
         error={error}
-        onVerify={handleVerify}
       />
       {isForgetting && (
         <ForgetPassword
@@ -122,19 +98,6 @@ function LoginPage() {
         <NotifyLinkSent
           onAccept={handleCloseSentLink}
           onClose={() => setIsNotifyingSent(false)}
-        />
-      )}
-      {showEmailVerification && (
-        <EmailVerification
-          onSuccess={handleVerifySuccess}
-          onClose={() => setShowEmailVerification(false)}
-          email={email}
-        />
-      )}
-      {showVerified && (
-        <SuccessfulVerification
-          onAccept={handleCloseVerifySucess}
-          onClose={() => setShowVerified(false)}
         />
       )}
     </LoginRegisterLayout>
