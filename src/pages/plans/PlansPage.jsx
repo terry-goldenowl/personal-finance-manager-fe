@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import CategoryPlans from "./components/CategoryPlans";
 import MonthPlans from "./components/MonthPlans";
+import SelectWallet from "../wallets/components/SelectWallet";
 
 function PlansPage() {
   const [viewBy, setViewBy] = useState("months");
@@ -29,8 +30,9 @@ function PlansPage() {
 
   return (
     <div className="p-8">
-      <div className="flex gap-4 mb-4">
+      <div className="flex gap-4 items-center justify-between">
         <h2 className="text-4xl">Plans</h2>
+        <SelectWallet />
       </div>
       <div className="flex flex-col items-center">
         <div className="w-3/5">

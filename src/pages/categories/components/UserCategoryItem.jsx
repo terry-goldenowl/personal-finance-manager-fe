@@ -8,6 +8,7 @@ import CategoriesService from "../../../services/categories";
 import PlansService from "../../../services/plans";
 import AddCategoryPlan from "../../plans/components/AddCategoryPlan";
 import AdjustBudget from "../../plans/components/AdjustBudget";
+import { useSelector } from "react-redux";
 
 function UserCategoryItem({ category, onUpdateSuccess }) {
   const [isHover, setIsHover] = useState(false);
@@ -17,6 +18,7 @@ function UserCategoryItem({ category, onUpdateSuccess }) {
   const [isAdjustingPlan, setIsAdjustingPlan] = useState(false);
   const [plan, setPlan] = useState();
   const [loading, setLoading] = useState(false);
+  const walletChosen = useSelector((state) => state.wallet.walletChosen);
 
   const getPlan = async () => {
     setLoading(true);
@@ -25,6 +27,7 @@ function UserCategoryItem({ category, onUpdateSuccess }) {
       month: new Date().getMonth() + 1,
       year: new Date().getFullYear(),
       category_id: category.id,
+      wallet_id: walletChosen?.id,
     });
     setTimeout(() => setLoading(false), 200);
 
@@ -36,8 +39,10 @@ function UserCategoryItem({ category, onUpdateSuccess }) {
   };
 
   useEffect(() => {
-    getPlan();
-  }, []);
+    if (isHover) {
+      getPlan();
+    }
+  }, [isHover]);
 
   const handleDeleteCategory = async () => {
     // Send request

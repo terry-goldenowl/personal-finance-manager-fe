@@ -14,6 +14,7 @@ function Input({
   accept = "*",
   required = null,
   disable = false,
+  mb = "mb-3",
 }) {
   const sizeStyle =
     size === "medium"
@@ -21,7 +22,7 @@ function Input({
       : "rounded-md py-1.5 px-3 text-sm ring-1";
 
   return (
-    <div className="mb-3">
+    <div className={mb}>
       {label && (
         <label htmlFor={name} className="flex items-center">
           {label}{" "}

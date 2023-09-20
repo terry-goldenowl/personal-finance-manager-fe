@@ -10,6 +10,7 @@ import monthsGetter from "../../../utils/monthsGetter";
 import yearsGetter from "../../../utils/yearsGetter";
 import Loading from "../../../components/others/Loading";
 import ReportsService from "../../../services/reports";
+import { useSelector } from "react-redux";
 
 function CategoryPlans({ _month, _year }) {
   const [isAddingPlan, setIsAddingPlan] = useState(false);
@@ -25,6 +26,7 @@ function CategoryPlans({ _month, _year }) {
       : yearsGetter(20).find((year) => year.id === new Date().getFullYear())
   );
   const [loading, setLoading] = useState(false);
+  const walletChosen = useSelector((state) => state.wallet.walletChosen);
 
   const getCategoryPlans = async () => {
     setLoading(true);
@@ -32,6 +34,7 @@ function CategoryPlans({ _month, _year }) {
       type: "category",
       year: year.id,
       month: month.id + 1,
+      wallet_id: walletChosen.id,
     });
 
     let responsePlans = responseData.data.plans;
@@ -41,12 +44,15 @@ function CategoryPlans({ _month, _year }) {
           year: plan.year,
           month: plan.month,
           report_type: "categories",
-          wallet: 1,
+          wallet_id: walletChosen.id,
         });
 
         const categoryReport =
           responseReportData.data.reports[plan.category.name];
-        return { ...plan, currentTotal: categoryReport ? categoryReport.amount : 0 };
+        return {
+          ...plan,
+          currentTotal: categoryReport ? categoryReport.amount : 0,
+        };
       })
     );
 
@@ -55,8 +61,9 @@ function CategoryPlans({ _month, _year }) {
   };
 
   useEffect(() => {
+    console.log(walletChosen)
     getCategoryPlans();
-  }, [month, year]);
+  }, [month, year, walletChosen]);
 
   const handleUpdateSuccess = () => {
     getCategoryPlans();

@@ -155,12 +155,7 @@ function AddCategoryPlan({
         required
       />
       <SelectWithImage
-        data={categories.map((cate) => {
-          return {
-            ...cate,
-            image: process.env.REACT_APP_API_HOST + cate.image,
-          };
-        })}
+        data={categories}
         label={"Category:"}
         selected={categoryChosen}
         setSelected={setCategoryChosen}

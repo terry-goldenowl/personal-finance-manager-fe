@@ -10,6 +10,8 @@ import ReportsService from "../../services/reports";
 import getDaysInMonth from "../../utils/getDaysOfMonth";
 import TransactionItem from "./components/TransactionItem";
 import Loading from "../../components/others/Loading";
+import SelectWallet from "../wallets/components/SelectWallet";
+import { useSelector } from "react-redux";
 
 function ReportsPage() {
   const location = useLocation();
@@ -17,12 +19,15 @@ function ReportsPage() {
   const [month, setMonth] = useState(
     monthsGetter().find(
       (month) =>
-        month.id === (location.state.month - 1 || new Date().getMonth())
+        month.id ===
+        ((location.state && location.state.month - 1) || new Date().getMonth())
     )
   );
   const [year, setYear] = useState(
     yearsGetter(20).find(
-      (year) => year.id === (location.state.year || new Date().getFullYear())
+      (year) =>
+        year.id ===
+        ((location.state && location.state.year) || new Date().getFullYear())
     )
   );
   const [wallet, setWallet] = useState();
@@ -31,11 +36,12 @@ function ReportsPage() {
   const [search, setSearch] = useState();
   const [period, setPeriod] = useState("month");
   const [reports, setReports] = useState();
-  const [filledReports, setFilledReports] = useState();
+  const [filledReports, setFilledReports] = useState([]);
   const [chartLabels, setChartLabels] = useState([]);
   const [datasets, setDatasets] = useState([]);
   const [loading, setLoading] = useState(false);
   const [totalAmount, setTotalAmount] = useState(null);
+  const walletChosen = useSelector((state) => state.wallet.walletChosen);
 
   // Chqrt configurations
   Chart.register(...registerables);
@@ -101,7 +107,7 @@ function ReportsPage() {
       year: year.id,
       transaction_type: transactionType,
       report_type: reportType,
-      wallet: 1,
+      wallet: walletChosen?.id,
     };
 
     if (period === "month") {
@@ -118,7 +124,7 @@ function ReportsPage() {
         setChartLabels([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
       }
     }
-  }, [transactionType, reportType, period, month, year]);
+  }, [transactionType, reportType, period, month, year, walletChosen]);
 
   useEffect(() => {
     // console.log(reports);
@@ -181,8 +187,9 @@ function ReportsPage() {
   return (
     <div className="p-8">
       {/* Header */}
-      <div className="mb-8">
+      <div className="flex gap-4 items-center justify-between">
         <h2 className="text-4xl">Reports</h2>
+        <SelectWallet />
       </div>
 
       {/* Content */}
@@ -307,9 +314,9 @@ function ReportsPage() {
             </div> */}
           </div>
           {loading && <Loading />}
-          {!loading && filledReports && reportType === "categories" && (
+          {!loading && reports && reportType === "categories" && (
             <div className="mt-4 overflow-y-scroll" style={{ height: 600 }}>
-              {Object.values(filledReports).map((item, index) => {
+              {Object.values(reports).map((item, index) => {
                 return (
                   <CategoryItem
                     key={Math.random()}
@@ -342,6 +349,11 @@ function ReportsPage() {
                 />
               ))}
             </div>
+          )}
+          {!loading && reports && reports.length === 0 && (
+            <p className="text-2xl text-center text-gray-600 py-4">
+              No transaction has been made in this period!
+            </p>
           )}
         </div>
       </div>

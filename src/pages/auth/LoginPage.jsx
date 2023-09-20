@@ -8,6 +8,7 @@ import Cookies from "js-cookie";
 import { useNavigate } from "react-router";
 import EmailVerification from "./components/EmailVerification";
 import SuccessfulVerification from "./components/SuccessfulVerification";
+import { useDispatch } from "react-redux";
 
 function LoginPage() {
   const [isForgetting, setIsForgetting] = useState(false);
@@ -56,22 +57,19 @@ function LoginPage() {
       setEmail(values.email);
 
       setIsSubmitting(true);
+
       const responseData = await AuthService.login(values);
       setIsSubmitting(false);
 
       if (responseData.status === "success") {
-        // console.log(responseData);
-
         Cookies.set("token", responseData.data.token);
         Cookies.set("user", JSON.stringify(responseData.data.user));
 
         navigate("/transactions");
       } else {
-        console.log(responseData.error);
         setError(responseData.error);
       }
     } catch (error) {
-      console.log(error);
       setIsSubmitting(false);
       setError(error.response.data.message);
     }

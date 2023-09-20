@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import AddCategoryPlan from "../../plans/components/AddCategoryPlan";
 import PlansService from "../../../services/plans";
 import AdjustBudget from "../../plans/components/AdjustBudget";
+import { useSelector } from "react-redux";
 
 function DefaultCategoryItem({ category }) {
   const [isHover, setIsHover] = useState(false);
@@ -10,16 +11,18 @@ function DefaultCategoryItem({ category }) {
   const [isAdjustingPlan, setIsAdjustingPlan] = useState(false);
   const [plan, setPlan] = useState();
   const [loading, setLoading] = useState(false);
+  const walletChosen = useSelector((state) => state.wallet.walletChosen);
 
   const getPlan = async () => {
     setLoading(true);
     const responseData = await PlansService.getPlans({
-      type: "categories",
+      type: "category",
       month: new Date().getMonth() + 1,
       year: new Date().getFullYear(),
       category_id: category.id,
+      wallet_id: walletChosen?.id,
     });
-    setTimeout(() => setLoading(false), 200);
+    setTimeout(() => setLoading(false), 100);
 
     if (responseData.status === "success") {
       if (responseData.data.plans.length > 0)
