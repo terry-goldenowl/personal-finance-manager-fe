@@ -70,8 +70,45 @@ This section should list any major frameworks/libraries used to bootstrap your p
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-
-
+### Project folder structure
+```
+.
+├───node_modules
+├───public
+├───src
+    ├───assets
+    │   └───images
+    ├───components
+    │   ├───elements
+    │   ├───layout
+    │   ├───modal
+    │   ├───others
+    │   └───routes
+    ├───config
+    ├───pages
+    │   ├───admin
+    │   │   └───components
+    │   ├───auth
+    │   │   └───components
+    │   ├───categories
+    │   │   └───components
+    │   ├───incomes-expenses
+    │   │   └───components
+    │   ├───others
+    │   ├───plans
+    │   │   └───components
+    │   ├───profile
+    │   │   └───components
+    │   ├───reports
+    │   │   └───components
+    │   └───wallets
+    │       └───components
+    ├───scripts
+    ├───services
+    ├───stores
+    ├───styles
+    └───utils
+```
 <!-- GETTING STARTED -->
 ## Getting Started
 
