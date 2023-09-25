@@ -51,7 +51,7 @@ function CategoriesPage() {
     }
   }, [walletChosen]);
 
-  const handleUpdateSuccess = async (action, isDefault) => {
+  const handleUpdateSuccess = async (action) => {
     setisAddingCategory(false);
     getAllCategories();
 

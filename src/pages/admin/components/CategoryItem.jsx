@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { motion } from "framer-motion";
 import AddCategories from "../../categories/components/AddCategories";
 import ConfirmDeleteModal from "../../../components/modal/ConfirmDeleteModal";
@@ -36,9 +36,8 @@ function CategoryItem({ category, onUpdateSuccess }) {
         whileHover={{
           scale: 1.05,
         }}
-        onMouseEnter={() => setIsHover(true)}
-        onMouseLeave={() => setIsHover(false)}
-        // onClick={}
+        onMouseOver={() => setIsHover(true)}
+        onMouseOut={() => setIsHover(false)}
       >
         <div className="w-20 h-20 rounded-full overflow-hidden flex items-center justify-center shadow-sm shrink-0">
           <img

@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import Input from "../elements/Input";
 import { FileUploader } from "react-drag-drop-files";
 
 function ImageChoserPreview({

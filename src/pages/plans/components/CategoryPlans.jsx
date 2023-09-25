@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { plans } from "../../../utils/sampleData";
 import CategoryPlanItem from "./CategoryPlanItem";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlusCircle } from "@fortawesome/free-solid-svg-icons";
@@ -45,14 +44,13 @@ function CategoryPlans({ _month, _year }) {
 
         setYear(currentYear || yearsBetween[0]);
       }
-      setLoadingYears(false);
     } catch (e) {
       toast.error(e.response.data.message);
     }
+    setLoadingYears(false);
   };
 
   const getCategoryPlans = async () => {
-    console.log(1111);
     try {
       setLoading(true);
       const responseData = await PlansService.getCategoryPlans({
@@ -63,10 +61,10 @@ function CategoryPlans({ _month, _year }) {
       });
 
       setPlans(responseData.data.plans);
-      setLoading(false);
     } catch (e) {
       toast.error(e.response.data.message);
     }
+    setLoading(false);
   };
 
   useEffect(() => {

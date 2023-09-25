@@ -1,15 +1,15 @@
-import React from "react";
+import React, { useState } from "react";
 import Sidebar from "./Sidebar";
-import Cookies from "js-cookie";
 import { Outlet, useNavigate } from "react-router";
 import AuthService from "../../services/auth";
-import { ToastContainer, toast } from "react-toastify";
+import { toast } from "react-toastify";
 import { useDispatch, useSelector } from "react-redux";
 import AddWallet from "../../pages/wallets/components/AddWallets";
 import { walletActions } from "../../stores/wallets";
 import { authActions } from "../../stores/auth";
 
 function Layout() {
+  const [isLogging, setIsLogging] = useState(false);
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
@@ -19,20 +19,28 @@ function Layout() {
 
   const handleLogout = async () => {
     try {
-      await AuthService.logout();
+      toast.promise(
+        AuthService.logout().then(() => {
+          dispatch(authActions.logout());
+          dispatch(walletActions.resetWallets());
 
-      dispatch(authActions.logout());
-      dispatch(walletActions.resetWallets());
-
-      navigate("/login");
+          navigate("/login");
+        }),
+        {
+          pending: "Logging out...",
+          success: "Logout successfully!",
+          error: "Failed to log out!",
+        }
+      );
     } catch (e) {
       toast.error(e.response.data.message);
     }
+    setIsLogging(false);
   };
 
   return (
     <div className="bg-gray-100 flex flex-col lg:flex-row sm:flex-col">
-      <Sidebar onLogout={handleLogout} />
+      <Sidebar onLogout={handleLogout} isLogging={isLogging} />
       {!loadingWallets && haveDefaultWallet && (
         <div className="grow min-h-screen h-fit">
           <Outlet />

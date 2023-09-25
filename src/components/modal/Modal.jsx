@@ -1,6 +1,4 @@
-import { useState } from "react";
 import { createPortal } from "react-dom";
-import ModalWithNothing from "./ModalWithNothing";
 import { motion } from "framer-motion";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTimes } from "@fortawesome/free-solid-svg-icons";

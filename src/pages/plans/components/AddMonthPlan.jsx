@@ -9,7 +9,6 @@ import ReportsService from "../../../services/reports";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faInfoCircle } from "@fortawesome/free-solid-svg-icons";
 import formatCurrency from "../../../utils/currencyFormatter";
-import WalletsService from "../../../services/wallets";
 import PlansService from "../../../services/plans";
 import { toast } from "react-toastify";
 import { useSelector } from "react-redux";
@@ -50,11 +49,10 @@ function AddMonthPlan({ onClose, onAddingSuccess, _month, _year }) {
       } else {
         setLastMonthValue(0);
       }
-
-      setLoadingTotalLastMonth(false);
     } catch (e) {
       toast.error(e.response.data.message);
     }
+    setLoadingTotalLastMonth(false);
   };
 
   useEffect(() => {
@@ -82,34 +80,37 @@ function AddMonthPlan({ onClose, onAddingSuccess, _month, _year }) {
 
   const handleAddPlan = async () => {
     try {
+      let haveErrors = false;
       setErrors(null);
-      setProcessingSave(true);
 
-      if (!amount || amount.length === 0) {
+      if (!amount || amount === '0') {
+        haveErrors = true;
         return setErrors((prev) => {
           return { ...prev, amount: "Amount is required!" };
         });
       }
 
-      const data = {
-        wallet_id: walletSelected.id,
-        month: month.id + 1,
-        year: year.id,
-        amount,
-      };
+      if (!haveErrors) {
+        setProcessingSave(true);
+        const data = {
+          wallet_id: walletSelected.id,
+          month: month.id + 1,
+          year: year.id,
+          amount,
+        };
 
-      const responseData = await PlansService.createMonthPlan(data);
+        const responseData = await PlansService.createMonthPlan(data);
 
-      if (responseData.status === "success") {
-        onClose();
-        onAddingSuccess();
-        toast.success("Create plan successfully!");
+        if (responseData.status === "success") {
+          onClose();
+          onAddingSuccess();
+          toast.success("Create plan successfully!");
+        }
       }
-      setProcessingSave(false);
     } catch (e) {
-      setProcessingSave(false);
       toast.error(e.response.data.message);
     }
+    setProcessingSave(false);
   };
 
   return (

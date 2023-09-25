@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import ReportsService from "../../../services/reports";
 import formatCurrency from "../../../utils/currencyFormatter";
 import AdjustBudget from "./AdjustBudget";
 import ConfirmDeleteModal from "../../../components/modal/ConfirmDeleteModal";
@@ -12,20 +11,27 @@ function MonthPlanItem({ monthPlan, onUpdateSuccess, onSeeCategoryPlans }) {
   const [isAdjusting, setIsAdjusting] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [percentage, setPercentage] = useState();
+  const [isSavingDelete, setIsSavingDelete] = useState(false);
 
   const handleClickSeeCategoryPlans = () => {
     onSeeCategoryPlans(monthPlan.month, monthPlan.year);
   };
 
   const handleDeletePlan = async () => {
-    const responseData = await PlansService.deleteMonthPlan(monthPlan.id);
-    if (responseData.status === "success") {
-      setIsDeleting(false);
-      toast.success("Delete plan successfully!");
-      onUpdateSuccess();
-    } else {
-      toast.error(responseData.error);
+    try {
+      setIsSavingDelete(true);
+      const responseData = await PlansService.deleteMonthPlan(monthPlan.id);
+      if (responseData.status === "success") {
+        setIsDeleting(false);
+        toast.success("Delete plan successfully!");
+        onUpdateSuccess();
+      } else {
+        toast.error(responseData.error);
+      }
+    } catch (e) {
+      toast.error(e.response.data.message);
     }
+    setIsSavingDelete(false);
   };
 
   useEffect(() => {
@@ -141,6 +147,7 @@ function MonthPlanItem({ monthPlan, onUpdateSuccess, onSeeCategoryPlans }) {
           }
           onAccept={handleDeletePlan}
           onClose={() => setIsDeleting(false)}
+          processing={isSavingDelete}
         />
       )}
     </motion.div>

@@ -3,13 +3,20 @@ import Modal from "../../../components/modal/Modal";
 import AuthService from "../../../services/auth";
 import AuthInput from "./AuthInput";
 import { toast } from "react-toastify";
+import Input from "../../../components/elements/Input";
 
 function EmailVerification({ onSuccess, onClose, email }) {
   const [code, setCode] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleAccept = async () => {
     try {
+      if (code.length === 0) {
+        return setError("Verification code is required!");
+      }
+
+      setLoading(true);
       const responseData = await AuthService.verifyEmail({
         email: email,
         verification_code: code,
@@ -17,12 +24,12 @@ function EmailVerification({ onSuccess, onClose, email }) {
 
       if (responseData.status === "success") {
         onSuccess();
-      } else {
-        setError(responseData.error);
       }
     } catch (error) {
+      setError(error.response.data.error);
       toast.error(error.response.data.message);
     }
+    setLoading(false);
   };
 
   return (
@@ -31,8 +38,9 @@ function EmailVerification({ onSuccess, onClose, email }) {
       onAccept={handleAccept}
       onClose={onClose}
       width={"sm:w-fit w-11/12"}
+      processing={loading}
     >
-      <AuthInput
+      <Input
         type={"text"}
         name={"verification_code"}
         value={code}

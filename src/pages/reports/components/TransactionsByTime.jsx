@@ -26,14 +26,14 @@ function TransactionsByTime({ reports, month, year, period, reportType }) {
       tempReports = Object.entries(reports)
         .map(([day, values]) => ({ key: day, ...values }))
         .sort((a, b) => {
-          return sortOrder.id == 1 ? b.key - a.key : a.key - b.key;
+          return sortOrder.id === 1 ? b.key - a.key : a.key - b.key;
         });
     } else {
       const type = sortBy.id === 2 ? "expenses" : "incomes";
       tempReports = Object.entries(reports)
         .map(([day, values]) => ({ key: day, ...values }))
         .sort((a, b) => {
-          return sortOrder.id == 1 ? b[type] - a[type] : a[type] - b[type];
+          return sortOrder.id === 1 ? b[type] - a[type] : a[type] - b[type];
         });
     }
 

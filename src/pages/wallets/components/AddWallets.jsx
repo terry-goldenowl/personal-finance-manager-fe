@@ -14,6 +14,7 @@ function AddWallet({ onClose, onAddSuccess, wallet = null, isNew = null }) {
   const [errors, setErrors] = useState(null);
   const [isDefault, setIsDefault] = useState(false);
   const [title, setTitle] = useState("");
+  const [isSaving, setIsSaving] = useState(false);
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -31,24 +32,30 @@ function AddWallet({ onClose, onAddSuccess, wallet = null, isNew = null }) {
         setTitle("Add new wallet");
       }
     }
-  }, []);
+  }, [isNew, wallet]);
 
   const saveWallet = async () => {
     try {
       setErrors(null);
+      let haveErrors = false;
 
       if (name.length === 0) {
-        return setErrors((prev) => {
+        haveErrors = true;
+        setErrors((prev) => {
           return { ...prev, name: "Name is required!" };
         });
       }
 
       if (!wallet && !image) {
-        return setErrors((prev) => {
+        haveErrors = true;
+        setErrors((prev) => {
           return { ...prev, image: "Image is required!" };
         });
       }
 
+      if (haveErrors) return;
+
+      setIsSaving(true);
       let data = { name, default: isDefault ? 1 : 0 };
 
       if (image) {
@@ -75,6 +82,8 @@ function AddWallet({ onClose, onAddSuccess, wallet = null, isNew = null }) {
     } catch (e) {
       toast.error(e.response.data.message);
     }
+
+    setIsSaving(false);
   };
 
   return (
@@ -84,6 +93,7 @@ function AddWallet({ onClose, onAddSuccess, wallet = null, isNew = null }) {
       onAccept={saveWallet}
       width={"lg:w-1/4 sm:w-1/2 w-11/12"}
       action={isNew ? "yes" : "yesno"}
+      processing={isSaving}
     >
       <div className="">
         <Input

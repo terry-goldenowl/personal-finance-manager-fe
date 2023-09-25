@@ -26,38 +26,40 @@ function AdjustBudget({ onClose, plan, onUpdateSuccess }) {
 
   const handleAdjustBudget = async () => {
     try {
-      setProcessing(true);
+      let haveErrors = false;
       setErrors(null);
 
-      if (!amount || amount === 0) {
+      if (!amount || amount === "0") {
+        haveErrors = true;
         setProcessing(false);
-        return setErrors({ amount: "Invalid amount" });
+        setErrors({ amount: "Invalid amount" });
       }
 
-      let responseData;
-      if (!plan.category_id) {
-        responseData = await PlansService.updateMonthPlan(
-          { amount: amount },
-          plan.id
-        );
-      } else {
-        responseData = await PlansService.updateCategoryPlan(
-          { amount: amount },
-          plan.id
-        );
-      }
+      if (!haveErrors) {
+        setProcessing(true);
+        let responseData;
+        if (!plan.category_id) {
+          responseData = await PlansService.updateMonthPlan(
+            { amount: amount },
+            plan.id
+          );
+        } else {
+          responseData = await PlansService.updateCategoryPlan(
+            { amount: amount },
+            plan.id
+          );
+        }
 
-      if (responseData.status === "success") {
-        onClose();
-        toast.success("Update plan successfully!");
-        onUpdateSuccess();
+        if (responseData.status === "success") {
+          onClose();
+          toast.success("Update plan successfully!");
+          onUpdateSuccess();
+        }
       }
-
-      setProcessing(false);
     } catch (e) {
-      setProcessing(false);
       toast.error(e.response.data.message);
     }
+    setProcessing(false);
   };
 
   return (

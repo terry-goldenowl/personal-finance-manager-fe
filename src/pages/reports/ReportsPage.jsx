@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
-import yearsGetter from "../../utils/yearsGetter";
+import { useLocation } from "react-router-dom";
 import monthsGetter from "../../utils/monthsGetter";
 import ReportsService from "../../services/reports";
 import getDaysInMonth from "../../utils/getDaysOfMonth";
@@ -10,7 +9,6 @@ import Transactions from "./components/Transactions";
 import Charts from "./components/Charts";
 import Loading from "../../components/others/Loading";
 import Select from "../../components/elements/Select";
-import { controller } from "../../config/axiosConfig";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFileExcel } from "@fortawesome/free-regular-svg-icons";
 import { motion } from "framer-motion";
@@ -41,6 +39,7 @@ function ReportsPage() {
   const [years, setYears] = useState([]);
   const [year, setYear] = useState();
   const [loadingYears, setLoadingYears] = useState(false);
+  const [isExporting, setIsExporting] = useState(false);
 
   const getYearsBetween = async () => {
     try {
@@ -190,10 +189,6 @@ function ReportsPage() {
     }
   }, [transactionType, filledReports]);
 
-  useEffect(() => {
-    controller.abort();
-  }, []);
-
   const periodStyle = (_period) => {
     return (
       "grow py-2 text-center rounded-xl font-semibold " +
@@ -223,6 +218,7 @@ function ReportsPage() {
 
   const handleExportExcel = async () => {
     try {
+      setIsExporting(true);
       const response = await ReportsService.saveExport({
         month: month.id + 1,
         year: year.id,
@@ -240,6 +236,7 @@ function ReportsPage() {
     } catch (e) {
       toast.error("Something went wrong when export excel!");
     }
+    setIsExporting(false);
   };
 
   return (
@@ -363,7 +360,7 @@ function ReportsPage() {
               disabled={!reports || (reports && reports.length === 0)}
             >
               <FontAwesomeIcon icon={faFileExcel} />{" "}
-              <span>Export as excel</span>
+              <p>{isExporting ? "Exporting" : "Export as excel"}</p>
             </motion.button>
           )}
         </div>

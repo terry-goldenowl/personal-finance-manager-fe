@@ -1,20 +1,16 @@
 import React, { useEffect, useState } from "react";
 import ModalWithNothing from "../../../components/modal/ModalWithNothing";
-import WalletsService from "../../../services/wallets";
 import SelectWithImage from "../../../components/elements/SelectWithImage";
 import CategoriesService from "../../../services/categories";
 import Input from "../../../components/elements/Input";
 import format from "date-fns/format";
 import TransactionsService from "../../../services/transactions";
-import { motion } from "framer-motion";
 import ImageChoserPreview from "../../../components/others/ImageChoserPreview";
 import { toast } from "react-toastify";
 import formatCurrency from "../../../utils/currencyFormatter";
-import ReportsService from "../../../services/reports";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faInfoCircle } from "@fortawesome/free-solid-svg-icons";
 import PlansService from "../../../services/plans";
-import Loading from "../../../components/others/Loading";
 import { useSelector } from "react-redux";
 
 function AddTransaction({
@@ -62,11 +58,11 @@ function AddTransaction({
     if (transaction) {
       setCategorySelected(
         categories.length > 0 &&
-          categories.find((cate) => cate.name == transaction.category.name)
+          categories.find((cate) => cate.name === transaction.category.name)
       );
       setWalletSelected(
         wallets.length > 0 &&
-          wallets.find((wallet) => wallet.id == transaction.wallet_id)
+          wallets.find((wallet) => wallet.id === transaction.wallet_id)
       );
       setTitle(transaction.title);
       setAmount(transaction.amount);
@@ -86,10 +82,10 @@ function AddTransaction({
       setLoadingCategories(true);
       const data = await CategoriesService.getCategories({ type });
       setCategories(data.data.categories);
-      setLoadingCategories(false);
     } catch (e) {
       toast.error(e.response.data.message);
     }
+    setLoadingCategories(false);
   };
 
   const getTotalOfCategory = async () => {
@@ -104,57 +100,62 @@ function AddTransaction({
       });
 
       setPlanData(responseData.data.plans[0]);
-      setLoadingPlan(false);
     } catch (e) {
       toast.error(e.response.data.message);
     }
+    setLoadingPlan(false);
   };
 
   const saveTransaction = async () => {
     try {
+      let haveErrors = false;
       setErrors(null);
-      setProcessingSave(true);
 
       if (!title || title.length === 0) {
-        return setErrors((prev) => {
+        haveErrors = true;
+        setErrors((prev) => {
           return { ...prev, title: "Title is required!" };
         });
       }
 
       if (!amount || amount <= 0) {
-        return setErrors((prev) => {
+        haveErrors = true;
+        setErrors((prev) => {
           return { ...prev, amount: "Amount is invalid!" };
         });
       }
-      const data = {
-        wallet_id: walletSelected.id,
-        category_id: categorySelected.id,
-        title,
-        amount,
-        date: format(new Date(date), "yyyy/MM/dd"),
-        image: photo,
-        description,
-      };
 
-      let responseData;
-      if (!transaction) {
-        responseData = await TransactionsService.createTransaction(data);
-      } else {
-        responseData = await TransactionsService.updateTransaction(
-          data,
-          transaction.id
-        );
-      }
+      if (!haveErrors) {
+        setProcessingSave(true);
+        const data = {
+          wallet_id: walletSelected.id,
+          category_id: categorySelected.id,
+          title,
+          amount,
+          date: format(new Date(date), "yyyy/MM/dd"),
+          image: photo,
+          description,
+        };
 
-      if (responseData.status === "success") {
-        setIsAdding(false);
-        onAddingSuccess(transaction ? "update" : "create");
+        let responseData;
+        if (!transaction) {
+          responseData = await TransactionsService.createTransaction(data);
+        } else {
+          responseData = await TransactionsService.updateTransaction(
+            data,
+            transaction.id
+          );
+        }
+
+        if (responseData.status === "success") {
+          setIsAdding(false);
+          onAddingSuccess(transaction ? "update" : "create");
+        }
       }
-      setProcessingSave(false);
     } catch (e) {
-      setProcessingSave(false);
       toast.error(e.response.data.message);
     }
+    setProcessingSave(false);
   };
 
   const handleCancel = () => {

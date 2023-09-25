@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import Modal from "../../../components/modal/Modal";
-import Cookies from "js-cookie";
 import Input from "../../../components/elements/Input";
 import { FileUploader } from "react-drag-drop-files";
 import profile from "../../../assets/images/profile.png";
@@ -23,14 +22,16 @@ function Profile({ onClose }) {
   const [photo, setPhoto] = useState();
   const [name, setName] = useState(user.name);
   const [email, setEmail] = useState(user.email);
-  const [password, setPassword] = useState();
-  const [newPassword, setNewPassword] = useState();
-  const [passwordConfirm, setPasswordConfirm] = useState();
-  const [errors, setErrors] = useState();
+  const [password, setPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [passwordConfirm, setPasswordConfirm] = useState("");
+  const [errors, setErrors] = useState(null);
   const [isUpdatingPassword, setIsUpdatingPassword] = useState(false);
   const [isConfirmDelete, setIsConfirmDelete] = useState(false);
   const [isVerifyEmail, setIsVerifyEmail] = useState(false);
   const [isEmailVerified, setIsEmailVerified] = useState(true);
+  const [isUpdating, setIsUpdating] = useState(false);
+  const [isSavingPassword, setIsSavingPassword] = useState(false);
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -75,7 +76,9 @@ function Profile({ onClose }) {
 
   const handleSendCode = async () => {
     try {
-      const verifyResponse = await AuthService.sendVerificationCode({ email });
+      const verifyResponse = await AuthService.sendVerificationCode({
+        email,
+      });
 
       if (verifyResponse.status === "success") {
         setIsVerifyEmail(true);
@@ -107,21 +110,80 @@ function Profile({ onClose }) {
         toast.error(responseData.error);
       }
     } catch (e) {
+      setIsUpdating(false);
       toast.error(e.response.data.message);
     }
   };
 
   const handleAccept = async () => {
-    if (!isEmailVerified) {
-      await handleSendCode();
-      return;
+    let haveErrors = false;
+    setErrors(null);
+
+    if (email.length === 0) {
+      haveErrors = true;
+      setErrors((prev) => {
+        return { ...prev, email: "Email is required" };
+      });
     }
 
-    await handleUpdate();
+    if (name.length === 0) {
+      haveErrors = true;
+      setErrors((prev) => {
+        return { ...prev, name: "Name is required" };
+      });
+    }
+
+    if (!haveErrors) {
+      setIsUpdating(true);
+      if (!isEmailVerified) {
+        await handleSendCode();
+        return;
+      }
+
+      await handleUpdate();
+      setIsUpdating(false);
+    }
   };
 
   const handleUpdatePassword = async () => {
     try {
+      let haveErrors = false;
+      setErrors(null);
+
+      if (password.length === 0) {
+        haveErrors = true;
+        setErrors((prev) => {
+          return {
+            ...prev,
+            password: "Old password is required!",
+          };
+        });
+      }
+
+      if (newPassword.length < 8 || newPassword.length > 32) {
+        haveErrors = true;
+        setErrors((prev) => {
+          return {
+            ...prev,
+            newPassword:
+              "Password must be at least 8 and as most 32 characters!",
+          };
+        });
+      }
+
+      if (newPassword !== passwordConfirm) {
+        haveErrors = true;
+        setErrors((prev) => {
+          return {
+            ...prev,
+            passwordConfirm: "New password confirmation does not match",
+          };
+        });
+      }
+
+      if (haveErrors) return;
+
+      setIsSavingPassword(true);
       const data = {
         password,
         newPassword,
@@ -143,6 +205,7 @@ function Profile({ onClose }) {
     } catch (e) {
       toast.error(e.response.data.message);
     }
+    setIsSavingPassword(false);
   };
 
   const handleDeleteUser = async () => {
@@ -173,10 +236,11 @@ function Profile({ onClose }) {
       onClose={onClose}
       width={
         isUpdatingPassword
-          ? "lg:w-1/2 sm:w-3/5 w-11/12"
-          : "lg:w-1/4 sm:w-3/5 w-11/12"
+          ? "xl:w-3/5 lg:w-1/2 sm:w-3/5 w-11/12"
+          : "2xl:w-1/4 xl:w-2/5 lg:1/3 md:w-1/2 sm:w-4/5 w-11/12"
       }
       onAccept={handleAccept}
+      processing={isUpdating}
     >
       <div className="flex w-full lg:flex-row flex-col">
         <div
@@ -247,12 +311,14 @@ function Profile({ onClose }) {
                 Update password
               </button>
             )}
-            <button
-              className="text-sm bg-red-500 rounded-full py-1 px-3 hover:bg-red-600 text-white"
-              onClick={() => setIsConfirmDelete(true)}
-            >
-              Delete account
-            </button>
+            {roles.includes("user") && (
+              <button
+                className="text-sm bg-red-500 rounded-full py-1 px-3 hover:bg-red-600 text-white"
+                onClick={() => setIsConfirmDelete(true)}
+              >
+                Delete account
+              </button>
+            )}
           </div>
         </div>
         {isUpdatingPassword && (
@@ -283,7 +349,7 @@ function Profile({ onClose }) {
               value={passwordConfirm}
               label={"Password Confirmation"}
               onChange={(e) => setPasswordConfirm(e.target.value)}
-              error={errors?.newPassword_confirmation}
+              error={errors?.passwordConfirm}
               size="small"
               required
             />
@@ -299,7 +365,7 @@ function Profile({ onClose }) {
                 className="py-1 px-3 rounded-full bg-blue-500 text-white hover:bg-blue-600 text-sm"
                 onClick={handleUpdatePassword}
               >
-                Update password
+                {isSavingPassword ? "Updating password" : "Update password"}
               </button>
             </div>
           </div>

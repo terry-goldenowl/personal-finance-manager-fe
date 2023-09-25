@@ -12,11 +12,11 @@ function UsersPage() {
     try {
       setLoading(true);
       const responseData = await UsersServices.getUsers();
-      setLoading(false);
       setUsers(responseData.data.users);
     } catch (e) {
       toast.error(e.response.data.message);
     }
+    setLoading(false);
   };
 
   useEffect(() => {
@@ -31,7 +31,9 @@ function UsersPage() {
       </div>
       <div className="w-full">
         {loading && <Loading />}
-        {!loading && users.length > 0 && <Table data={users} />}
+        {!loading && users.length > 0 && (
+          <Table data={users} onUpdateSuccess={() => getUsers()} />
+        )}
       </div>
     </div>
   );

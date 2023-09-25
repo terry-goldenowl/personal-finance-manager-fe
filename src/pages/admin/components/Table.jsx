@@ -13,9 +13,10 @@ import { format } from "date-fns";
 import UsersServices from "../../../services/users";
 import { toast } from "react-toastify";
 
-function Table({ data }) {
-  const [isDelelingUser, setIsDeletingUser] = useState(false);
+function Table({ data, onUpdateSuccess }) {
+  const [isDeletingUser, setIsDeletingUser] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
+  const [isSavingDelete, setIsSavingDelete] = useState(false);
 
   const columns = useMemo(
     () => [
@@ -29,6 +30,7 @@ function Table({ data }) {
         Cell: ({ cell: { value } }) => (
           <img
             src={value ? process.env.REACT_APP_API_HOST + value : avatar}
+            alt=""
             className="w-10 h-10 rounded-full"
           />
         ),
@@ -75,15 +77,22 @@ function Table({ data }) {
     setIsDeletingUser(true);
   };
 
-  const handleDeleteUser = async (id) => {
-    const responseData = await UsersServices.deleteUserById(id);
+  const handleDeleteUser = async () => {
+    try {
+      setIsSavingDelete(true);
+      const responseData = await UsersServices.deleteUserById(selectedUser);
 
-    if (responseData.status === "success") {
-      setIsDeletingUser(false);
-      toast.success("Delete user successfully");
-    } else {
-      toast.error(responseData.error);
+      if (responseData.status === "success") {
+        setIsDeletingUser(false);
+        onUpdateSuccess();
+        toast.success("Delete user successfully");
+      } else {
+        toast.error(responseData.error);
+      }
+    } catch (e) {
+      toast.error(e.response.data.message);
     }
+    setIsSavingDelete(false);
   };
 
   const {
@@ -117,7 +126,7 @@ function Table({ data }) {
 
   return (
     <div>
-      <div className="mt-4 mb-4 md:mb-0 flex justify-between items-center">
+      <div className="mt-4 mb-4 flex justify-between items-center">
         <p className="uppercase text-md font-semibold">
           Total: <span className="text-purple-600">{data.length}</span>{" "}
         </p>
@@ -206,7 +215,7 @@ function Table({ data }) {
         </button>
       </div>
 
-      {isDelelingUser && (
+      {isDeletingUser && (
         <ConfirmDeleteModal
           message={
             "Do you really want to delete this user (ID: " +
@@ -215,6 +224,7 @@ function Table({ data }) {
           }
           onClose={() => setIsDeletingUser(false)}
           onAccept={handleDeleteUser}
+          processing={isSavingDelete}
         />
       )}
     </div>

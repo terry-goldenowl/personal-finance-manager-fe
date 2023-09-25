@@ -1,6 +1,6 @@
 import { faPen, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { motion } from "framer-motion";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import IconButton from "../../../components/elements/IconButton";
 import AddCategories from "./AddCategories";
 import ConfirmDeleteModal from "../../../components/modal/ConfirmDeleteModal";
@@ -15,9 +15,11 @@ function UserCategoryItem({ category, onUpdateSuccess }) {
   const [isDeletingCategory, setisDeletingCategory] = useState(false);
   const [isAddingPlan, setIsAddingPlan] = useState(false);
   const [isAdjustingPlan, setIsAdjustingPlan] = useState(false);
+  const [isSavingDelete, setIsSavingDelete] = useState(false);
 
   const handleDeleteCategory = async () => {
     try {
+      setIsSavingDelete(true);
       const data = await CategoriesService.deleteCategory(category.id);
       if (data.status === "success") {
         setisDeletingCategory(false);
@@ -26,6 +28,7 @@ function UserCategoryItem({ category, onUpdateSuccess }) {
     } catch (e) {
       toast.error(e.response.data.message);
     }
+    setIsSavingDelete(false);
   };
 
   return (
@@ -102,6 +105,7 @@ function UserCategoryItem({ category, onUpdateSuccess }) {
           }
           onAccept={handleDeleteCategory}
           onClose={() => setisDeletingCategory(false)}
+          processing={isSavingDelete}
         />
       )}
       {isAddingPlan && (

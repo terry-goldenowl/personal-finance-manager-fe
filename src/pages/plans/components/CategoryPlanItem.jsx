@@ -11,6 +11,7 @@ function CategoryPlanItem({ categoryPlan, onUpdateSuccess }) {
   const [percentage, setPercentage] = useState(0);
   const [isDeleting, setIsDeleting] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
+  const [isSavingDelete, setIsSavingDelete] = useState(false);
 
   useEffect(() => {
     if (categoryPlan.actual) {
@@ -29,15 +30,23 @@ function CategoryPlanItem({ categoryPlan, onUpdateSuccess }) {
   };
 
   const handleDelete = async () => {
-    const responseData = await PlansService.deleteCategoryPlan(categoryPlan.id);
+    try {
+      setIsSavingDelete(true);
+      const responseData = await PlansService.deleteCategoryPlan(
+        categoryPlan.id
+      );
 
-    if (responseData.status === "success") {
-      setIsDeleting(false);
-      toast.success("Delete category plan successfully!");
-      onUpdateSuccess();
-    } else {
-      toast.error("Some thing went wrong when delete category plan!");
+      if (responseData.status === "success") {
+        setIsDeleting(false);
+        toast.success("Delete category plan successfully!");
+        onUpdateSuccess();
+      } else {
+        toast.error("Some thing went wrong when delete category plan!");
+      }
+    } catch (e) {
+      toast.error(e.response.data.message);
     }
+    setIsSavingDelete(false);
   };
 
   return (
@@ -152,6 +161,7 @@ function CategoryPlanItem({ categoryPlan, onUpdateSuccess }) {
           }
           onAccept={handleDelete}
           onClose={() => setIsDeleting(false)}
+          processing={isSavingDelete}
         />
       )}
       {isUpdating && (

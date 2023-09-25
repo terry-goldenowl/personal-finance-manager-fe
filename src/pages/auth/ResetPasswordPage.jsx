@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import LoginRegisterLayout from "./LoginRegisterLayout";
 import ResetPasswordForm from "./components/ResetPasswordForm";
-import { useNavigate, useParams } from "react-router";
+import { useParams } from "react-router";
 import AuthService from "../../services/auth";
 import SuccessfulResetPassword from "./components/SuccessfulResetPassword";
 import { toast } from "react-toastify";
@@ -20,19 +20,17 @@ function ResetPasswordPage() {
     try {
       setIsSubmitting(true);
       const data = { ...values, email, token };
-      console.log(data);
+
       const responseData = await AuthService.resetPassword(data);
-      setIsSubmitting(false);
 
       if (responseData.status === "success") {
         setShowSuccessful(true);
-      } else {
-        setError(responseData.error);
       }
-    } catch (error) {
-      setIsSubmitting(false);
+    } catch (e) {
+      setError(e.response.data.error);
       toast.error(error.response.data.message);
     }
+    setIsSubmitting(false);
   };
 
   return (

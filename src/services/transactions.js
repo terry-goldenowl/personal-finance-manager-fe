@@ -9,9 +9,10 @@ export default class TransactionsService {
     return response.data;
   }
 
-  static async getTransactionsYears(params) {
+  static async getTransactionsYears(params, signal) {
     const response = await instance.get("/transactions/years", {
       params,
+      signal,
     });
 
     return response.data;

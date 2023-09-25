@@ -27,22 +27,25 @@ function AddCategories({ onClose, onAddSuccess, category = null }) {
 
   const saveCategory = async () => {
     try {
+      let haveErrors = false;
       setErrors(null);
       setProcessing(true);
 
       if (name.length === 0) {
+        haveErrors = true;
         setErrors((prev) => {
           return { ...prev, name: "Name is required!" };
         });
       }
 
       if (!category && !image) {
+        haveErrors = true;
         setErrors((prev) => {
           return { ...prev, image: "Image is required!" };
         });
       }
 
-      if (!errors) {
+      if (!haveErrors) {
         let data = { name, type: type.name };
         if (image) {
           data = { ...data, image };
@@ -63,11 +66,10 @@ function AddCategories({ onClose, onAddSuccess, category = null }) {
           onAddSuccess(category ? "update" : "create", category !== null);
         }
       }
-      setProcessing(false);
     } catch (e) {
-      setProcessing(false);
       toast.error(e.response.data.message);
     }
+    setProcessing(false);
   };
 
   return (

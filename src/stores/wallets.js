@@ -46,7 +46,7 @@ const walletsSlice = createSlice({
 
         if (!state.walletChosen) {
           state.walletChosen = action.payload.find(
-            (wallet) => wallet.default == 1
+            (wallet) => wallet.default === 1
           );
         }
       }

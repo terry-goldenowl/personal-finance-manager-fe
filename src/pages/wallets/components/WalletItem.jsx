@@ -13,9 +13,11 @@ import formatCurrency from "../../../utils/currencyFormatter";
 function WalletItem({ wallet, onUpdateSuccess }) {
   const [isDeleting, setIsDeleting] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
+  const [isSavingDelete, setIsSavingDelete] = useState(false);
 
   const handleDelete = async () => {
     try {
+      setIsSavingDelete(true);
       const responseData = await WalletsService.deleteWallet(wallet.id);
 
       if (responseData.status === "success") {
@@ -27,6 +29,7 @@ function WalletItem({ wallet, onUpdateSuccess }) {
     } catch (e) {
       toast.error(e.response.data.message);
     }
+    setIsSavingDelete(false);
   };
 
   return (
@@ -46,7 +49,18 @@ function WalletItem({ wallet, onUpdateSuccess }) {
         />
       </div>
       <div className="grow">
-        <p className="text-lg text-white">{wallet.name}</p>
+        <div className="flex items-center gap-1">
+          <p className="text-lg text-white">{wallet.name}</p>
+          {wallet.default === true && (
+            <div
+              className="bg-yellow-500 text-white uppercase font-bold px-1 rounded-full"
+              style={{ fontSize: 10 }}
+            >
+              Default
+            </div>
+          )}
+        </div>
+
         <p className="text-white text-sm">
           {" "}
           Balance:{" "}
@@ -85,17 +99,18 @@ function WalletItem({ wallet, onUpdateSuccess }) {
         </Popover>
       </div>
 
-      {isDeleting && wallet.default == false && (
+      {isDeleting && wallet.default === 0 && (
         <ConfirmDeleteModal
           message={
             "Are you sure to delete this wallet? This will also delete ALL TRANSACTIONS and PLANS related to it! "
           }
           onClose={() => setIsDeleting(false)}
           onAccept={handleDelete}
+          processing={isSavingDelete}
         />
       )}
 
-      {isDeleting && wallet.default == true && (
+      {isDeleting && wallet.default === 1 && (
         <InfoModal
           title="Warning"
           message={

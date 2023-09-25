@@ -10,14 +10,13 @@ import {
   buildStyles,
 } from "react-circular-progressbar";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { formatMonth } from "../../../utils/dateFormatter";
 import PlansService from "../../../services/plans";
 import AddMonthPlan from "../../plans/components/AddMonthPlan";
 import { useNavigate } from "react-router";
 import { useSelector } from "react-redux";
 import Loading from "../../../components/others/Loading";
 import getMonthName from "../../../utils/getMonthName";
-import { categoriesController } from "../../../services/categories";
+import { toast } from "react-toastify";
 
 function Report({
   month,
@@ -35,18 +34,22 @@ function Report({
   const navigate = useNavigate();
 
   const getPlan = async () => {
-    setLoadingPlan(true);
-    const responseData = await PlansService.getMonthPlans({
-      month,
-      year,
-      wallet_id: walletChosen?.id,
-      with_report: true,
-    });
+    try {
+      setLoadingPlan(true);
+      const responseData = await PlansService.getMonthPlans({
+        month,
+        year,
+        wallet_id: walletChosen?.id,
+        with_report: true,
+      });
 
-    if (responseData.status === "success") {
-      if (responseData.data.plans.length > 0)
-        setPlan(responseData.data.plans[0]);
-      else setPlan(null);
+      if (responseData.status === "success") {
+        if (responseData.data.plans.length > 0)
+          setPlan(responseData.data.plans[0]);
+        else setPlan(null);
+      }
+    } catch (e) {
+      toast.error(e.response.data.message);
     }
     setLoadingPlan(false);
   };
@@ -72,7 +75,10 @@ function Report({
   };
 
   return (
-    <div className="lg:w-5/12 w-full rounded-2xl sm:px-6 px-3 bg-white py-6 shadow-lg">
+    <div
+      className="lg:w-5/12 w-full rounded-2xl sm:px-6 px-3 bg-white py-6 shadow-lg"
+      style={{ minHeight: 300 }}
+    >
       <div className="flex justify-between items-center mb-4 ">
         <button
           className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center hover:bg-purple-200 active:bg-purple-300"
@@ -139,6 +145,7 @@ function Report({
                   <img
                     className="object-cover w-full h-full"
                     src={process.env.REACT_APP_API_HOST + walletChosen?.image}
+                    alt=""
                   />
                 </div>
 
@@ -197,7 +204,7 @@ function Report({
                     <div className="flex flex-col justify-center items-end text-md w-1/2 text-red font-bold text-end">
                       <p className="">You have overspent your budget of: </p>
                       <p className="text-xl">
-                        {formatCurrency((plan.amount - plan.expenses) * -1)}
+                        {formatCurrency((plan.amount - report.expenses) * -1)}
                       </p>
                     </div>
                   )}

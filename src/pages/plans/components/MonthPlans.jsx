@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useState } from "react";
 import AddMonthPlan from "./AddMonthPlan";
 import PlansService from "../../../services/plans";
 import MonthPlanItem from "./MonthPlanItem";
@@ -38,10 +38,10 @@ function MonthPlans({ onSeeCategoryPlans }) {
 
         setYear(currentYear || yearsBetween[0]);
       }
-      setLoadingYears(false);
     } catch (e) {
       toast.error(e.response.data.message);
     }
+    setLoadingYears(false);
   };
 
   const getMonthPlans = async () => {
@@ -54,13 +54,14 @@ function MonthPlans({ onSeeCategoryPlans }) {
       });
 
       setPlans(responseData.data.plans);
-      setLoading(false);
     } catch (e) {
       toast.error(e.response.data.message);
     }
+    setLoading(false);
   };
 
   useEffect(() => {
+    setLoading(true);
     if (year && walletChosen) {
       getMonthPlans();
     }

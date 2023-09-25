@@ -10,15 +10,22 @@ import { motion } from "framer-motion";
 function TransactionItem({ transaction, index, onModifySuccess }) {
   const [isViewingDetail, setIsViewingDetail] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
 
   const handleDeleteTransaction = async () => {
-    const data = await TransactionsService.deleteTransaction(transaction.id);
+    try {
+      setIsSaving(true);
+      const data = await TransactionsService.deleteTransaction(transaction.id);
 
-    if (data.status === "success") {
-      setIsDeleting(false);
-      setIsViewingDetail(false);
-      onModifySuccess("delete");
+      if (data.status === "success") {
+        setIsDeleting(false);
+        setIsViewingDetail(false);
+        onModifySuccess("delete");
+      }
+    } catch (e) {
+      toast.error(e.response.data.message);
     }
+    setIsSaving(false);
   };
 
   return (
@@ -43,7 +50,7 @@ function TransactionItem({ transaction, index, onModifySuccess }) {
             className="absolute w-full bottom-0 left-0 bg-purple-500 text-white uppercase text-center"
             style={{ fontSize: 9 }}
           >
-            {shorten(transaction.category.name, 6)}
+            {shorten(transaction.category.name, 8)}
           </div>
         </div>
 
@@ -93,6 +100,7 @@ function TransactionItem({ transaction, index, onModifySuccess }) {
           message={
             "Are you sure to delete this transaction? This action can not be undone!"
           }
+          processing={isSaving}
         />
       )}
     </>

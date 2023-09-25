@@ -34,14 +34,14 @@ function TransactionsByCategoryItem({
       }
 
       const responseData = await TransactionsService.getTransactions(params);
-      setLoading(false);
-
+      
       if (responseData.status === "success") {
         setTransactions(responseData.data.transactions);
       }
     } catch (e) {
       toast.error(e.response.data.message);
     }
+    setLoading(false);
   };
 
   useEffect(() => {

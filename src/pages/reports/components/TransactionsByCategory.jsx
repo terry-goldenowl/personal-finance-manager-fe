@@ -23,12 +23,12 @@ function TransactionsByCategory({ reports, month, year, totalAmount, period }) {
     let tempReports = [];
 
     tempReports = Object.values(reports).sort((a, b) => {
-      if (sortBy.id == 1) {
-        return sortOrder.id == 1
+      if (sortBy.id === 1) {
+        return sortOrder.id === 1
           ? b.name?.localeCompare(a.name)
           : a.name?.localeCompare(b.name);
       } else {
-        return sortOrder.id == 1 ? b.amount - a.amount : a.amount - b.amount;
+        return sortOrder.id === 1 ? b.amount - a.amount : a.amount - b.amount;
       }
     });
 

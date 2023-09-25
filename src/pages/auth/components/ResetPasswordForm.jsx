@@ -1,7 +1,6 @@
 import React from "react";
 import { Formik } from "formik";
 import AuthInput from "./AuthInput";
-import { useNavigate } from "react-router";
 
 function ResetPasswordForm({ onSubmit, error, submitting }) {
   return (

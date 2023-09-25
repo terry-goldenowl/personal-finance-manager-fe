@@ -1,5 +1,4 @@
-import Cookies from "js-cookie";
-import React, { useEffect } from "react";
+import React from "react";
 import { Navigate, Outlet } from "react-router";
 import { fetchWallets } from "../../stores/wallets";
 import { useDispatch, useSelector } from "react-redux";

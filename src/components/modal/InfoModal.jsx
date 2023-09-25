@@ -1,4 +1,3 @@
-import { Dialog } from "@headlessui/react";
 import React from "react";
 import Modal from "./Modal";
 

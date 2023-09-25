@@ -26,7 +26,6 @@ function TransactionByTimeItem({ item, index, day, month, year, wallet }) {
       if (day) params = { ...params, day };
 
       const responseData = await TransactionsService.getTransactions(params);
-      setLoading(false);
 
       if (responseData.status === "success") {
         setTransactions(responseData.data.transactions);
@@ -34,13 +33,14 @@ function TransactionByTimeItem({ item, index, day, month, year, wallet }) {
     } catch (e) {
       toast.error(e.response.data.message);
     }
+    setLoading(false);
   };
 
   useEffect(() => {
     if (showDropdown && !transactions) {
       getTransactions();
     }
-  }, [showDropdown]);
+  }, [showDropdown, transactions]);
 
   return (
     <div>
@@ -59,13 +59,13 @@ function TransactionByTimeItem({ item, index, day, month, year, wallet }) {
           </div>
 
           <div className="grow flex items-center justify-between">
-            {item.expenses != undefined && (
+            {item.expenses !== undefined && (
               <p className="text-md font-bold text-orange-600">
                 {"-" + formatCurrency(item.expenses)}
               </p>
             )}
 
-            {item.incomes != undefined && (
+            {item.incomes !== undefined && (
               <p className="shrink-0 text-md font-bold text-green-600 text-end">
                 {"+" + formatCurrency(item.incomes)}
               </p>
@@ -93,7 +93,7 @@ function TransactionByTimeItem({ item, index, day, month, year, wallet }) {
                 key={transaction.id}
                 className="flex my-1 sm:mx-6 mx-2 gap-3 border-b border-b-purple-300 items-center"
               >
-                <p className="w-1/5 text-sm font-bold">
+                <p className="w-1/5 text-sm font-bold shrink-0">
                   {format(new Date(transaction.date), "dd/MM/yyyy")}
                 </p>
                 <p className="grow">{shorten(transaction.title, 50)}</p>

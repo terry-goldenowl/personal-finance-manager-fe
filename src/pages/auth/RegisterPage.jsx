@@ -3,7 +3,6 @@ import LoginRegisterLayout from "./LoginRegisterLayout";
 import RegisterForm from "./components/RegisterForm";
 import AuthService from "../../services/auth";
 import EmailVerification from "./components/EmailVerification";
-import SuccessfulVerification from "./components/SuccessfulVerification";
 import { useNavigate } from "react-router";
 import InfoModal from "../../components/modal/InfoModal";
 import { toast } from "react-toastify";
@@ -25,24 +24,20 @@ function RegisterPage() {
         email: registerFields.email,
       });
 
-      setIsSubmitting(false);
-
       if (responseData.status === "success") {
         setIsVerifyingEmail(true);
-      } else {
-        toast.error(responseData.error);
-        setError(responseData.error);
       }
-    } catch (error) {
-      toast.error(error.response.data.message);
+    } catch (e) {
+      setError(e.response.data.error);
+      toast.error(e.response.data.message);
     }
+    setIsSubmitting(false);
   };
 
   const handleVerifySuccess = async () => {
     try {
       setIsSubmitting(true);
       const responseData = await AuthService.register(values);
-      setIsSubmitting(false);
 
       if (responseData.status === "success") {
         setIsVerifyingEmail(false);
@@ -53,6 +48,7 @@ function RegisterPage() {
     } catch (e) {
       toast.error(e.response.data.message);
     }
+    setIsSubmitting(false);
   };
 
   return (

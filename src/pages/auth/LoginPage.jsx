@@ -64,13 +64,12 @@ function LoginPage() {
         } else {
           navigate("/transactions");
         }
-      } else {
-        setError(responseData.error);
       }
-    } catch (error) {
-      setIsSubmitting(false);
-      toast.error(error.response.data.message);
+    } catch (e) {
+      setError(e.response.data.error);
+      toast.error(e.response.data.message);
     }
+    setIsSubmitting(false);
   };
 
   const handleCloseSentLink = () => {

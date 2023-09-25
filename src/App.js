@@ -12,7 +12,7 @@ import CategoriesPage from "./pages/categories/CategoriesPage";
 import PlansPage from "./pages/plans/PlansPage";
 import { Provider } from "react-redux";
 import store from "./stores";
-import { ToastContainer, toast } from "react-toastify";
+import { ToastContainer } from "react-toastify";
 import AdminPage from "./pages/admin/AdminPage";
 import DefaultCategoriesPage from "./pages/admin/DefaultCategoriesPage";
 import UsersPage from "./pages/admin/UsersPage";

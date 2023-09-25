@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import Modal from "../../../components/modal/Modal";
 import CategoriesService from "../../../services/categories";
 import SelectWithImage from "../../../components/elements/SelectWithImage";
-import WalletsService from "../../../services/wallets";
 import Input from "../../../components/elements/Input";
 import Select from "../../../components/elements/Select";
 import monthsGetter from "../../../utils/monthsGetter";
@@ -45,12 +44,16 @@ function AddCategoryPlan({
   const [processingSave, setProcessingSave] = useState(false);
 
   const getCategories = async () => {
-    setLoadingCategories(true);
-    const data = await CategoriesService.getCategories({ type: "expenses" });
-    setCategories(data.data.categories);
+    try {
+      setLoadingCategories(true);
+      const data = await CategoriesService.getCategories({ type: "expenses" });
+      setCategories(data.data.categories);
 
-    if (category) setCategoryChosen(category);
-    else setCategoryChosen(data.data.categories[0]);
+      if (category) setCategoryChosen(category);
+      else setCategoryChosen(data.data.categories[0]);
+    } catch (e) {
+      toast.error(e.response.data.message);
+    }
     setLoadingCategories(false);
   };
 
@@ -69,12 +72,10 @@ function AddCategoryPlan({
           responseData.data.reports[categoryChosen.name].amount
         );
       else setLastMonthValue(0);
-
-      setLoadingTotalLastMonth(false);
     } catch (e) {
-      setLoadingTotalLastMonth(false);
       toast.error(e.response.data.message);
     }
+    setLoadingTotalLastMonth(false);
   };
 
   useEffect(() => {
@@ -107,36 +108,38 @@ function AddCategoryPlan({
 
   const handleAddPlan = async () => {
     try {
+      let haveErrors = false;
       setErrors(null);
-      setProcessingSave(true);
 
-      if (!amount || amount.length === 0) {
-        return setErrors((prev) => {
+      if (!amount || amount === "0") {
+        haveErrors = true;
+        setErrors((prev) => {
           return { ...prev, amount: "Amount is required!" };
         });
       }
 
-      const data = {
-        wallet_id: walletSelected.id,
-        category_id: categoryChosen.id,
-        month: month.id + 1,
-        year: year.id,
-        amount,
-      };
+      if (!haveErrors) {
+        setProcessingSave(true);
+        const data = {
+          wallet_id: walletSelected.id,
+          category_id: categoryChosen.id,
+          month: month.id + 1,
+          year: year.id,
+          amount,
+        };
 
-      const responseData = await PlansService.createCategoryPlan(data);
+        const responseData = await PlansService.createCategoryPlan(data);
 
-      if (responseData.status === "success") {
-        onClose();
-        toast.success("Create plan successfully!");
-        onUpdateSuccess();
+        if (responseData.status === "success") {
+          onClose();
+          toast.success("Create plan successfully!");
+          onUpdateSuccess();
+        }
       }
-
-      setProcessingSave(false);
     } catch (e) {
-      setProcessingSave(false);
-      toast.error(e);
+      toast.error(e.response.data.message);
     }
+    setProcessingSave(false);
   };
 
   return (

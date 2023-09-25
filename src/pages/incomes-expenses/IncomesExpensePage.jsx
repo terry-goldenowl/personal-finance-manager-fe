@@ -54,25 +54,28 @@ function IncomesExpensePage() {
   };
 
   const getTransactions = async () => {
-    let params = {
-      month,
-      year,
-      wallet: walletChosen?.id,
-    };
+    try {
+      let params = {
+        month,
+        year,
+        wallet: walletChosen?.id,
+      };
 
-    if (day) {
-      params = { ...params, day };
+      if (day) {
+        params = { ...params, day };
+      }
+
+      if (search.length > 0) {
+        params = { ...params, search };
+      }
+
+      setLoadingTransactions(true);
+
+      const responseData = await TransactionsService.getTransactions(params);
+      setTransactions(responseData.data.transactions);
+    } catch (e) {
+      toast.error(e.response.data.message);
     }
-
-    if (search.length > 0) {
-      params = { ...params, search };
-    }
-
-    setLoadingTransactions(true);
-
-    const responseData = await TransactionsService.getTransactions(params);
-    setTransactions(responseData.data.transactions);
-
     setLoadingTransactions(false);
   };
 
@@ -84,10 +87,10 @@ function IncomesExpensePage() {
         wallet: walletChosen?.id,
       });
       setReport(responseData.data.reports[month + ""]);
-      setLoadingReport(false);
     } catch (e) {
       toast.error(e.response.data.message);
     }
+    setLoadingReport(false);
   };
 
   const handleClickAddTx = (type) => {

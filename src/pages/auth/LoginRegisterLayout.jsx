@@ -7,6 +7,7 @@ import logoText from "../../assets/images/name-money-master.png";
 import { useNavigate } from "react-router";
 import "../../styles/auth.css";
 import Benefits from "./components/Benefits";
+import { motion } from "framer-motion";
 
 function LoginRegisterLayout({ children }) {
   const images = [graphic1, graphic2, graphic3];
@@ -40,10 +41,15 @@ function LoginRegisterLayout({ children }) {
           </div>
         </div>
         <div className="md:block hidden">
-          <div className="" style={{ width: 500, height: 500 }}>
+          <motion.div
+            className=""
+            style={{ width: 500, height: 500 }}
+            initial={{ opacity: 0, translateX: 20 }}
+            animate={{ opacity: 1, translateX: 0 }}
+          >
             <img src={images[currentImage]} alt="" className="" />
-          </div>
-          <div className="flex gap-2">
+          </motion.div>
+          <div className="flex gap-2 justify-center">
             {images.map((image, index) => {
               return (
                 <button
@@ -103,7 +109,7 @@ function LoginRegisterLayout({ children }) {
           <div
             style={{ width: 450 }}
             className={`flip-card flex items-center sm:p-0 p-2 ${
-              shownBenefits == true ? "active" : ""
+              shownBenefits === true ? "active" : ""
             }`}
           >
             <div

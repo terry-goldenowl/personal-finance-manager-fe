@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faEllipsis,
@@ -7,10 +7,8 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { useSelector } from "react-redux";
 import { Popover } from "@headlessui/react";
-import IconButton from "../elements/IconButton";
 
 function AccountPopup({
-  setIsShown,
   onLogout,
   onClickWallets,
   onClickProfile,

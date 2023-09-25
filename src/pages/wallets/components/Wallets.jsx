@@ -1,6 +1,5 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import ModalWithNothing from "../../../components/modal/ModalWithNothing";
-import WalletsService from "../../../services/wallets";
 import IconButton from "../../../components/elements/IconButton";
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
 import AddWallet from "./AddWallets";
@@ -34,7 +33,11 @@ function Wallets({ onClose }) {
           {loading && <Loading />}
           {!loading &&
             wallets.map((wallet) => (
-              <WalletItem wallet={wallet} onUpdateSuccess={handleAddSuccess} />
+              <WalletItem
+                key={wallet.id}
+                wallet={wallet}
+                onUpdateSuccess={handleAddSuccess}
+              />
             ))}
         </div>
         <div className="flex justify-end">

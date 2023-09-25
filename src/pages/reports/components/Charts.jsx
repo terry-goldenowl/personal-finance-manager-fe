@@ -1,10 +1,6 @@
 import React from "react";
 import { Chart, registerables } from "chart.js";
 import { Bar, Doughnut } from "react-chartjs-2";
-import Select from "../../../components/elements/Select";
-import yearsGetter from "../../../utils/yearsGetter";
-import monthsGetter from "../../../utils/monthsGetter";
-import Loading from "../../../components/others/Loading";
 
 function Charts({
   loading,
@@ -12,7 +8,6 @@ function Charts({
   chartLabels,
   datasets,
   filledReports,
-  period,
 }) {
   // Chqrt configurations
   Chart.register(...registerables);

@@ -111,7 +111,7 @@ function RegisterForm({ submitting, error, setError, onSubmit }) {
               disabled={submitting}
               className="bg-purple-600 text-white py-2 w-full rounded-lg mt-8 text-xl hover:bg-purple-700"
             >
-              {submitting ? "Submitting...." : "Submit"}
+              {submitting ? "Registering...." : "Register"}
             </button>
             <p className="text-center mt-2 text-md">
               Already have account?{" "}
