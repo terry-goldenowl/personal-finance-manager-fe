@@ -3,7 +3,7 @@ import { Formik } from "formik";
 import { useNavigate } from "react-router";
 import Input from "../../../components/elements/Input";
 
-function RegisterForm({ onSubmit, submitting, error, setError }) {
+function RegisterForm({ submitting, error, setError, onSubmit }) {
   const navigate = useNavigate();
   // console.log(error);
   return (
@@ -43,7 +43,6 @@ function RegisterForm({ onSubmit, submitting, error, setError }) {
           return errors;
         }}
         onSubmit={(values, { setSubmitting }) => {
-          // setSubmitting(submitting);
           onSubmit(values);
         }}
       >
@@ -112,7 +111,7 @@ function RegisterForm({ onSubmit, submitting, error, setError }) {
               disabled={submitting}
               className="bg-purple-600 text-white py-2 w-full rounded-lg mt-8 text-xl hover:bg-purple-700"
             >
-              {submitting ? "Submitting...." : "Submit"}
+              {submitting ? "Registering...." : "Register"}
             </button>
             <p className="text-center mt-2 text-md">
               Already have account?{" "}

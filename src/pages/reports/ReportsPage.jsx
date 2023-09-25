@@ -1,17 +1,19 @@
 import React, { useEffect, useState } from "react";
-import { Bar, Doughnut } from "react-chartjs-2";
-import { Chart, registerables } from "chart.js";
 import { useLocation } from "react-router-dom";
-import CategoryItem from "./components/CategoryItem";
-import Select from "../../components/elements/Select";
-import yearsGetter from "../../utils/yearsGetter";
 import monthsGetter from "../../utils/monthsGetter";
 import ReportsService from "../../services/reports";
 import getDaysInMonth from "../../utils/getDaysOfMonth";
-import TransactionItem from "./components/TransactionItem";
-import Loading from "../../components/others/Loading";
 import SelectWallet from "../wallets/components/SelectWallet";
 import { useSelector } from "react-redux";
+import Transactions from "./components/Transactions";
+import Charts from "./components/Charts";
+import Loading from "../../components/others/Loading";
+import Select from "../../components/elements/Select";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faFileExcel } from "@fortawesome/free-regular-svg-icons";
+import { motion } from "framer-motion";
+import TransactionsService from "../../services/transactions";
+import { toast } from "react-toastify";
 
 function ReportsPage() {
   const location = useLocation();
@@ -23,17 +25,9 @@ function ReportsPage() {
         ((location.state && location.state.month - 1) || new Date().getMonth())
     )
   );
-  const [year, setYear] = useState(
-    yearsGetter(20).find(
-      (year) =>
-        year.id ===
-        ((location.state && location.state.year) || new Date().getFullYear())
-    )
-  );
-  const [wallet, setWallet] = useState();
+
   const [transactionType, setTransactionType] = useState("total");
   const [reportType, setReportType] = useState("expenses-incomes");
-  const [search, setSearch] = useState();
   const [period, setPeriod] = useState("month");
   const [reports, setReports] = useState();
   const [filledReports, setFilledReports] = useState([]);
@@ -42,52 +36,51 @@ function ReportsPage() {
   const [loading, setLoading] = useState(false);
   const [totalAmount, setTotalAmount] = useState(null);
   const walletChosen = useSelector((state) => state.wallet.walletChosen);
+  const [years, setYears] = useState([]);
+  const [year, setYear] = useState();
+  const [loadingYears, setLoadingYears] = useState(false);
+  const [isExporting, setIsExporting] = useState(false);
 
-  // Chqrt configurations
-  Chart.register(...registerables);
-  Chart.defaults.font.family = "Raleway";
-  Chart.defaults.color = "#000000";
-  Chart.defaults.font.size = 14;
+  const getYearsBetween = async () => {
+    try {
+      setLoadingYears(true);
+      const responseData = await TransactionsService.getTransactionsYears({
+        wallet_id: walletChosen?.id,
+      });
 
-  // Button styles
-  const periodStyle = (_period) => {
-    return (
-      "grow py-2 text-center rounded-xl font-semibold " +
-      (period === _period
-        ? "bg-purple-500 text-white"
-        : "bg-transparent text-purple-500")
-    );
-  };
+      if (responseData.status === "success") {
+        const yearsBetween = responseData.data.years.map((y) => {
+          return { id: y, name: y };
+        });
 
-  const transactionTypeStyle = (_transactionType) => {
-    return (
-      "grow py-1 text-center rounded-xl font-semibold " +
-      (transactionType === _transactionType
-        ? "bg-purple-500 text-white"
-        : "bg-purple-100 text-purple-500")
-    );
-  };
+        setYears(yearsBetween);
 
-  const reportTypeStyle = (_reportType) => {
-    return (
-      "py-3 px-6 border-b-4 " +
-      (reportType === _reportType
-        ? "border-b-purple-500 text-purple-600 font-semibold"
-        : "border-b-purple-200 hover:font-semibold")
-    );
+        const currentYear = yearsBetween.find(
+          (y) => y.id === new Date().getFullYear()
+        );
+
+        setYear(currentYear || yearsBetween[0]);
+      }
+      setLoadingYears(false);
+    } catch (e) {
+      toast.error(e.response.data.message);
+    }
   };
 
   const getReports = async (params) => {
-    setLoading(true);
-    const responseData = await ReportsService.getReports(params);
+    try {
+      setLoading(true);
+      const responseData = await ReportsService.getReports(params);
 
-    if (responseData.status === "success") {
-      setReports(responseData.data.reports);
+      if (responseData.status === "success") {
+        setReports(responseData.data.reports);
+      }
+      setLoading(false);
+    } catch (e) {
+      toast.error(e.response.data.message);
     }
-    setLoading(false);
   };
 
-  // Fill reports with empty month/day
   const fillReports = (labels) => {
     if (filledReports) {
       const names = Object.keys(reports);
@@ -103,23 +96,24 @@ function ReportsPage() {
   };
 
   useEffect(() => {
-    let params = {
-      year: year.id,
-      transaction_type: transactionType,
-      report_type: reportType,
-      wallet: walletChosen?.id,
-    };
+    setLoading(true);
+    if (walletChosen && year) {
+      let params = {
+        year: year?.id,
+        transaction_type: transactionType,
+        report_type: reportType,
+        wallet: walletChosen.id,
+      };
 
-    if (period === "month") {
-      params = { ...params, month: month.id + 1 };
+      if (period === "month") {
+        params = { ...params, month: month.id + 1 };
+      }
+      getReports(params);
     }
-
-    getReports(params);
 
     if (reportType === "expenses-incomes") {
       if (period === "month") {
-        // console.log(getDaysInMonth(year, month));
-        setChartLabels(getDaysInMonth(year.id, month.id + 1));
+        setChartLabels(getDaysInMonth(year?.id, month.id + 1));
       } else {
         setChartLabels([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
       }
@@ -127,7 +121,13 @@ function ReportsPage() {
   }, [transactionType, reportType, period, month, year, walletChosen]);
 
   useEffect(() => {
-    // console.log(reports);
+    setLoadingYears(true);
+    if (walletChosen) {
+      getYearsBetween();
+    }
+  }, [walletChosen]);
+
+  useEffect(() => {
     if (reports) {
       setFilledReports(reports);
       if (reportType === "expenses-incomes") {
@@ -142,9 +142,14 @@ function ReportsPage() {
         label: "Total expenses",
         data:
           filledReports &&
-          Object.values(filledReports).map((report) => report.expenses),
+          Object.values(filledReports).map((report) =>
+            period === "year" && transactionType === "total"
+              ? report.expenses * -1
+              : report.expenses
+          ),
         borderRadius: 10,
-        backgroundColor: "#09234899",
+        backgroundColor: "#EA580Baa",
+
         //   barThickness: 30,
       };
 
@@ -154,7 +159,7 @@ function ReportsPage() {
           filledReports &&
           Object.values(filledReports).map((report) => report.incomes),
         borderRadius: 10,
-        backgroundColor: "#ffaa2390",
+        backgroundColor: "#16A34Aaa",
         //   barThickness: 30,
       };
 
@@ -184,22 +189,71 @@ function ReportsPage() {
     }
   }, [transactionType, filledReports]);
 
+  const periodStyle = (_period) => {
+    return (
+      "grow py-2 text-center rounded-xl font-semibold " +
+      (period === _period
+        ? "bg-purple-500 text-white"
+        : "bg-transparent text-purple-500 hover:bg-purple-200")
+    );
+  };
+
+  const transactionTypeStyle = (_transactionType) => {
+    return (
+      "grow py-1 text-center rounded-xl font-semibold " +
+      (transactionType === _transactionType
+        ? "bg-purple-500 text-white"
+        : "bg-purple-100 text-purple-500 hover:bg-purple-200")
+    );
+  };
+
+  const reportTypeStyle = (_reportType) => {
+    return (
+      "py-3 px-6 border-b-4 " +
+      (reportType === _reportType
+        ? "border-b-purple-500 text-purple-600 font-semibold"
+        : "border-b-purple-200 hover:font-semibold")
+    );
+  };
+
+  const handleExportExcel = async () => {
+    try {
+      setIsExporting(true);
+      const response = await ReportsService.saveExport({
+        month: month.id + 1,
+        year: year.id,
+      });
+
+      const blob = new Blob([response.data]);
+      const url = window.URL.createObjectURL(blob);
+
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = "transactions.xlsx";
+      link.click();
+
+      window.URL.revokeObjectURL(url);
+    } catch (e) {
+      toast.error("Something went wrong when export excel!");
+    }
+    setIsExporting(false);
+  };
+
   return (
-    <div className="p-8">
+    <div className="lg:p-8 sm:p-14 p-3">
       {/* Header */}
-      <div className="flex gap-4 items-center justify-between">
-        <h2 className="text-4xl">Reports</h2>
+      <div className="flex gap-4 items-center justify-between mb-4">
+        <h2 className="sm:text-4xl text-3xl">Reports</h2>
         <SelectWallet />
       </div>
 
       {/* Content */}
-      <div className="flex gap-8">
-        {/* Charts */}
-        <div className="w-7/12">
+      <div className="flex gap-8 lg:flex-row flex-col">
+        <div className="lg:w-1/2 xl:w-7/12 w-full sm:p-4 p-2 rounded-2xl bg-white">
           <div className="mb-3">
             <div className="flex justify-end gap-3">
               {period === "month" && (
-                <div className="w-1/6">
+                <div className="lg:w-1/6 sm:w-1/3 w-1/2">
                   <Select
                     selected={month}
                     setSelected={setMonth}
@@ -207,51 +261,30 @@ function ReportsPage() {
                   />
                 </div>
               )}
-              <div className="w-1/6">
+              <div className="lg:w-1/6 sm:w-1/3 w-1/2">
                 <Select
                   selected={year}
                   setSelected={setYear}
-                  data={yearsGetter(20)}
+                  data={years}
+                  loading={loadingYears}
                 />
               </div>
             </div>
           </div>
+
           {loading && <Loading />}
-          <div className="mb-5">
-            {!loading && reportType === "expenses-incomes" && (
-              <Bar
-                height={400}
-                width={600}
-                data={{
-                  labels: chartLabels,
-                  datasets: datasets,
-                }}
-                options={{
-                  maintainAspectRatio: false,
-                  // scales: {
-                  //   x: {
-                  //     stacked: true,
-                  //   },
-                  // },
-                }}
-              />
-            )}
-            {!loading && reportType === "categories" && (
-              <Doughnut
-                height={400}
-                width={400}
-                options={{
-                  maintainAspectRatio: false,
-                }}
-                data={{
-                  labels: Object.values(filledReports).map(
-                    (report) => report.name
-                  ),
-                  datasets: datasets,
-                }}
-              />
-            )}
-          </div>
+
+          <Charts
+            {...{
+              loading,
+              reportType,
+              chartLabels,
+              datasets,
+              filledReports,
+              period,
+            }}
+          />
+
           <div>
             <div className="flex gap-2 mb-2 p-2 rounded-xl bg-purple-100">
               <button
@@ -289,9 +322,9 @@ function ReportsPage() {
             </div>
           </div>
         </div>
-        {/* Categories and expenses/incomes (transactions) */}
-        <div className="w-5/12">
-          <div className="flex border-b border-b-purple-200 items-center">
+
+        <div className="xl:w-5/12 lg:w-1/2 w-full">
+          <div className="flex border-b border-b-purple-200 items-center lg:justify-start justify-center">
             <button
               className={reportTypeStyle("expenses-incomes")}
               onClick={() => setReportType("expenses-incomes")}
@@ -304,56 +337,31 @@ function ReportsPage() {
             >
               By categories
             </button>
-
-            {/* <div className="flex grow items-center bg-white py-2 px-4 ms-6 rounded-xl my-1 gap-2">
-              <input type="text" name="search" className="grow outline-none" />
-              <FontAwesomeIcon
-                icon={faSearch}
-                className="text-gray-400 text-xl"
-              />
-            </div> */}
           </div>
-          {loading && <Loading />}
-          {!loading && reports && reportType === "categories" && (
-            <div className="mt-4 overflow-y-scroll" style={{ height: 600 }}>
-              {Object.values(reports).map((item, index) => {
-                return (
-                  <CategoryItem
-                    key={Math.random()}
-                    item={item}
-                    index={index}
-                    month={period === "month" ? month.id + 1 : null}
-                    year={year.id}
-                    wallet={1}
-                    percentage={
-                      totalAmount
-                        ? Math.round((item.amount / totalAmount) * 100)
-                        : 0
-                    }
-                  />
-                );
-              })}
-            </div>
-          )}
-          {!loading && reports && reportType === "expenses-incomes" && (
-            <div className="mt-3">
-              {Object.keys(reports).map((key, index) => (
-                <TransactionItem
-                  item={reports[key]}
-                  day={period === "month" ? key : null}
-                  index={index}
-                  month={period === "year" ? key : month.id + 1}
-                  year={year.id}
-                  wallet={1}
-                  key={Math.random()}
-                />
-              ))}
-            </div>
-          )}
-          {!loading && reports && reports.length === 0 && (
-            <p className="text-2xl text-center text-gray-600 py-4">
-              No transaction has been made in this period!
-            </p>
+          <Transactions
+            {...{
+              month,
+              year,
+              reports,
+              period,
+              loading,
+              totalAmount,
+              reportType,
+            }}
+          />
+          {month && year && walletChosen && (
+            <motion.button
+              className={
+                "bg-green-600 text-white hover:bg-green-700 py-2 px-8 rounded-lg shadow-xl lg:fixed static w-full lg:w-fit flex justify-center lg:bottom-4 lg:right-4 xl:bottom-10 xl:right-10 gap-1 items-center mt-6 lg:mt-0 " +
+                ((!reports || (reports && reports.length === 0)) &&
+                  "disabled:opacity-90")
+              }
+              onClick={handleExportExcel}
+              disabled={!reports || (reports && reports.length === 0)}
+            >
+              <FontAwesomeIcon icon={faFileExcel} />{" "}
+              <p>{isExporting ? "Exporting" : "Export as excel"}</p>
+            </motion.button>
           )}
         </div>
       </div>

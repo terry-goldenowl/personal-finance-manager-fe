@@ -1,14 +1,13 @@
 import { faPen, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { motion } from "framer-motion";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import IconButton from "../../../components/elements/IconButton";
 import AddCategories from "./AddCategories";
 import ConfirmDeleteModal from "../../../components/modal/ConfirmDeleteModal";
 import CategoriesService from "../../../services/categories";
-import PlansService from "../../../services/plans";
 import AddCategoryPlan from "../../plans/components/AddCategoryPlan";
 import AdjustBudget from "../../plans/components/AdjustBudget";
-import { useSelector } from "react-redux";
+import { toast } from "react-toastify";
 
 function UserCategoryItem({ category, onUpdateSuccess }) {
   const [isHover, setIsHover] = useState(false);
@@ -16,41 +15,20 @@ function UserCategoryItem({ category, onUpdateSuccess }) {
   const [isDeletingCategory, setisDeletingCategory] = useState(false);
   const [isAddingPlan, setIsAddingPlan] = useState(false);
   const [isAdjustingPlan, setIsAdjustingPlan] = useState(false);
-  const [plan, setPlan] = useState();
-  const [loading, setLoading] = useState(false);
-  const walletChosen = useSelector((state) => state.wallet.walletChosen);
-
-  const getPlan = async () => {
-    setLoading(true);
-    const responseData = await PlansService.getPlans({
-      type: "categories",
-      month: new Date().getMonth() + 1,
-      year: new Date().getFullYear(),
-      category_id: category.id,
-      wallet_id: walletChosen?.id,
-    });
-    setTimeout(() => setLoading(false), 200);
-
-    if (responseData.status === "success") {
-      if (responseData.data.plans.length > 0)
-        setPlan(responseData.data.plans[0]);
-      else setPlan(null);
-    }
-  };
-
-  useEffect(() => {
-    if (isHover) {
-      getPlan();
-    }
-  }, [isHover]);
+  const [isSavingDelete, setIsSavingDelete] = useState(false);
 
   const handleDeleteCategory = async () => {
-    // Send request
-    const data = await CategoriesService.deleteCategory(category.id);
-    if (data.status === "success") {
-      setisDeletingCategory(false);
-      onUpdateSuccess("delete");
+    try {
+      setIsSavingDelete(true);
+      const data = await CategoriesService.deleteCategory(category.id);
+      if (data.status === "success") {
+        setisDeletingCategory(false);
+        onUpdateSuccess("delete", false);
+      }
+    } catch (e) {
+      toast.error(e.response.data.message);
     }
+    setIsSavingDelete(false);
   };
 
   return (
@@ -59,12 +37,15 @@ function UserCategoryItem({ category, onUpdateSuccess }) {
       onMouseEnter={() => setIsHover(true)}
       onMouseLeave={() => setIsHover(false)}
     >
-      <div className="w-16 h-16 overflow-hidden rounded-md shadow-sm">
+      <div className="w-16 h-16 shadow-sm relative">
         <img
           src={process.env.REACT_APP_API_HOST + category.image}
           alt=""
-          className="object-cover w-full h-full"
+          className="object-cover w-full h-full rounded-md"
         />
+        {category.plan && (
+          <div className="absolute w-3 h-3 bg-purple-400 rounded-full -right-1 -top-1"></div>
+        )}
       </div>
       <div className="flex items-center">
         <p className="text-md font-semibold">{category.name}</p>
@@ -73,8 +54,8 @@ function UserCategoryItem({ category, onUpdateSuccess }) {
       <div className="flex justify-end grow items-center gap-1">
         {isHover && category.type === "expenses" && (
           <motion.div
-            initial={{ rotate: -90, scale: 0 }}
-            animate={{ rotate: 0, scale: 1 }}
+            initial={{ scaleX: 0 }}
+            animate={{ scaleX: 1 }}
             transition={{
               type: "spring",
             }}
@@ -82,13 +63,15 @@ function UserCategoryItem({ category, onUpdateSuccess }) {
             <button
               className="bg-blue-600 text-white py-1 px-4 rounded-xl shadow-sm shadow-blue-300 text-sm"
               onClick={() => {
-                !plan ? setIsAddingPlan(true) : setIsAdjustingPlan(true);
+                !category.plan
+                  ? setIsAddingPlan(true)
+                  : setIsAdjustingPlan(true);
                 setIsHover(false);
               }}
             >
-              {loading && "Loading..."}
-              {!loading &&
-                (!plan ? "Set plan this month" : "Adjust plan this month")}
+              {!category.plan
+                ? "Set plan this month"
+                : "Adjust plan this month"}
             </button>
           </motion.div>
         )}
@@ -111,10 +94,7 @@ function UserCategoryItem({ category, onUpdateSuccess }) {
       {isUpdatingCategory && (
         <AddCategories
           onClose={() => setisUpdatingCategory(false)}
-          onAddSuccess={(action) => {
-            onUpdateSuccess(action);
-            setisUpdatingCategory(false);
-          }}
+          onAddSuccess={onUpdateSuccess}
           category={category}
         />
       )}
@@ -125,6 +105,7 @@ function UserCategoryItem({ category, onUpdateSuccess }) {
           }
           onAccept={handleDeleteCategory}
           onClose={() => setisDeletingCategory(false)}
+          processing={isSavingDelete}
         />
       )}
       {isAddingPlan && (
@@ -133,14 +114,14 @@ function UserCategoryItem({ category, onUpdateSuccess }) {
           _year={new Date().getFullYear()}
           onClose={() => setIsAddingPlan(false)}
           category={category}
-          onUpdateSuccess={() => getPlan()}
+          onUpdateSuccess={onUpdateSuccess}
         />
       )}
       {isAdjustingPlan && (
         <AdjustBudget
-          plan={plan}
+          plan={category.plan}
           onClose={() => setIsAdjustingPlan(false)}
-          onUpdateSuccess={() => getPlan()}
+          onUpdateSuccess={onUpdateSuccess}
         />
       )}
     </div>

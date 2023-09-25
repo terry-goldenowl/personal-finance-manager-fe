@@ -1,20 +1,16 @@
 import React, { useEffect, useState } from "react";
 import ModalWithNothing from "../../../components/modal/ModalWithNothing";
-import WalletsService from "../../../services/wallets";
 import SelectWithImage from "../../../components/elements/SelectWithImage";
 import CategoriesService from "../../../services/categories";
 import Input from "../../../components/elements/Input";
 import format from "date-fns/format";
 import TransactionsService from "../../../services/transactions";
-import { motion } from "framer-motion";
 import ImageChoserPreview from "../../../components/others/ImageChoserPreview";
 import { toast } from "react-toastify";
 import formatCurrency from "../../../utils/currencyFormatter";
-import ReportsService from "../../../services/reports";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faInfoCircle } from "@fortawesome/free-solid-svg-icons";
 import PlansService from "../../../services/plans";
-import Loading from "../../../components/others/Loading";
 import { useSelector } from "react-redux";
 
 function AddTransaction({
@@ -26,11 +22,10 @@ function AddTransaction({
   setIsDeleting,
   onAddingSuccess,
 }) {
-  const walletChosen = useSelector((state) => state.wallet.walletChosen);
+  const { wallets, walletChosen } = useSelector((state) => state.wallet);
 
   const [categories, setCategories] = useState([]);
-  const [wallets, setWallets] = useState([]);
-  const [categorySelected, setCategorySelected] = useState({});
+  const [categorySelected, setCategorySelected] = useState(null);
   const [walletSelected, setWalletSelected] = useState(walletChosen);
   const [title, setTitle] = useState("");
   const [amount, setAmount] = useState();
@@ -39,17 +34,22 @@ function AddTransaction({
   const [date, setDate] = useState(new Date());
   const [description, setDescription] = useState("");
   const [errors, setErrors] = useState(null);
-  const [currentTotalOfCategory, setCurrentTotalOfCategory] = useState(0);
-  const [plannedAmount, setPlannedAmount] = useState(null);
+  const [planData, setPlanData] = useState(null);
   const [loadingPlan, setLoadingPlan] = useState(false);
+  const [loadingCategories, setLoadingCategories] = useState(false);
+  const [processingSave, setProcessingSave] = useState(false);
 
   useEffect(() => {
-    getWallets();
+    setLoadingCategories(true);
     getCategories();
   }, []);
 
   useEffect(() => {
-    if (categorySelected && walletSelected) {
+    if (
+      categorySelected &&
+      walletSelected &&
+      categorySelected.type === "expenses"
+    ) {
       getTotalOfCategory();
     }
   }, [walletSelected, categorySelected, date]);
@@ -58,11 +58,11 @@ function AddTransaction({
     if (transaction) {
       setCategorySelected(
         categories.length > 0 &&
-          categories.find((cate) => cate.name == transaction.category.name)
+          categories.find((cate) => cate.name === transaction.category.name)
       );
       setWalletSelected(
         wallets.length > 0 &&
-          wallets.find((wallet) => wallet.id == transaction.wallet_id)
+          wallets.find((wallet) => wallet.id === transaction.wallet_id)
       );
       setTitle(transaction.title);
       setAmount(transaction.amount);
@@ -77,87 +77,85 @@ function AddTransaction({
     }
   }, [wallets, categories]);
 
-  const getWallets = async () => {
-    const data = await WalletsService.getWallets();
-    setWallets(data.data.wallets);
-  };
-
   const getCategories = async () => {
-    const data = await CategoriesService.getCategories({ type });
-    setCategories(data.data.categories);
+    try {
+      setLoadingCategories(true);
+      const data = await CategoriesService.getCategories({ type });
+      setCategories(data.data.categories);
+    } catch (e) {
+      toast.error(e.response.data.message);
+    }
+    setLoadingCategories(false);
   };
 
   const getTotalOfCategory = async () => {
-    setLoadingPlan(true);
-    const reportData = await ReportsService.getReports({
-      year: new Date(date).getFullYear(),
-      month: new Date(date).getMonth() + 1,
-      report_type: "categories",
-      wallet: walletSelected.id,
-    });
+    try {
+      setLoadingPlan(true);
+      const responseData = await PlansService.getCategoryPlans({
+        year: new Date(date).getFullYear(),
+        month: new Date(date).getMonth() + 1,
+        category_id: categorySelected?.id,
+        wallet_id: walletSelected?.id,
+        with_report: true,
+      });
 
-    const planData = await PlansService.getPlans({
-      year: new Date(date).getFullYear(),
-      month: new Date(date).getMonth() + 1,
-      type: "category",
-      category_id: categorySelected.id,
-      wallet_id: walletSelected.id,
-    });
-
-    if (reportData.data.reports[categorySelected.name]) {
-      setCurrentTotalOfCategory(
-        reportData.data.reports[categorySelected.name].amount
-      );
-    } else setCurrentTotalOfCategory(null);
-
-    if (planData.data.plans[0]) {
-      setPlannedAmount(planData.data.plans[0].amount);
-      console.log(planData.data.plans[0].amount);
-    } else setPlannedAmount(null);
-
+      setPlanData(responseData.data.plans[0]);
+    } catch (e) {
+      toast.error(e.response.data.message);
+    }
     setLoadingPlan(false);
   };
 
   const saveTransaction = async () => {
-    setErrors(null);
+    try {
+      let haveErrors = false;
+      setErrors(null);
 
-    if (!title || title.length === 0) {
-      return setErrors((prev) => {
-        return { ...prev, title: "Title is required!" };
-      });
-    }
+      if (!title || title.length === 0) {
+        haveErrors = true;
+        setErrors((prev) => {
+          return { ...prev, title: "Title is required!" };
+        });
+      }
 
-    if (!amount || amount <= 0) {
-      return setErrors((prev) => {
-        return { ...prev, amount: "Amount is invalid!" };
-      });
-    }
-    const data = {
-      wallet_id: walletSelected.id,
-      category_id: categorySelected.id,
-      title,
-      amount,
-      date: format(new Date(date), "yyyy/MM/dd"),
-      image: photo,
-      description,
-    };
+      if (!amount || amount <= 0) {
+        haveErrors = true;
+        setErrors((prev) => {
+          return { ...prev, amount: "Amount is invalid!" };
+        });
+      }
 
-    let responseData;
-    if (!transaction) {
-      responseData = await TransactionsService.createTransaction(data);
-    } else {
-      responseData = await TransactionsService.updateTransaction(
-        data,
-        transaction.id
-      );
-    }
+      if (!haveErrors) {
+        setProcessingSave(true);
+        const data = {
+          wallet_id: walletSelected.id,
+          category_id: categorySelected.id,
+          title,
+          amount,
+          date: format(new Date(date), "yyyy/MM/dd"),
+          image: photo,
+          description,
+        };
 
-    if (responseData.status === "success") {
-      setIsAdding(false);
-      onAddingSuccess(transaction ? "update" : "create");
-    } else {
-      setErrors(responseData.error);
+        let responseData;
+        if (!transaction) {
+          responseData = await TransactionsService.createTransaction(data);
+        } else {
+          responseData = await TransactionsService.updateTransaction(
+            data,
+            transaction.id
+          );
+        }
+
+        if (responseData.status === "success") {
+          setIsAdding(false);
+          onAddingSuccess(transaction ? "update" : "create");
+        }
+      }
+    } catch (e) {
+      toast.error(e.response.data.message);
     }
+    setProcessingSave(false);
   };
 
   const handleCancel = () => {
@@ -185,7 +183,10 @@ function AddTransaction({
 
   return (
     <>
-      <ModalWithNothing onClose={handleCancel} width={"w-1/2"}>
+      <ModalWithNothing
+        onClose={handleCancel}
+        width={"lg:w-1/2 sm:w-3/4 w-11/12"}
+      >
         {/*HEADER*/}
         <div className="flex items-start justify-center p-5 border-b border-solid border-slate-200 rounded-t max-h-screen">
           <h3 className="text-2xl text-center">
@@ -195,13 +196,13 @@ function AddTransaction({
         </div>
 
         {/*BODY*/}
-        <div className="relative px-6 py-4 flex-auto">
-          <div className="flex">
+        <div className="relative sm:px-6 px-3 py-4 flex-auto">
+          <div className="flex flex-col lg:flex-row max-h-96 overflow-y-scroll lg:max-h-none">
             {/* LEFT SIDE INPUTS (REQUIRED) */}
-            <div className="p-3 border-r border-gray-200 w-1/2">
+            <div className="p-3 border-r border-gray-200 w-full lg:w-1/2">
               <SelectWithImage
                 data={wallets}
-                label={"Wallets"}
+                label={"Wallet"}
                 selected={walletSelected}
                 setSelected={setWalletSelected}
                 required
@@ -212,6 +213,7 @@ function AddTransaction({
                 selected={categorySelected}
                 setSelected={setCategorySelected}
                 required
+                loading={loadingCategories}
               />
               <Input
                 label={"Title"}
@@ -223,24 +225,58 @@ function AddTransaction({
                 required
                 error={(errors && errors.title) || null}
               />
-
-              {loadingPlan && <Loading size="small" />}
-              {!loadingPlan && plannedAmount && currentTotalOfCategory && (
-                <div className="flex items-center gap-2">
-                  <FontAwesomeIcon
-                    icon={faInfoCircle}
-                    className="text-blue-600"
-                  />
-                  <p className="text-sm text-blue-600 italic">
-                    As you planned, the remaining of expenses for this category
-                    this month is{" "}
-                    <span className="font-bold">
-                      {formatCurrency(plannedAmount - currentTotalOfCategory)}
-                    </span>
-                  </p>
-                </div>
+              {type === "expenses" && (
+                <>
+                  {loadingPlan && (
+                    <p className="text-sm text-blue-600 italic">
+                      Loading remainder of this month plan ...
+                    </p>
+                  )}
+                  {!loadingPlan && (
+                    <>
+                      {planData && (
+                        <div className="flex items-center gap-2">
+                          <FontAwesomeIcon
+                            icon={faInfoCircle}
+                            className={
+                              planData.amount - planData.actual >= 0
+                                ? "text-blue-600"
+                                : "text-red-600"
+                            }
+                          />
+                          {planData.amount - planData.actual >= 0 && (
+                            <p className="text-sm text-blue-600 italic">
+                              As you planned, the remaining of expenses for this
+                              category this month is{" "}
+                              <span className="font-bold">
+                                {formatCurrency(
+                                  planData.amount - planData.actual
+                                )}
+                              </span>
+                            </p>
+                          )}
+                          {planData.amount - planData.actual < 0 && (
+                            <p className="text-sm text-red-600 italic">
+                              As you planned, your expenses for this category
+                              exceeds{" "}
+                              <span className="font-bold">
+                                {formatCurrency(
+                                  (planData.amount - planData.actual) * -1
+                                )}
+                              </span>
+                            </p>
+                          )}
+                        </div>
+                      )}
+                      {planData === undefined && (
+                        <p className="text-sm text-blue-600 italic">
+                          You didn't set plan for this category this month
+                        </p>
+                      )}
+                    </>
+                  )}
+                </>
               )}
-
               <Input
                 label={"Amount"}
                 type={"text"}
@@ -263,7 +299,7 @@ function AddTransaction({
             </div>
 
             {/* RIGHT SIDE INPUTS (OPTIONAL)*/}
-            <div className="p-3 w-1/2">
+            <div className="p-3 lg:w-1/2 sm:w-full">
               <ImageChoserPreview
                 image={photo}
                 setImage={setPhoto}
@@ -311,7 +347,7 @@ function AddTransaction({
               </button>
             </div>
           )}
-          <div>
+          <div className="flex justify-end gap-2">
             <button
               className="text-gray-500 background-transparent font-bold uppercase px-6 py-2 text-sm outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
               type="button"
@@ -324,7 +360,11 @@ function AddTransaction({
               type="button"
               onClick={saveTransaction}
             >
-              {!transaction ? "Add transaction" : "Update transaction"}
+              {processingSave
+                ? "Processing..."
+                : !transaction
+                ? "Add transaction"
+                : "Update"}
             </button>
           </div>
         </div>

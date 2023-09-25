@@ -1,24 +1,14 @@
 import React from "react";
 import { Formik } from "formik";
-import AuthInput from "./AuthInput";
 import { useNavigate } from "react-router";
-import AuthService from "../../../services/auth";
 import Input from "../../../components/elements/Input";
 
-function LoginForm({ onForgetting, onLogin, onVerify, submitting, error }) {
+function LoginForm({ onForgetting, onLogin, submitting, error }) {
   const navigate = useNavigate();
 
   return (
     <>
       <h2 className="text-purple-500 text-3xl text-center mb-6">Login</h2>
-      <div className="flex gap-2 items-center mt-3">
-        {error && <p className="text-red-500">{error}</p>}
-        {error && error.includes("verified") && (
-          <button className="text-blue-700 hover:underline" onClick={onVerify}>
-            Verify now
-          </button>
-        )}
-      </div>
 
       <Formik
         initialValues={{
@@ -63,7 +53,9 @@ function LoginForm({ onForgetting, onLogin, onVerify, submitting, error }) {
               onBlur={handleBlur}
               value={values.email}
               label={"Email"}
-              error={errors.email && touched.email && errors.email}
+              error={
+                (errors.email && touched.email && errors.email) || error?.email
+              }
             />
 
             <Input
@@ -73,7 +65,10 @@ function LoginForm({ onForgetting, onLogin, onVerify, submitting, error }) {
               onBlur={handleBlur}
               value={values.password}
               label={"Password"}
-              error={errors.password && touched.password && errors.password}
+              error={
+                (errors.password && touched.password && errors.password) ||
+                error?.password
+              }
             />
 
             <div className="flex justify-between">

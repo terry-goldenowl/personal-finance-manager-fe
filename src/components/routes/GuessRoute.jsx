@@ -1,11 +1,14 @@
-import Cookies from "js-cookie";
 import React from "react";
+import { useSelector } from "react-redux";
 import { Navigate, Outlet } from "react-router";
 
 function GuessRoute() {
-  // Check if token exists in cookies
-  if (Cookies.get("token")) {
-    return <Navigate to={"/transactions"} />;
+  const { isAuthenticated, roles } = useSelector((state) => state.auth);
+
+  if (isAuthenticated) {
+    return (
+      <Navigate to={roles.includes("admin") ? "/admin" : "transactions"} />
+    );
   }
 
   return <Outlet />;

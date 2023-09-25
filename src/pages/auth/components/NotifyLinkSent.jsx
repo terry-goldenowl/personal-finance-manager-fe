@@ -7,6 +7,7 @@ function NotifyLinkSent({ onAccept, onClose }) {
       title={"Email verification successfully"}
       onAccept={onAccept}
       onClose={onClose}
+      width={"sm:w-fit w-11/12"}
     >
       <p>A reset password link was sent to your email!</p>
     </Modal>

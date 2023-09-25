@@ -1,41 +1,12 @@
 import { motion } from "framer-motion";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import AddCategoryPlan from "../../plans/components/AddCategoryPlan";
-import PlansService from "../../../services/plans";
 import AdjustBudget from "../../plans/components/AdjustBudget";
-import { useSelector } from "react-redux";
 
-function DefaultCategoryItem({ category }) {
+function DefaultCategoryItem({ category, onUpdateSuccess }) {
   const [isHover, setIsHover] = useState(false);
   const [isAddingPlan, setIsAddingPlan] = useState(false);
   const [isAdjustingPlan, setIsAdjustingPlan] = useState(false);
-  const [plan, setPlan] = useState();
-  const [loading, setLoading] = useState(false);
-  const walletChosen = useSelector((state) => state.wallet.walletChosen);
-
-  const getPlan = async () => {
-    setLoading(true);
-    const responseData = await PlansService.getPlans({
-      type: "category",
-      month: new Date().getMonth() + 1,
-      year: new Date().getFullYear(),
-      category_id: category.id,
-      wallet_id: walletChosen?.id,
-    });
-    setTimeout(() => setLoading(false), 100);
-
-    if (responseData.status === "success") {
-      if (responseData.data.plans.length > 0)
-        setPlan(responseData.data.plans[0]);
-      else setPlan(null);
-    }
-  };
-
-  useEffect(() => {
-    if (isHover) {
-      getPlan();
-    }
-  }, [isHover]);
 
   return (
     <>
@@ -44,19 +15,22 @@ function DefaultCategoryItem({ category }) {
         onMouseEnter={() => setIsHover(true)}
         onMouseLeave={() => setIsHover(false)}
       >
-        <div className="w-24 h-24 overflow-hidden rounded-md shadow-sm mb-2">
+        <div className="w-24 h-24 shadow-sm mb-2 relative">
           <img
             src={process.env.REACT_APP_API_HOST + category.image}
             alt=""
-            className="object-cover w-full h-full"
+            className="object-cover w-full h-full rounded-md"
           />
+          {category.plan && (
+            <div className="absolute w-3 h-3 bg-purple-400 rounded-full -right-1 -top-1"></div>
+          )}
         </div>
         <p className="font-semibold text-sm text-center">{category.name}</p>
         {isHover && category.type === "expenses" && (
           <motion.div
             className="absolute -bottom-6 z-10"
-            initial={{ rotate: -90, scale: 0 }}
-            animate={{ rotate: 0, scale: 1 }}
+            initial={{ scaleX: 0 }}
+            animate={{ scaleX: 1 }}
             transition={{
               type: "spring",
             }}
@@ -64,13 +38,15 @@ function DefaultCategoryItem({ category }) {
             <button
               className="bg-blue-600 text-white py-1 px-4 rounded-xl shadow-sm shadow-blue-300 text-sm"
               onClick={() => {
-                !plan ? setIsAddingPlan(true) : setIsAdjustingPlan(true);
+                !category.plan
+                  ? setIsAddingPlan(true)
+                  : setIsAdjustingPlan(true);
                 setIsHover(false);
               }}
             >
-              {loading && "Loading..."}
-              {!loading &&
-                (!plan ? "Set plan this month" : "Adjust plan this month")}
+              {!category.plan
+                ? "Set plan this month"
+                : "Adjust plan this month"}
             </button>
           </motion.div>
         )}
@@ -81,14 +57,14 @@ function DefaultCategoryItem({ category }) {
           _year={new Date().getFullYear()}
           onClose={() => setIsAddingPlan(false)}
           category={category}
-          onUpdateSuccess={() => getPlan()}
+          onUpdateSuccess={onUpdateSuccess}
         />
       )}
       {isAdjustingPlan && (
         <AdjustBudget
-          plan={plan}
+          plan={category.plan}
           onClose={() => setIsAdjustingPlan(false)}
-          onUpdateSuccess={() => getPlan()}
+          onUpdateSuccess={onUpdateSuccess}
         />
       )}
     </>

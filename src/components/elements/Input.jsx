@@ -41,7 +41,9 @@ function Input({
           "block border-gray-300 ring-inset ring-gray-300 focus:ring-purple-400 w-full outline-none shadow-sm " +
           sizeStyle +
           " " +
-          style
+          style +
+          " " +
+          (error ? "ring-red-500" : "ring-gray-300")
         }
         placeholder={placeholder}
         disabled={disable}

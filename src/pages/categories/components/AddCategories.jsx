@@ -4,6 +4,7 @@ import Input from "../../../components/elements/Input";
 import Select from "../../../components/elements/Select";
 import ImageChoserPreview from "../../../components/others/ImageChoserPreview";
 import CategoriesService from "../../../services/categories";
+import { toast } from "react-toastify";
 
 const types = [
   { id: 1, name: "expenses" },
@@ -15,6 +16,7 @@ function AddCategories({ onClose, onAddSuccess, category = null }) {
   const [image, setImage] = useState(null);
   const [type, setType] = useState(types[0]);
   const [errors, setErrors] = useState(null);
+  const [processing, setProcessing] = useState(false);
 
   useEffect(() => {
     if (category) {
@@ -24,42 +26,50 @@ function AddCategories({ onClose, onAddSuccess, category = null }) {
   }, []);
 
   const saveCategory = async () => {
-    setErrors(null);
+    try {
+      let haveErrors = false;
+      setErrors(null);
+      setProcessing(true);
 
-    if (name.length === 0) {
-      setErrors((prev) => {
-        return { ...prev, name: "Name is required!" };
-      });
-    }
-
-    if (!category && !image) {
-      setErrors((prev) => {
-        return { ...prev, image: "Image is required!" };
-      });
-    }
-
-    if (!errors) {
-      let data = { name, type: type.name };
-      if (image) {
-        data = { ...data, image };
+      if (name.length === 0) {
+        haveErrors = true;
+        setErrors((prev) => {
+          return { ...prev, name: "Name is required!" };
+        });
       }
 
-      let responseData;
-      if (!category) {
-        responseData = await CategoriesService.createCategory(data);
-      } else {
-        responseData = await CategoriesService.updateCategory(
-          data,
-          category.id
-        );
+      if (!category && !image) {
+        haveErrors = true;
+        setErrors((prev) => {
+          return { ...prev, image: "Image is required!" };
+        });
       }
 
-      if (responseData.status === "success") {
-        onAddSuccess(category ? "update" : "create");
-      } else {
-        setErrors(responseData.error);
+      if (!haveErrors) {
+        let data = { name, type: type.name };
+        if (image) {
+          data = { ...data, image };
+        }
+
+        let responseData;
+        if (!category) {
+          responseData = await CategoriesService.createCategory(data);
+        } else {
+          responseData = await CategoriesService.updateCategory(
+            data,
+            category.id
+          );
+        }
+
+        if (responseData.status === "success") {
+          onClose();
+          onAddSuccess(category ? "update" : "create", category !== null);
+        }
       }
+    } catch (e) {
+      toast.error(e.response.data.message);
     }
+    setProcessing(false);
   };
 
   return (
@@ -67,7 +77,8 @@ function AddCategories({ onClose, onAddSuccess, category = null }) {
       title={category ? "Update category" : "Add new category"}
       onClose={onClose}
       onAccept={saveCategory}
-      width={"w-1/4"}
+      width={"lg:w-1/4 sm:w-3/5 md:1/2 w-11/12"}
+      processing={processing}
     >
       <div className="">
         <Input

@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import Input from "../elements/Input";
 import { FileUploader } from "react-drag-drop-files";
 
 function ImageChoserPreview({
@@ -50,12 +49,14 @@ function ImageChoserPreview({
           Image <span className="text-red-600 text-2xl">{required && "*"}</span>
         </label>
 
-        <FileUploader
-          multiple={false}
-          handleChange={handleFileChange}
-          name="image"
-          types={["JPG", "JPEG", "PNG", "GIF"]}
-        />
+        <div className="w-full overflow-hidden">
+          <FileUploader
+            multiple={false}
+            handleChange={handleFileChange}
+            name="image"
+            types={["JPG", "JPEG", "PNG", "GIF"]}
+          />
+        </div>
 
         <p className="text-red-500 text-end italic text-sm mt-1">
           {errors && errors.image}

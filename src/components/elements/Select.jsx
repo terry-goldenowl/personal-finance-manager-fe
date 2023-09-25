@@ -1,4 +1,4 @@
-import { Fragment, useEffect, useState } from "react";
+import { Fragment } from "react";
 import { Listbox, Transition } from "@headlessui/react";
 import { CheckIcon, ChevronUpDownIcon } from "@heroicons/react/20/solid";
 
@@ -12,6 +12,7 @@ export default function Select({
   selected,
   setSelected,
   required,
+  loading = false,
 }) {
   return (
     <div className="mb-2">
@@ -26,7 +27,8 @@ export default function Select({
               <Listbox.Button className="relative w-full cursor-default rounded-md bg-white py-1.5 pl-3 pr-10 text-left text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:outline-none focus:ring-2 focus:ring-purple-500 sm:text-sm sm:leading-6">
                 <span className="flex items-center">
                   <span className="block truncate capitalize">
-                    {selected && selected.name}
+                    {!loading && selected && selected.name}
+                    {loading && "Loading..."}
                   </span>
                 </span>
                 <span className="pointer-events-none absolute inset-y-0 right-0 ml-3 flex items-center pr-2">

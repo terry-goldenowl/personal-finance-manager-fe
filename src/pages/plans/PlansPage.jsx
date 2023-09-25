@@ -7,6 +7,8 @@ function PlansPage() {
   const [viewBy, setViewBy] = useState("months");
   const [monthGiven, setMonthGiven] = useState(null);
   const [yearGiven, setYearGiven] = useState(null);
+  const [monthPlans, setMonthPlans] = useState(null);
+  const [categoryPlans, setCategoryPlans] = useState(null);
 
   const btnStyle = (vb) => {
     if (viewBy === vb)
@@ -29,18 +31,17 @@ function PlansPage() {
   };
 
   return (
-    <div className="p-8">
-      <div className="flex gap-4 items-center justify-between">
-        <h2 className="text-4xl">Plans</h2>
+    <div className="lg:p-8 sm:p-14 p-3">
+      <div className="flex gap-4 items-center justify-between mb-4">
+        <h2 className="sm:text-4xl text-3xl">Plans</h2>
         <SelectWallet />
       </div>
       <div className="flex flex-col items-center">
-        <div className="w-3/5">
+        <div className="xl:w-3/5 sm:w-full lg:w-4/5 w-full">
           <div className="mb-4 flex justify-center w-full">
             <button
               className={
-                "py-2 w-1/2 rounded-l-full hover:font-bold " +
-                btnStyle("months")
+                "py-2 w-1/2 rounded-l-lg hover:font-bold " + btnStyle("months")
               }
               onClick={() => setViewBy("months")}
             >
@@ -48,7 +49,7 @@ function PlansPage() {
             </button>
             <button
               className={
-                "py-2 w-1/2 rounded-r-full hover:font-bold " +
+                "py-2 w-1/2 rounded-r-lg hover:font-bold " +
                 btnStyle("categories")
               }
               onClick={handleClickByCategoryPlans}
@@ -58,10 +59,19 @@ function PlansPage() {
           </div>
           <div className="">
             {viewBy === "months" && (
-              <MonthPlans onSeeCategoryPlans={handleSeeCategoryPlans} />
+              <MonthPlans
+                onSeeCategoryPlans={handleSeeCategoryPlans}
+                plans={monthPlans}
+                setPlans={setMonthPlans}
+              />
             )}
             {viewBy === "categories" && (
-              <CategoryPlans _month={monthGiven} _year={yearGiven} />
+              <CategoryPlans
+                _month={monthGiven}
+                _year={yearGiven}
+                plans={categoryPlans}
+                setPlans={setCategoryPlans}
+              />
             )}
           </div>
         </div>

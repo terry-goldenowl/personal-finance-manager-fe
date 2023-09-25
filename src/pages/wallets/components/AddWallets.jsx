@@ -5,7 +5,8 @@ import ImageChoserPreview from "../../../components/others/ImageChoserPreview";
 import WalletsService from "../../../services/wallets";
 import { useNavigate } from "react-router";
 import { useDispatch } from "react-redux";
-import { walletActions } from "../../../stores/wallets";
+import { fetchWallets, walletActions } from "../../../stores/wallets";
+import { toast } from "react-toastify";
 
 function AddWallet({ onClose, onAddSuccess, wallet = null, isNew = null }) {
   const [name, setName] = useState("");
@@ -13,6 +14,7 @@ function AddWallet({ onClose, onAddSuccess, wallet = null, isNew = null }) {
   const [errors, setErrors] = useState(null);
   const [isDefault, setIsDefault] = useState(false);
   const [title, setTitle] = useState("");
+  const [isSaving, setIsSaving] = useState(false);
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -30,49 +32,58 @@ function AddWallet({ onClose, onAddSuccess, wallet = null, isNew = null }) {
         setTitle("Add new wallet");
       }
     }
-  }, []);
+  }, [isNew, wallet]);
 
   const saveWallet = async () => {
-    setErrors(null);
+    try {
+      setErrors(null);
+      let haveErrors = false;
 
-    if (name.length === 0) {
-      return setErrors((prev) => {
-        return { ...prev, name: "Name is required!" };
-      });
-    }
-
-    if (!wallet && !image) {
-      return setErrors((prev) => {
-        return { ...prev, image: "Image is required!" };
-      });
-    }
-
-    let data = { name, default: isDefault ? 1 : 0 };
-
-    if (image) {
-      data = { ...data, image };
-    }
-
-    console.log(data);
-
-    let responseData;
-    if (!wallet) {
-      responseData = await WalletsService.createWallet(data);
-    } else {
-      responseData = await WalletsService.updateWallet(data, wallet.id);
-    }
-
-    if (responseData.status === "success") {
-      if (isNew) {
-        dispatch(walletActions.setHaveDefaultWallet(true));
-        navigate("/transactions");
-      } else {
-        onClose();
-        onAddSuccess(wallet ? "update" : "create");
+      if (name.length === 0) {
+        haveErrors = true;
+        setErrors((prev) => {
+          return { ...prev, name: "Name is required!" };
+        });
       }
-    } else {
-      setErrors(responseData.error);
+
+      if (!wallet && !image) {
+        haveErrors = true;
+        setErrors((prev) => {
+          return { ...prev, image: "Image is required!" };
+        });
+      }
+
+      if (haveErrors) return;
+
+      setIsSaving(true);
+      let data = { name, default: isDefault ? 1 : 0 };
+
+      if (image) {
+        data = { ...data, image };
+      }
+
+      let responseData;
+      if (!wallet) {
+        responseData = await WalletsService.createWallet(data);
+      } else {
+        responseData = await WalletsService.updateWallet(data, wallet.id);
+      }
+
+      if (responseData.status === "success") {
+        if (isNew) {
+          dispatch(fetchWallets());
+          dispatch(walletActions.setHaveDefaultWallet(true));
+          navigate("/transactions");
+        } else {
+          onClose();
+          onAddSuccess(wallet ? "update" : "create");
+        }
+      }
+    } catch (e) {
+      toast.error(e.response.data.message);
     }
+
+    setIsSaving(false);
   };
 
   return (
@@ -80,8 +91,9 @@ function AddWallet({ onClose, onAddSuccess, wallet = null, isNew = null }) {
       title={title}
       onClose={onClose}
       onAccept={saveWallet}
-      width={"w-1/4"}
+      width={"lg:w-1/4 sm:w-1/2 w-11/12"}
       action={isNew ? "yes" : "yesno"}
+      processing={isSaving}
     >
       <div className="">
         <Input

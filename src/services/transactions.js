@@ -1,9 +1,18 @@
-import instance from "../utils/axiosConfig";
+import instance from "../config/axiosConfig";
 
 export default class TransactionsService {
   static async getTransactions(params) {
     const response = await instance.get("/transactions", {
       params,
+    });
+
+    return response.data;
+  }
+
+  static async getTransactionsYears(params, signal) {
+    const response = await instance.get("/transactions/years", {
+      params,
+      signal,
     });
 
     return response.data;
@@ -36,6 +45,12 @@ export default class TransactionsService {
         },
       }
     );
+    return response.data;
+  }
+
+  static async getCounts() {
+    const response = await instance.get("/transactions/count");
+
     return response.data;
   }
 }

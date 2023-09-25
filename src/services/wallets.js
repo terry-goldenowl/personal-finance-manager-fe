@@ -1,4 +1,4 @@
-import instance from "../utils/axiosConfig";
+import instance from "../config/axiosConfig";
 
 export default class WalletsService {
   static async getWallets() {

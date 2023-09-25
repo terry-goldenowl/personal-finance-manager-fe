@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import Modal from "../../../components/modal/Modal";
 import CategoriesService from "../../../services/categories";
 import SelectWithImage from "../../../components/elements/SelectWithImage";
-import WalletsService from "../../../services/wallets";
 import Input from "../../../components/elements/Input";
 import Select from "../../../components/elements/Select";
 import monthsGetter from "../../../utils/monthsGetter";
@@ -13,6 +12,7 @@ import { faInfoCircle } from "@fortawesome/free-solid-svg-icons";
 import formatCurrency from "../../../utils/currencyFormatter";
 import PlansService from "../../../services/plans";
 import { toast } from "react-toastify";
+import { useSelector } from "react-redux";
 
 function AddCategoryPlan({
   onClose,
@@ -21,10 +21,10 @@ function AddCategoryPlan({
   _year,
   category = null,
 }) {
+  const { wallets, walletChosen } = useSelector((state) => state.wallet);
   const [categories, setCategories] = useState([]);
   const [categoryChosen, setCategoryChosen] = useState();
-  const [wallets, setWallets] = useState([]);
-  const [walletChosen, setWalletChosen] = useState();
+  const [walletSelected, setWalletSelected] = useState(walletChosen);
   const [amount, setAmount] = useState();
   const [formattedAmount, setFormattedAmount] = useState();
   const [month, setMonth] = useState(
@@ -38,41 +38,54 @@ function AddCategoryPlan({
       : yearsGetter(20).find((year) => year.id === new Date().getFullYear())
   );
   const [errors, setErrors] = useState(null);
-  const [lastMonthValue, setLastMonthValue] = useState({});
+  const [lastMonthValue, setLastMonthValue] = useState(null);
+  const [loadingTotalLastMonth, setLoadingTotalLastMonth] = useState(false);
+  const [loadingCategories, setLoadingCategories] = useState(false);
+  const [processingSave, setProcessingSave] = useState(false);
 
   const getCategories = async () => {
-    const data = await CategoriesService.getCategories({ type: "expenses" });
-    setCategories(data.data.categories);
-    if (category) setCategoryChosen(category);
-    else setCategoryChosen(data.data.categories[0]);
-  };
+    try {
+      setLoadingCategories(true);
+      const data = await CategoriesService.getCategories({ type: "expenses" });
+      setCategories(data.data.categories);
 
-  const getWallets = async () => {
-    const data = await WalletsService.getWallets();
-    setWallets(data.data.wallets);
-    setWalletChosen(data.data.wallets[0]);
+      if (category) setCategoryChosen(category);
+      else setCategoryChosen(data.data.categories[0]);
+    } catch (e) {
+      toast.error(e.response.data.message);
+    }
+    setLoadingCategories(false);
   };
 
   const getReport = async () => {
-    const responseData = await ReportsService.getReports({
-      year: year.id,
-      month: month.id,
-      report_type: "categories",
-      // wallet: 2,
-    });
+    try {
+      setLoadingTotalLastMonth(true);
+      const responseData = await ReportsService.getReports({
+        year: year.id,
+        month: month.id,
+        report_type: "categories",
+        wallet: walletSelected?.id,
+      });
 
-    if (responseData.data.reports[categoryChosen.name])
-      setLastMonthValue(responseData.data.reports[categoryChosen.name].amount);
+      if (responseData.data.reports[categoryChosen.name])
+        setLastMonthValue(
+          responseData.data.reports[categoryChosen.name].amount
+        );
+      else setLastMonthValue(0);
+    } catch (e) {
+      toast.error(e.response.data.message);
+    }
+    setLoadingTotalLastMonth(false);
   };
 
   useEffect(() => {
-    getWallets();
+    setLoadingCategories(true);
     getCategories();
   }, []);
 
   useEffect(() => {
-    if (year && month && categoryChosen && walletChosen) getReport();
-  }, [year, month, categoryChosen, walletChosen]);
+    if (year && month && categoryChosen && walletSelected) getReport();
+  }, [year, month, categoryChosen, walletSelected]);
 
   const handleAmountChange = (event) => {
     setErrors((prev) => {
@@ -94,31 +107,39 @@ function AddCategoryPlan({
   };
 
   const handleAddPlan = async () => {
-    setErrors(null);
+    try {
+      let haveErrors = false;
+      setErrors(null);
 
-    if (!amount || amount.length === 0) {
-      return setErrors((prev) => {
-        return { ...prev, amount: "Amount is required!" };
-      });
+      if (!amount || amount === "0") {
+        haveErrors = true;
+        setErrors((prev) => {
+          return { ...prev, amount: "Amount is required!" };
+        });
+      }
+
+      if (!haveErrors) {
+        setProcessingSave(true);
+        const data = {
+          wallet_id: walletSelected.id,
+          category_id: categoryChosen.id,
+          month: month.id + 1,
+          year: year.id,
+          amount,
+        };
+
+        const responseData = await PlansService.createCategoryPlan(data);
+
+        if (responseData.status === "success") {
+          onClose();
+          toast.success("Create plan successfully!");
+          onUpdateSuccess();
+        }
+      }
+    } catch (e) {
+      toast.error(e.response.data.message);
     }
-
-    const data = {
-      wallet_id: walletChosen.id,
-      category_id: categoryChosen.id,
-      month: month.id + 1,
-      year: year.id,
-      amount,
-    };
-
-    const responseData = await PlansService.createCategoryPlan(data);
-
-    if (responseData.status === "success") {
-      onClose();
-      toast.success("Create plan successfully!");
-      onUpdateSuccess();
-    } else {
-      toast.error(responseData.error);
-    }
+    setProcessingSave(false);
   };
 
   return (
@@ -126,32 +147,47 @@ function AddCategoryPlan({
       onAccept={handleAddPlan}
       onClose={onClose}
       title={"Add category plan"}
-      width={"w-1/4"}
+      width={"lg:w-1/4 sm:w-1/2 w-11/12"}
+      processing={processingSave}
     >
       {categoryChosen && (
-        <div className="flex items-center gap-2">
-          <FontAwesomeIcon icon={faInfoCircle} className="text-blue-600" />
-          {!isNaN(lastMonthValue) && (
+        <>
+          {loadingTotalLastMonth && !lastMonthValue && (
             <p className="text-sm text-blue-600 italic">
-              Total expenses of all transactions belong to this category last
-              month is{" "}
-              <span className="font-bold">
-                {formatCurrency(lastMonthValue)}
-              </span>
+              Loading total expenses last month ...
             </p>
           )}
-          {!lastMonthValue && (
-            <p className="text-sm text-blue-600 italic">
-              You didn't spend anything of this category last month!
-            </p>
+          {!loadingTotalLastMonth && lastMonthValue >= 0 && (
+            <>
+              <div className="flex items-center gap-2">
+                <FontAwesomeIcon
+                  icon={faInfoCircle}
+                  className="text-blue-600"
+                />
+                {lastMonthValue > 0 && (
+                  <p className="text-sm text-blue-600 italic">
+                    Total expenses of all transactions belong to this category
+                    last month is{" "}
+                    <span className="font-bold">
+                      {formatCurrency(lastMonthValue)}
+                    </span>
+                  </p>
+                )}
+                {lastMonthValue === 0 && (
+                  <p className="text-sm text-blue-600 italic">
+                    You didn't spend anything of this category last month!
+                  </p>
+                )}
+              </div>
+            </>
           )}
-        </div>
+        </>
       )}
       <SelectWithImage
         data={wallets}
         label={"Wallet:"}
-        selected={walletChosen}
-        setSelected={setWalletChosen}
+        selected={walletSelected}
+        setSelected={setWalletSelected}
         required
       />
       <SelectWithImage
@@ -160,6 +196,7 @@ function AddCategoryPlan({
         selected={categoryChosen}
         setSelected={setCategoryChosen}
         required
+        loading={loadingCategories}
       />
       <Input
         label={"Intended amount"}

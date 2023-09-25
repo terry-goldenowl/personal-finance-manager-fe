@@ -1,27 +1,19 @@
-import Cookies from "js-cookie";
-import React, { useEffect } from "react";
+import React from "react";
 import { Navigate, Outlet } from "react-router";
-import WalletsService from "../../services/wallets";
-import { walletActions } from "../../stores/wallets";
-import { useDispatch } from "react-redux";
+import { fetchWallets } from "../../stores/wallets";
+import { useDispatch, useSelector } from "react-redux";
 
 function ProtectedRoute() {
   const dispatch = useDispatch();
-  // Check if token exists in cookies
-  if (!Cookies.get("token")) {
+  const { isAuthenticated, roles } = useSelector((state) => state.auth);
+
+  if (!isAuthenticated) {
     return <Navigate to={"/login"} />;
   }
 
-  const getWallets = async () => {
-    dispatch(walletActions.setLoadingWallet(true));
-    const walletResponse = await WalletsService.getWallets();
-    dispatch(
-      walletActions.setHaveDefaultWallet(walletResponse.data.wallets.length > 0)
-    );
-    dispatch(walletActions.setLoadingWallet(false));
-  };
-
-  getWallets();
+  if (roles.includes("user")) {
+    dispatch(fetchWallets());
+  }
 
   return <Outlet />;
 }

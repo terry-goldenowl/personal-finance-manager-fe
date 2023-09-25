@@ -7,6 +7,7 @@ import logoText from "../../assets/images/name-money-master.png";
 import { useNavigate } from "react-router";
 import "../../styles/auth.css";
 import Benefits from "./components/Benefits";
+import { motion } from "framer-motion";
 
 function LoginRegisterLayout({ children }) {
   const images = [graphic1, graphic2, graphic3];
@@ -19,46 +20,55 @@ function LoginRegisterLayout({ children }) {
   }, 2500);
 
   return (
-    <div className="flex h-screen">
-      <div className="w-1/2 grow h-100 flex flex-col items-center justify-start">
+    <div className="flex h-screen lg:flex-row flex-col">
+      <div className="lg:w-1/2 w-full lg:grow flex flex-col items-center justify-start">
         <div className="flex gap-2 items-center justify-start w-full px-6 py-2">
-          <img src={logo} alt="" width={70} height={70} />
-          <img src={logoText} alt="" style={{ height: 50 }} />
+          <img src={logo} alt="" className="sm:w-16 sm:h-16 h-14 w-14" />
+          <img src={logoText} alt="" className="sm:h-12 h-10" />
         </div>
-        <div className="mb-4 w-full bg-purple-400 py-5 px-12 rounded-tr-full rounded-br-full relative">
-          <h2 className="w-full text-4xl text-white mb-2 leading-tight">
+        <div className="sm:mb-4 mb-2 w-full bg-purple-400 md:py-5 py-3 md:px-12 px-6 md:rounded-tr-full md:rounded-br-full md:relative">
+          <h2 className="w-full md:text-4xl text-2xl text-white mb-2 leading-tight">
             We help you to manage your finance efficiently!
           </h2>
           <h5 className="text-white text-2xl">Let's join.</h5>
-          <button
-            className="bg-purple-600 py-2 px-6 text-white rounded-full absolute right-16 bottom-4 hover:bg-purple-700"
-            onClick={() => setShownBenefits(!shownBenefits)}
+          <div className="flex justify-end mt-1">
+            <button
+              className="bg-purple-600 py-2 px-6 text-white rounded-full md:absolute block right-16 bottom-4 hover:bg-purple-700"
+              onClick={() => setShownBenefits(!shownBenefits)}
+            >
+              See what you can benefit
+            </button>
+          </div>
+        </div>
+        <div className="md:block hidden">
+          <motion.div
+            className=""
+            style={{ width: 500, height: 500 }}
+            initial={{ opacity: 0, translateX: 20 }}
+            animate={{ opacity: 1, translateX: 0 }}
           >
-            See what you can benefit
-          </button>
-        </div>
-        <div className="" style={{ width: 500, height: 500 }}>
-          <img src={images[currentImage]} alt="" className="" />
-        </div>
-        <div className="flex gap-2">
-          {images.map((image, index) => {
-            return (
-              <button
-                key={Math.random()}
-                className={`rounded-md ${
-                  currentImage === index ? "bg-purple-300" : "bg-gray-300"
-                }`}
-                style={{ width: 80, height: 5 }}
-                onClick={() => setCurrentImage(index)}
-              ></button>
-            );
-          })}
+            <img src={images[currentImage]} alt="" className="" />
+          </motion.div>
+          <div className="flex gap-2 justify-center">
+            {images.map((image, index) => {
+              return (
+                <button
+                  key={Math.random()}
+                  className={`rounded-md w-full ${
+                    currentImage === index ? "bg-purple-300" : "bg-gray-300"
+                  }`}
+                  style={{ width: 80, height: 5 }}
+                  onClick={() => setCurrentImage(index)}
+                ></button>
+              );
+            })}
+          </div>
         </div>
       </div>
 
-      <div className="w-1/2 grow flex flex-col relative overflow-hidden">
+      <div className="lg:w-1/2 w-full grow flex flex-col relative overflow-hidden">
         <div
-          className="flex gap-2 justify-end py-3 pe-8"
+          className="hidden gap-2 justify-end py-3 pe-8 md:flex"
           style={{
             backgroundImage:
               "linear-gradient(to left, rgb(216, 180, 254), #ffffff)",
@@ -98,12 +108,12 @@ function LoginRegisterLayout({ children }) {
 
           <div
             style={{ width: 450 }}
-            className={`flip-card flex items-center ${
-              shownBenefits == true ? "active" : ""
+            className={`flip-card flex items-center sm:p-0 p-2 ${
+              shownBenefits === true ? "active" : ""
             }`}
           >
             <div
-              className="border-blue-400 rounded-3xl p-6 bg-white form-card w-full"
+              className="border-blue-400 rounded-3xl sm:p-6 p-4 bg-white form-card w-full"
               style={{
                 boxShadow: "0 0 30px rgb(216, 180, 254)",
               }}
@@ -116,7 +126,7 @@ function LoginRegisterLayout({ children }) {
                 boxShadow: "0 0 30px rgb(216, 180, 254)",
               }}
             >
-              <Benefits setShownBenefits={setShownBenefits}/>
+              <Benefits setShownBenefits={setShownBenefits} />
             </div>
           </div>
         </div>
