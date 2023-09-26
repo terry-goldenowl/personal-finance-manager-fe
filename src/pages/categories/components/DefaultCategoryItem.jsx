@@ -17,7 +17,7 @@ function DefaultCategoryItem({ category, onUpdateSuccess }) {
       >
         <div className="w-24 h-24 shadow-sm mb-2 relative">
           <img
-            src={process.env.REACT_APP_API_HOST + category.image}
+            src={category.image}
             alt=""
             className="object-cover w-full h-full rounded-md"
           />

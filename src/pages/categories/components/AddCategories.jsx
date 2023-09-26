@@ -105,9 +105,7 @@ function AddCategories({ onClose, onAddSuccess, category = null }) {
           setImage={setImage}
           errors={errors}
           setErrors={setErrors}
-          defaultPreview={
-            category && process.env.REACT_APP_API_HOST + category.image
-          }
+          defaultPreview={category && category.image}
           required
         />
       </div>

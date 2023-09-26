@@ -3,7 +3,7 @@ import { createPortal } from "react-dom";
 
 export default function ModalWithNothing({ onClose, children, width }) {
   return createPortal(
-    <div className="justify-center items-center flex overflow-x-hidden overflow-y-auto fixed inset-0 outline-none focus:outline-none">
+    <div className="justify-center items-center flex overflow-x-hidden overflow-y-auto fixed inset-0 outline-none focus:outline-none z-40">
       <motion.div
         className={"relative my-6 mx-auto max-w-3xl z-50 " + width}
         initial={{ scaleX: 0, opacity: 0.5 }}

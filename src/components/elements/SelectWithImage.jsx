@@ -28,10 +28,7 @@ export default function SelectWithImage({
                 {!loading && (
                   <span className="flex items-center">
                     <img
-                      src={
-                        selected &&
-                        process.env.REACT_APP_API_HOST + selected.image
-                      }
+                      src={selected && selected.image}
                       alt=""
                       className="h-5 w-5 flex-shrink-0 rounded-full"
                     />
@@ -75,9 +72,7 @@ export default function SelectWithImage({
                           <>
                             <div className="flex items-center">
                               <img
-                                src={
-                                  process.env.REACT_APP_API_HOST + item.image
-                                }
+                                src={item.image}
                                 alt=""
                                 className="h-5 w-5 flex-shrink-0 rounded-full"
                               />

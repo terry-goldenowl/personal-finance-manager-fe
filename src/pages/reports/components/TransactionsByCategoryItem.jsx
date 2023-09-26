@@ -61,7 +61,7 @@ function TransactionsByCategoryItem({
       >
         <div className="w-14 h-14 flex justify-center items-center overflow-hidden rounded-md shrink-0">
           <img
-            src={process.env.REACT_APP_API_HOST + item.image}
+            src={item.image}
             alt=""
             className="object-cover h-full w-full"
           />

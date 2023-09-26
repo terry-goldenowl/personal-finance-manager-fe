@@ -5,6 +5,7 @@ import { useParams } from "react-router";
 import AuthService from "../../services/auth";
 import SuccessfulResetPassword from "./components/SuccessfulResetPassword";
 import { toast } from "react-toastify";
+import Cookies from "js-cookie";
 
 function ResetPasswordPage() {
   const params = useParams();
@@ -14,7 +15,7 @@ function ResetPasswordPage() {
   const [error, setError] = useState(null);
 
   const token = params.token;
-  const email = localStorage.getItem("email");
+  const email = Cookies.get("email");
 
   const submitHandler = async (values) => {
     try {
@@ -25,10 +26,11 @@ function ResetPasswordPage() {
 
       if (responseData.status === "success") {
         setShowSuccessful(true);
+        Cookies.remove("email");
       }
     } catch (e) {
       setError(e.response.data.error);
-      toast.error(error.response.data.message);
+      toast.error(e.response.data.message);
     }
     setIsSubmitting(false);
   };

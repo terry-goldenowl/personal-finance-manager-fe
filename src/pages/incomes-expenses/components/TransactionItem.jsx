@@ -42,7 +42,7 @@ function TransactionItem({ transaction, index, onModifySuccess }) {
       >
         <div className="w-16 h-16 overflow-hidden rounded-md shadow-sm flex-shrink-0 relative">
           <img
-            src={process.env.REACT_APP_API_HOST + transaction.category.image}
+            src={transaction.category.image}
             alt=""
             className="object-cover w-full h-full"
           />
