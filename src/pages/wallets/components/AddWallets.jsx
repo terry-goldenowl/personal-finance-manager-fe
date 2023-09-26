@@ -113,7 +113,7 @@ function AddWallet({ onClose, onAddSuccess, wallet = null, isNew = null }) {
           errors={errors}
           setErrors={setErrors}
           defaultPreview={
-            wallet && process.env.REACT_APP_API_HOST + wallet.image
+            wallet && wallet.image
           }
           required
         />

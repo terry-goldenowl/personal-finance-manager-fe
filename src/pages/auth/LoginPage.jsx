@@ -8,6 +8,7 @@ import { useNavigate } from "react-router";
 import { useDispatch } from "react-redux";
 import { authActions } from "../../stores/auth";
 import { toast } from "react-toastify";
+import Cookies from "js-cookie";
 
 function LoginPage() {
   const [isForgetting, setIsForgetting] = useState(false);
@@ -36,7 +37,7 @@ function LoginPage() {
         setIsForgetting(false);
         setIsNotifyingSent(true);
 
-        localStorage.setItem("email", email);
+        Cookies.set('email', email)
       } else {
         setIsForgetting(true);
         setForgetError(responseData.error);

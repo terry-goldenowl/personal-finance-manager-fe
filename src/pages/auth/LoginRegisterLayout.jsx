@@ -108,12 +108,12 @@ function LoginRegisterLayout({ children }) {
 
           <div
             style={{ width: 450 }}
-            className={`flip-card flex items-center sm:p-0 p-2 ${
+            className={`flip-card flex items-center justify-center sm:p-0 p-2 ${
               shownBenefits === true ? "active" : ""
             }`}
           >
             <div
-              className="border-blue-400 rounded-3xl sm:p-6 p-4 bg-white form-card w-full"
+              className="border-blue-400 rounded-3xl sm:p-6 p-4 bg-white form-card w-11/12"
               style={{
                 boxShadow: "0 0 30px rgb(216, 180, 254)",
               }}
@@ -121,7 +121,7 @@ function LoginRegisterLayout({ children }) {
               {children}
             </div>
             <div
-              className="border-blue-400 rounded-3xl p-6 bg-white benefits-card w-full"
+              className="border-blue-400 rounded-3xl p-6 bg-white benefits-card w-11/12"
               style={{
                 boxShadow: "0 0 30px rgb(216, 180, 254)",
               }}

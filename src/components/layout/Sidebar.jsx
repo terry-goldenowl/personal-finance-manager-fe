@@ -81,7 +81,10 @@ function Sidebar({ onLogout, isLogging }) {
   };
 
   return (
-    <div className="sidebar w-screen bg-white lg:w-40 px-5 sm:py-5 py-4 lg:px-3 shadow-lg flex lg:flex-col lg:justify-center flex-row sm:justify-center justify-start gap-5 items-center lg:rounded-br-3xl h-fit sticky top-0 left-0 z-30 bg-opacity-90">
+    <div
+      className="sidebar w-screen bg-white lg:w-40 px-5 sm:py-5 py-4 lg:px-3 shadow-lg flex lg:flex-col lg:justify-center flex-row sm:justify-center justify-start gap-5 items-center lg:rounded-br-3xl h-fit sticky top-0 left-0 bg-opacity-90"
+      style={{ zIndex: 25 }}
+    >
       <div className="lg:mb-6 mb-0 flex flex-col items-center relative">
         <div className="absolute top-0 right-0">
           <AccountPopup
@@ -93,9 +96,7 @@ function Sidebar({ onLogout, isLogging }) {
 
         <div className="rounded-full lg:w-16 lg:h-16 w-12 h-12 overflow-hidden">
           <img
-            src={
-              user.photo ? process.env.REACT_APP_API_HOST + user.photo : avatar
-            }
+            src={user.photo ? user.photo : avatar}
             alt=""
             className="object-cover w-full h-full"
           />

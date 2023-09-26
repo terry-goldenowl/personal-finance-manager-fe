@@ -58,7 +58,7 @@ function CategoryPlanItem({ categoryPlan, onUpdateSuccess }) {
       >
         <div className="w-10 h-10 rounded-full flex items-center justify-center overflow-hidden">
           <img
-            src={process.env.REACT_APP_API_HOST + categoryPlan.category.image}
+            src={categoryPlan.category.image}
             alt=""
             className="object-cover w-full h-full"
           />

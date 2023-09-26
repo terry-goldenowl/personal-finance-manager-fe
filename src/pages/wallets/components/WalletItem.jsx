@@ -43,7 +43,7 @@ function WalletItem({ wallet, onUpdateSuccess }) {
     >
       <div className="w-14 h-14 rounded-full overflow-hidden shadow-md bg-white">
         <img
-          src={process.env.REACT_APP_API_HOST + wallet.image}
+          src={wallet.image}
           alt=""
           className="object-cover h-full w-full"
         />

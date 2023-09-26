@@ -41,7 +41,7 @@ function CategoryItem({ category, onUpdateSuccess }) {
       >
         <div className="w-20 h-20 rounded-full overflow-hidden flex items-center justify-center shadow-sm shrink-0">
           <img
-            src={process.env.REACT_APP_API_HOST + category.image}
+            src={category.image}
             alt=""
             className="object-cover w-full h-full"
           />

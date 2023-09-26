@@ -16,7 +16,7 @@ function Profile({ onClose }) {
   const { user, roles } = useSelector((state) => state.auth);
 
   const [preview, setPreview] = useState(
-    user.photo ? process.env.REACT_APP_API_HOST + user.photo : profile
+    user.photo ? user.photo : profile
   );
 
   const [photo, setPhoto] = useState();
@@ -236,8 +236,8 @@ function Profile({ onClose }) {
       onClose={onClose}
       width={
         isUpdatingPassword
-          ? "xl:w-3/5 lg:w-1/2 sm:w-3/5 w-11/12"
-          : "2xl:w-1/4 xl:w-2/5 lg:1/3 md:w-1/2 sm:w-4/5 w-11/12"
+          ? "sm:w-3/5 w-11/12"
+          : "xl:w-1/4 md:w-1/3 sm:w-1/2 w-11/12"
       }
       onAccept={handleAccept}
       processing={isUpdating}

@@ -144,7 +144,7 @@ function Report({
                 <div className="w-32 h-32 rounded-xl overflow-hidden mb-2">
                   <img
                     className="object-cover w-full h-full"
-                    src={process.env.REACT_APP_API_HOST + walletChosen?.image}
+                    src={walletChosen?.image}
                     alt=""
                   />
                 </div>

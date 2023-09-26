@@ -29,7 +29,7 @@ function Table({ data, onUpdateSuccess }) {
         accessor: "photo",
         Cell: ({ cell: { value } }) => (
           <img
-            src={value ? process.env.REACT_APP_API_HOST + value : avatar}
+            src={value ? value : avatar}
             alt=""
             className="w-10 h-10 rounded-full"
           />
