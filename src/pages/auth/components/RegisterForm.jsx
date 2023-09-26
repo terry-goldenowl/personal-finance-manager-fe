@@ -1,10 +1,11 @@
 import React from "react";
 import { Formik } from "formik";
-import AuthInput from "./AuthInput";
 import { useNavigate } from "react-router";
+import Input from "../../../components/elements/Input";
 
-function RegisterForm({ onSubmit }) {
+function RegisterForm({ submitting, error, setError, onSubmit }) {
   const navigate = useNavigate();
+  // console.log(error);
   return (
     <>
       <h2 className="text-purple-500 text-3xl text-center">Register</h2>
@@ -17,6 +18,7 @@ function RegisterForm({ onSubmit }) {
         }}
         validate={(values) => {
           const errors = {};
+          setError(null);
 
           if (!values.name) {
             errors.name = "Required";
@@ -41,7 +43,6 @@ function RegisterForm({ onSubmit }) {
           return errors;
         }}
         onSubmit={(values, { setSubmitting }) => {
-          setSubmitting(false);
           onSubmit(values);
         }}
       >
@@ -55,35 +56,44 @@ function RegisterForm({ onSubmit }) {
           isSubmitting,
         }) => (
           <form onSubmit={handleSubmit} className="mt-6" method="post">
-            <AuthInput
+            <Input
               type={"name"}
               name={"name"}
               onChange={handleChange}
               onBlur={handleBlur}
               value={values.name}
               label={"Name"}
-              error={errors.name && touched.name && errors.name}
+              error={
+                (errors.name && touched.name && errors.name) ||
+                (error && error.name)
+              }
             />
-            <AuthInput
+            <Input
               type={"email"}
               name={"email"}
               onChange={handleChange}
               onBlur={handleBlur}
               value={values.email}
               label={"Email"}
-              error={errors.email && touched.email && errors.email}
+              error={
+                (errors.email && touched.email && errors.email) ||
+                (error && error.email)
+              }
             />
 
-            <AuthInput
+            <Input
               type={"password"}
               name={"password"}
               onChange={handleChange}
               onBlur={handleBlur}
               value={values.password}
               label={"Password"}
-              error={errors.password && touched.password && errors.password}
+              error={
+                (errors.password && touched.password && errors.password) ||
+                (error && error.password)
+              }
             />
-            <AuthInput
+            <Input
               type={"password"}
               name={"password_confirmation"}
               onChange={handleChange}
@@ -98,10 +108,10 @@ function RegisterForm({ onSubmit }) {
             />
             <button
               type="submit"
-              disabled={isSubmitting}
+              disabled={submitting}
               className="bg-purple-600 text-white py-2 w-full rounded-lg mt-8 text-xl hover:bg-purple-700"
             >
-              Submit
+              {submitting ? "Registering...." : "Register"}
             </button>
             <p className="text-center mt-2 text-md">
               Already have account?{" "}
