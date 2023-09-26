@@ -10,13 +10,13 @@ function ForgetPassword({ onAccept, onClose, error, setError, isSendingLink }) {
     setEmail(value);
 
     if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(value)) {
-      setError("Email is not valid!");
+      setError({ email: "Email is not valid!" });
     } else setError(null);
   };
 
   const acceptHandle = () => {
     if (email.length === 0) {
-      setError("Email is required!!");
+      setError({ email: "Email is required!!" });
     } else {
       onAccept(email);
     }
@@ -35,7 +35,7 @@ function ForgetPassword({ onAccept, onClose, error, setError, isSendingLink }) {
         value={email}
         onChange={handleEmailChange}
         onBlur={handleEmailChange}
-        error={error}
+        error={error?.email}
         label={"Enter your email to get the reset password link"}
       />
     </Modal>

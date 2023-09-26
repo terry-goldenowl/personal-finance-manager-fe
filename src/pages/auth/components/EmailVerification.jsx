@@ -13,7 +13,9 @@ function EmailVerification({ onSuccess, onClose, email }) {
   const handleAccept = async () => {
     try {
       if (code.length === 0) {
-        return setError("Verification code is required!");
+        return setError({
+          verification_code: "Verification code is required!",
+        });
       }
 
       setLoading(true);
@@ -46,7 +48,7 @@ function EmailVerification({ onSuccess, onClose, email }) {
         value={code}
         onChange={(e) => setCode(e.target.value)}
         onBlur={(e) => setCode(e.target.value)}
-        error={error}
+        error={error?.verification_code}
         label={
           "Your email haven't been verified yet! Please enter the code that we have sent to your email in mailtrap to verify."
         }
