@@ -109,6 +109,10 @@ This section should list any major frameworks/libraries used to bootstrap your p
     ├───styles
     └───utils
 ```
+
+## Architecture Diagram
+![image](https://github.com/terry-goldenowl/personal-finance-manager-fe/assets/138744655/844695dc-6a1f-48f2-a43e-15bdf1cd0b10)
+
 <!-- GETTING STARTED -->
 ## Getting Started
 
