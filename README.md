@@ -12,10 +12,8 @@
   <p align="center">
     Help you master your money effectively!
     <br />
-    <a href="https://github.com/othneildrew/Best-README-Template"><strong>Explore the docs »</strong></a>
     <br />
-    <br />
-    <a href="#">View Demo</a>
+    <a href="https://money-master-nine.vercel.app/">View Demo</a>
     ·
     <a href="https://github.com/terry-goldenowl/personal-finance-manager-fe/issues">Report Bug</a>
     ·
@@ -33,6 +31,9 @@
       <a href="#about-the-project">About The Project</a>
       <ul>
         <li><a href="#built-with">Built With</a></li>
+        <li><a href="#project-folder-structure">Project Folder Structure</a></li>
+        <li><a href="#architecture-diagram">Architecture Diagram</a></li>
+        <li><a href="#db-diagram">DB Diagram</a></li>
       </ul>
     </li>
     <li>
@@ -110,8 +111,11 @@ This section should list any major frameworks/libraries used to bootstrap your p
     └───utils
 ```
 
-## Architecture Diagram
+### Architecture Diagram
 ![image](https://github.com/terry-goldenowl/personal-finance-manager-fe/assets/138744655/844695dc-6a1f-48f2-a43e-15bdf1cd0b10)
+
+## DB Diagram
+[![](https://mermaid.ink/img/pako:eNqN0dEKgjAUBuBXOZxre4HdjZIKTEMXEQxiuFNKmTHdRczePaUiMot2ez7O_7PjMC01IUMyk1ztjSrkCdq3SvwYmmY0ahyseRD4gkGmqt6wdDDmwp9G8ebLWMQ8TPhYzKOQQWpI1fSJFlEoZttlwH-YZ84Au_cbSAQGEm1FGnalkTikX9F_4LcOg_4p_i3T978T0MOCTKFy3R7MdRsk1hkVJLGjWplDx66tU7Yuk8spRVYbSx7as27_63FiZDt1rOh6AzyDmkE?type=png)](https://mermaid.live/edit#pako:eNqN0dEKgjAUBuBXOZxre4HdjZIKTEMXEQxiuFNKmTHdRczePaUiMot2ez7O_7PjMC01IUMyk1ztjSrkCdq3SvwYmmY0ahyseRD4gkGmqt6wdDDmwp9G8ebLWMQ8TPhYzKOQQWpI1fSJFlEoZttlwH-YZ84Au_cbSAQGEm1FGnalkTikX9F_4LcOg_4p_i3T978T0MOCTKFy3R7MdRsk1hkVJLGjWplDx66tU7Yuk8spRVYbSx7as27_63FiZDt1rOh6AzyDmkE)
 
 <!-- GETTING STARTED -->
 ## Getting Started
