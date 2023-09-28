@@ -4,7 +4,7 @@ import Modal from "../../../components/modal/Modal";
 function NotifyLinkSent({ onAccept, onClose }) {
   return (
     <Modal
-      title={"Email verification successfully"}
+      title={"Reset password link was sent!"}
       onAccept={onAccept}
       onClose={onClose}
       width={"sm:w-fit w-11/12"}

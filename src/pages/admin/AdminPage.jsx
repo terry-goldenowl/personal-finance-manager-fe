@@ -10,6 +10,8 @@ import { Chart, registerables } from "chart.js";
 import { motion } from "framer-motion";
 import CategoriesService from "../../services/categories";
 import { toast } from "react-toastify";
+import StatisticItem from "./components/StatisticItem";
+import Select from "../../components/elements/Select";
 
 const options = {
   scales: {
@@ -38,22 +40,40 @@ function AdminPage() {
   const [userQuantityPerMonth, setUserQuantityPerMonth] = useState([]);
   const [transactionQuantityPerMonth, setTransactionQuantityPerMonth] =
     useState([]);
+  const [loadingTransactionCount, setLoadingTransactionCount] = useState(false);
+  const [loadingUserCount, setLoadingUserCount] = useState(false);
+  const [loadingCategoryCount, setLoadingCategoryCount] = useState(false);
+  const [year, setYear] = useState(null);
+  const [years, setYears] = useState([]);
+  const [loadingYears, setLoadingYears] = useState(false);
+
+  Chart.register(...registerables);
+  Chart.defaults.font.family = "Quicksand";
+  Chart.defaults.color = "#000000";
+  Chart.defaults.font.size = 14;
 
   const getCounts = async () => {
+    setLoadingCategoryCount(true);
+    setLoadingTransactionCount(true);
+    setLoadingUserCount(true);
+
     try {
       let responseData = await UsersServices.getCounts();
+      setLoadingUserCount(false);
 
       if (responseData.status === "success") {
         setUsersCounts(responseData.data);
       }
 
       responseData = await TransactionsService.getCounts();
+      setLoadingTransactionCount(false);
 
       if (responseData.status === "success") {
         setTransactionsCounts(responseData.data);
       }
 
       responseData = await CategoriesService.getDefaultCount();
+      setLoadingCategoryCount(false);
 
       if (responseData.status === "success") {
         setDefaultCategoriesCount(responseData.data.count);
@@ -61,15 +81,17 @@ function AdminPage() {
     } catch (e) {
       toast.error(e.response.data.message);
     }
+
+    setLoadingCategoryCount(false);
+    setLoadingTransactionCount(false);
+    setLoadingUserCount(false);
   };
 
   const getUserQuantityPerMonth = async () => {
     try {
       const responseData = await ReportsService.getUserQuantityPerMonth({
-        year: new Date().getFullYear(),
+        year: year?.id,
       });
-
-      console.log(responseData);
 
       if (responseData.status === "success") {
         setUserQuantityPerMonth(responseData.data.quantities);
@@ -82,7 +104,7 @@ function AdminPage() {
   const getTransactionQuantityPerMonth = async () => {
     try {
       const responseData = await ReportsService.getTransactionQuantityPerMonth({
-        year: new Date().getFullYear(),
+        year: year?.id,
       });
 
       if (responseData.status === "success") {
@@ -91,6 +113,24 @@ function AdminPage() {
     } catch (e) {
       toast.error(e.response.data.message);
     }
+  };
+
+  const getYears = async () => {
+    try {
+      setLoadingYears(true);
+      const responseData = await UsersServices.getYears();
+
+      if (responseData.status === "success") {
+        const years = responseData.data.years.map((y) => {
+          return { id: y, name: y };
+        });
+
+        setYears(years);
+      }
+    } catch (e) {
+      toast.error(e.response.data.message);
+    }
+    setLoadingYears(false);
   };
 
   const statistics = useMemo(
@@ -102,6 +142,7 @@ function AdminPage() {
         color: "text-green-600",
         bgColor: "from-green-400 to-green-200",
         image: usersImg,
+        loading: loadingUserCount,
       },
       {
         name: "Transactions",
@@ -110,6 +151,7 @@ function AdminPage() {
         color: "text-blue-600",
         bgColor: "from-blue-400 to-blue-200",
         image: transactionsImg,
+        loading: loadingTransactionCount,
       },
       {
         name: "Default Categories",
@@ -118,15 +160,18 @@ function AdminPage() {
         color: "text-orange-600",
         bgColor: "from-orange-400 to-orange-200",
         image: categoriesImg,
+        loading: loadingCategoryCount,
       },
     ],
-    [transactionsCounts, usersCounts, defaultCategoriesCount]
+    [
+      transactionsCounts,
+      usersCounts,
+      defaultCategoriesCount,
+      loadingCategoryCount,
+      loadingTransactionCount,
+      loadingUserCount,
+    ]
   );
-
-  Chart.register(...registerables);
-  Chart.defaults.font.family = "Quicksand";
-  Chart.defaults.color = "#000000";
-  Chart.defaults.font.size = 14;
 
   const userQuantityData = useMemo(() => {
     return {
@@ -158,61 +203,63 @@ function AdminPage() {
 
   useEffect(() => {
     getCounts();
-    getUserQuantityPerMonth();
-    getTransactionQuantityPerMonth();
+    getYears();
   }, []);
+
+  useEffect(() => {
+    if (years.length === 0) return;
+    const currentYear = years.find((y) => y.id === new Date().getFullYear());
+
+    setYear(currentYear || years[0]);
+  }, [years]);
+
+  useEffect(() => {
+    if (year) {
+      getUserQuantityPerMonth();
+      getTransactionQuantityPerMonth();
+    }
+  }, [year]);
 
   return (
     <div className="lg:p-8 sm:p-14 p-3">
       <div className="flex gap-4 items-center">
         <h2 className="sm:text-4xl text-3xl">Dash board</h2>
       </div>
-      <div>
+      <div className="mb-3">
         <div className="mt-8 flex gap-4 md:flex-row flex-col">
           {statistics &&
             statistics.map((statistic) => (
-              <motion.div
-                key={Math.random() * 100}
-                className={`p-4 rounded-2xl xl:w-1/4 md:w-1/3 w-full flex justify-between items-center shadow-md bg-gradient-to-tr ${statistic.bgColor}`}
-                whileHover={{ scale: 1.05 }}
-              >
-                <div>
-                  <p className={`text-3xl font-bold ${statistic.color}`}>
-                    {statistic.count}
-                  </p>
-                  <p
-                    className={`text-md uppercase ${statistic.color} font-bold`}
-                  >
-                    {statistic.name}
-                  </p>
-                  {statistic.currentMonthCount && (
-                    <p>
-                      This month: <span>{statistic.currentMonthCount}</span>
-                    </p>
-                  )}
-                </div>
-                <div>
-                  <img src={statistic.image} alt="" className="w-16 h-16" />
-                </div>
-              </motion.div>
+              <StatisticItem statistic={statistic} key={Math.random()} />
             ))}
         </div>
       </div>
-      <div className="flex lg:gap-4 gap-8 mt-6 max-w-full lg:flex-row flex-col">
-        <div className="lg:w-1/2 w-full h-96 p-4 rounded-2xl bg-white relative shadow-md">
-          <Line data={userQuantityData} options={options} />
-          <div className="flex justify-center items-center absolute -bottom-5 w-full">
-            <p className="italic py-1 px-4 bg-green-500 text-white rounded-xl shadow-sm text-sm uppercase font-bold">
-              User quantities per month
-            </p>
+      <div>
+        <div className="flex justify-end">
+          <div className="w-40">
+            <Select
+              selected={year}
+              setSelected={setYear}
+              data={years}
+              loading={loadingYears}
+            />
           </div>
         </div>
-        <div className="lg:w-1/2 w-full h-96 p-4 rounded-2xl bg-white relative shadow-md">
-          <Line data={transactionQuantityData} options={options} />
-          <div className="flex justify-center items-center absolute -bottom-5 w-full">
-            <p className="italic py-1 px-4 bg-blue-500 text-white rounded-xl shadow-sm text-sm uppercase font-bold">
-              Transaction quantities per month
-            </p>
+        <div className="flex lg:gap-4 gap-8 mt-6 max-w-full lg:flex-row flex-col">
+          <div className="lg:w-1/2 w-full h-96 p-4 rounded-2xl bg-white relative shadow-md">
+            <Line data={userQuantityData} options={options} />
+            <div className="flex justify-center items-center absolute -bottom-5 w-full">
+              <p className="italic py-1 px-4 bg-green-500 text-white rounded-xl shadow-sm text-sm uppercase font-bold">
+                User quantities per month
+              </p>
+            </div>
+          </div>
+          <div className="lg:w-1/2 w-full h-96 p-4 rounded-2xl bg-white relative shadow-md">
+            <Line data={transactionQuantityData} options={options} />
+            <div className="flex justify-center items-center absolute -bottom-5 w-full">
+              <p className="italic py-1 px-4 bg-blue-500 text-white rounded-xl shadow-sm text-sm uppercase font-bold">
+                Transaction quantities per month
+              </p>
+            </div>
           </div>
         </div>
       </div>

@@ -14,6 +14,8 @@ import { faFileExcel } from "@fortawesome/free-regular-svg-icons";
 import { motion } from "framer-motion";
 import TransactionsService from "../../services/transactions";
 import { toast } from "react-toastify";
+import axios from "axios";
+import { controller } from "../../config/axiosConfig";
 
 function ReportsPage() {
   const location = useLocation();
@@ -61,10 +63,10 @@ function ReportsPage() {
 
         setYear(currentYear || yearsBetween[0]);
       }
-      setLoadingYears(false);
     } catch (e) {
       toast.error(e.response.data.message);
     }
+    setLoadingYears(false);
   };
 
   const getReports = async (params) => {
@@ -75,10 +77,10 @@ function ReportsPage() {
       if (responseData.status === "success") {
         setReports(responseData.data.reports);
       }
-      setLoading(false);
     } catch (e) {
       toast.error(e.response.data.message);
     }
+    setLoading(false);
   };
 
   const fillReports = (labels) => {
@@ -93,6 +95,56 @@ function ReportsPage() {
         }
       });
     }
+  };
+
+  const periodStyle = (_period) => {
+    return (
+      "grow py-2 text-center rounded-xl font-semibold " +
+      (period === _period
+        ? "bg-purple-500 text-white"
+        : "bg-transparent text-purple-500 hover:bg-purple-200")
+    );
+  };
+
+  const transactionTypeStyle = (_transactionType) => {
+    return (
+      "grow py-1 text-center rounded-xl font-semibold " +
+      (transactionType === _transactionType
+        ? "bg-purple-500 text-white"
+        : "bg-purple-100 text-purple-500 hover:bg-purple-200")
+    );
+  };
+
+  const reportTypeStyle = (_reportType) => {
+    return (
+      "py-3 px-6 border-b-4 " +
+      (reportType === _reportType
+        ? "border-b-purple-500 text-purple-600 font-semibold"
+        : "border-b-purple-200 hover:font-semibold")
+    );
+  };
+
+  const handleExportExcel = async () => {
+    try {
+      setIsExporting(true);
+      const response = await ReportsService.saveExport({
+        month: month.id + 1,
+        year: year.id,
+      });
+
+      const blob = new Blob([response.data]);
+      const url = window.URL.createObjectURL(blob);
+
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = "transactions.xlsx";
+      link.click();
+
+      window.URL.revokeObjectURL(url);
+    } catch (e) {
+      toast.error("Something went wrong when export excel!");
+    }
+    setIsExporting(false);
   };
 
   useEffect(() => {
@@ -189,62 +241,14 @@ function ReportsPage() {
     }
   }, [transactionType, filledReports]);
 
-  const periodStyle = (_period) => {
-    return (
-      "grow py-2 text-center rounded-xl font-semibold " +
-      (period === _period
-        ? "bg-purple-500 text-white"
-        : "bg-transparent text-purple-500 hover:bg-purple-200")
-    );
-  };
-
-  const transactionTypeStyle = (_transactionType) => {
-    return (
-      "grow py-1 text-center rounded-xl font-semibold " +
-      (transactionType === _transactionType
-        ? "bg-purple-500 text-white"
-        : "bg-purple-100 text-purple-500 hover:bg-purple-200")
-    );
-  };
-
-  const reportTypeStyle = (_reportType) => {
-    return (
-      "py-3 px-6 border-b-4 " +
-      (reportType === _reportType
-        ? "border-b-purple-500 text-purple-600 font-semibold"
-        : "border-b-purple-200 hover:font-semibold")
-    );
-  };
-
-  const handleExportExcel = async () => {
-    try {
-      setIsExporting(true);
-      const response = await ReportsService.saveExport({
-        month: month.id + 1,
-        year: year.id,
-      });
-
-      const blob = new Blob([response.data]);
-      const url = window.URL.createObjectURL(blob);
-
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = "transactions.xlsx";
-      link.click();
-
-      window.URL.revokeObjectURL(url);
-    } catch (e) {
-      toast.error("Something went wrong when export excel!");
-    }
-    setIsExporting(false);
-  };
-
   return (
     <div className="lg:p-8 sm:p-14 p-3">
       {/* Header */}
       <div className="flex gap-4 items-center justify-between mb-4">
         <h2 className="sm:text-4xl text-3xl">Reports</h2>
-        <SelectWallet />
+        <div className="w-40">
+          <SelectWallet />
+        </div>
       </div>
 
       {/* Content */}
@@ -329,7 +333,7 @@ function ReportsPage() {
               className={reportTypeStyle("expenses-incomes")}
               onClick={() => setReportType("expenses-incomes")}
             >
-              By transactions
+              {period === "month" ? "By days" : "By months"}
             </button>
             <button
               className={reportTypeStyle("categories")}

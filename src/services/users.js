@@ -43,4 +43,10 @@ export default class UsersServices {
 
     return response.data;
   }
+
+  static async getYears() {
+    const response = await instance.get("/users/years");
+
+    return response.data;
+  }
 }

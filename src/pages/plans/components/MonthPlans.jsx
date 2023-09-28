@@ -69,6 +69,7 @@ function MonthPlans({ onSeeCategoryPlans }) {
 
   useEffect(() => {
     setLoadingYears(true);
+    setLoading(true);
     if (walletChosen) getYearsBetween();
   }, [walletChosen]);
 
@@ -84,7 +85,7 @@ function MonthPlans({ onSeeCategoryPlans }) {
           />
         </div>
         <button
-          className="rounded-md bg-blue-500 text-white px-6 py-1.5 hover:bg-blue-600"
+          className="rounded-lg bg-blue-600 text-white px-6 py-1.5 hover:bg-blue-700"
           onClick={() => setIsAddingPlan(true)}
         >
           Create plan

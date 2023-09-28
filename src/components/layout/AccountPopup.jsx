@@ -21,7 +21,7 @@ function AccountPopup({
         <FontAwesomeIcon icon={faEllipsis} />
       </Popover.Button>
 
-      <Popover.Panel className="absolute z-10 left-8 top-0 shadow-lg bg-white p-3 rounded-md overflow-hidden">
+      <Popover.Panel className="absolute z-10 left-8 top-0 shadow-lg bg-white p-3 rounded-xl overflow-hidden">
         <div className="flex flex-col gap-2">
           <Popover.Button
             className="bg-blue-100 py-2 w-52 rounded-md whitespace-nowrap hover:bg-blue-200 hover:font-semibold"

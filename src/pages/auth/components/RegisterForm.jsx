@@ -36,6 +36,11 @@ function RegisterForm({ submitting, error, setError, onSubmit }) {
             errors.email = "Invalid email address";
           }
 
+          if (values.password.length < 8 || values.password.length > 32) {
+            errors.password =
+              "Password's lenght must be between 8 and 32 characters";
+          }
+
           if (values.password !== values.password_confirmation) {
             errors.password_confirmation =
               "Password confirmation is not correct";

@@ -45,35 +45,38 @@ function MonthPlanItem({ monthPlan, onUpdateSuccess, onSeeCategoryPlans }) {
   return (
     <motion.div
       className={
-        "border-blue-400 rounded-xl p-4 bg-blue-200 mb-6 " +
+        " rounded-3xl p-4 bg-white mb-6 " +
         (monthPlan.month === new Date().getMonth() + 1
-          ? "border-2 shadow-xl shadow-blue-200"
-          : "border")
+          ? "border-2 shadow-md border-blue-500"
+          : "border shadow-md")
       }
       whileHover={{
         scale: 1.05,
       }}
     >
       <div className="mb-3 flex justify-between items-center md:flex-row flex-col gap-2">
-        <p className="text-3xl uppercase">
-          {getMonthName(monthPlan.month - 1)}{" "}
-          <span className="text-xl">{monthPlan.year}</span>
-        </p>
+        <div className="md:bg-gradient-to-br md:from-blue-700 md:to-blue-400 md:px-6 md:py-1 md:rounded-r-full md:relative md:-left-4 shadow-lg">
+          <p className="text-3xl uppercase md:text-white text-blue-600">
+            {getMonthName(monthPlan.month - 1)}{" "}
+            <span className="text-xl">{monthPlan.year}</span>
+          </p>
+        </div>
+
         <div className="flex gap-1">
           <button
-            className="py-1 px-4 rounded-md bg-blue-500 text-white text-xs uppercase font-bold hover:bg-blue-600"
+            className="py-1.5 px-4 rounded-md bg-blue-100 text-blue-600 text-sm hover:bg-blue-200 font-bold"
             onClick={() => setIsAdjusting(true)}
           >
             Adjust budget
           </button>
           <button
-            className="py-1 px-4 rounded-md bg-blue-500 text-white text-xs uppercase font-bold hover:bg-blue-600"
+            className="py-1.5 px-4 rounded-md bg-blue-100 text-blue-600 text-sm hover:bg-blue-200 font-bold"
             onClick={handleClickSeeCategoryPlans}
           >
             See category plans
           </button>
           <button
-            className="py-1 px-4 rounded-md bg-red-500 text-white text-xs uppercase font-bold hover:bg-red-600"
+            className="py-1.5 px-4 rounded-md bg-red-100 text-red-600 text-sm hover:bg-red-200 font-bold"
             onClick={() => setIsDeleting(true)}
           >
             Delete
@@ -109,7 +112,7 @@ function MonthPlanItem({ monthPlan, onUpdateSuccess, onSeeCategoryPlans }) {
           )}
         </div>
         <div className="flex gap-3 items-center">
-          <div className="h-3 bg-blue-50 rounded-full grow shadow-sm">
+          <div className="h-3 bg-blue-100 rounded-full grow shadow-sm">
             <div
               className={
                 "h-full rounded-full " +

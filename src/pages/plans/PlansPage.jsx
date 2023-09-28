@@ -11,8 +11,7 @@ function PlansPage() {
   const [categoryPlans, setCategoryPlans] = useState(null);
 
   const btnStyle = (vb) => {
-    if (viewBy === vb)
-      return "bg-blue-500 text-white hover:bg-blue-600 font-bold";
+    if (viewBy === vb) return "bg-blue-600 text-white font-bold";
     else return "text-blue-600 bg-blue-200";
   };
 
@@ -34,14 +33,16 @@ function PlansPage() {
     <div className="lg:p-8 sm:p-14 p-3">
       <div className="flex gap-4 items-center justify-between mb-4">
         <h2 className="sm:text-4xl text-3xl">Plans</h2>
-        <SelectWallet />
+        <div className="w-40">
+          <SelectWallet />
+        </div>
       </div>
       <div className="flex flex-col items-center">
         <div className="xl:w-3/5 sm:w-full lg:w-4/5 w-full">
-          <div className="mb-4 flex justify-center w-full">
+          <div className="mb-4 flex justify-center w-full p-2 bg-blue-200 rounded-xl gap-2">
             <button
               className={
-                "py-2 w-1/2 rounded-l-lg hover:font-bold " + btnStyle("months")
+                "py-2 w-1/2 rounded-xl hover:font-bold hover:bg-blue-200 " + btnStyle("months")
               }
               onClick={() => setViewBy("months")}
             >
@@ -49,7 +50,7 @@ function PlansPage() {
             </button>
             <button
               className={
-                "py-2 w-1/2 rounded-r-lg hover:font-bold " +
+                "py-2 w-1/2 rounded-xl hover:font-bold hover:bg-blue-200 " +
                 btnStyle("categories")
               }
               onClick={handleClickByCategoryPlans}
