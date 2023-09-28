@@ -94,7 +94,7 @@ function Sidebar({ onLogout, isLogging }) {
           />
         </div>
 
-        <div className="rounded-full lg:w-16 lg:h-16 w-12 h-12 overflow-hidden">
+        <div className="rounded-full lg:w-16 lg:h-16 w-12 h-12 overflow-hidden shadow-md">
           <img
             src={user.photo ? user.photo : avatar}
             alt=""

@@ -14,13 +14,13 @@ import PlansService from "../../../services/plans";
 import { useSelector } from "react-redux";
 
 function AddTransaction({
-  isAdding,
   setIsAdding,
   type,
   transaction = null,
-  isDeleting,
   setIsDeleting,
   onAddingSuccess,
+  month = new Date().getMonth(),
+  year = new Date().getFullYear(),
 }) {
   const { wallets, walletChosen } = useSelector((state) => state.wallet);
 
@@ -31,7 +31,9 @@ function AddTransaction({
   const [amount, setAmount] = useState();
   const [formattedAmount, setFormattedAmount] = useState("");
   const [photo, setPhoto] = useState(null);
-  const [date, setDate] = useState(new Date());
+  const [date, setDate] = useState(
+    new Date(year, month - 1, new Date().getDate())
+  );
   const [description, setDescription] = useState("");
   const [errors, setErrors] = useState(null);
   const [planData, setPlanData] = useState(null);
@@ -305,11 +307,7 @@ function AddTransaction({
                 setImage={setPhoto}
                 errors={errors}
                 setErrors={setErrors}
-                defaultPreview={
-                  transaction
-                    ? transaction.image
-                    : ""
-                }
+                defaultPreview={transaction ? transaction.image : ""}
               />
 
               {/* DESCRIPTION */}

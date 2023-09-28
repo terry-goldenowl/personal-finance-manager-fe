@@ -30,12 +30,13 @@ function AddMonthPlan({ onClose, onAddingSuccess, _month, _year }) {
   );
   const [errors, setErrors] = useState(null);
   const [lastMonthValue, setLastMonthValue] = useState(null);
-  const [loadingTotalLastMonth, setLoadingTotalLastMonth] = useState(false);
+  const [currentMonthValue, setCurrentMonthValue] = useState(null);
+  const [loadingTotal, setLoadingTotal] = useState(false);
   const [processingSave, setProcessingSave] = useState(false);
 
   const getReport = async () => {
     try {
-      setLoadingTotalLastMonth(true);
+      setLoadingTotal(true);
       const responseData = await ReportsService.getReports({
         year: year.id,
         report_type: "expenses-incomes",
@@ -43,19 +44,26 @@ function AddMonthPlan({ onClose, onAddingSuccess, _month, _year }) {
       });
 
       if (responseData.data.reports[month.id + ""]) {
-        const lastMonthExpense =
-          responseData.data.reports[month.id + ""].expenses;
-        setLastMonthValue(lastMonthExpense);
+        setLastMonthValue(responseData.data.reports[month.id + ""].expenses);
       } else {
         setLastMonthValue(0);
+      }
+
+      if (responseData.data.reports[month.id + 1 + ""]) {
+        setCurrentMonthValue(
+          responseData.data.reports[month.id + 1 + ""].expenses
+        );
+      } else {
+        setCurrentMonthValue(0);
       }
     } catch (e) {
       toast.error(e.response.data.message);
     }
-    setLoadingTotalLastMonth(false);
+    setLoadingTotal(false);
   };
 
   useEffect(() => {
+    setLoadingTotal(true);
     if (walletSelected) getReport();
   }, [year, month, walletSelected]);
 
@@ -83,7 +91,7 @@ function AddMonthPlan({ onClose, onAddingSuccess, _month, _year }) {
       let haveErrors = false;
       setErrors(null);
 
-      if (!amount || amount === '0') {
+      if (!amount || amount === "0") {
         haveErrors = true;
         return setErrors((prev) => {
           return { ...prev, amount: "Amount is required!" };
@@ -124,22 +132,26 @@ function AddMonthPlan({ onClose, onAddingSuccess, _month, _year }) {
       {month && year && (
         <div className="flex items-center gap-2">
           <FontAwesomeIcon icon={faInfoCircle} className="text-blue-600" />
-          {!loadingTotalLastMonth && lastMonthValue > 0 && (
+          {!loadingTotal && (
             <p className="text-sm text-blue-600 italic">
               Total expenses of all transactions last month is{" "}
               <span className="font-bold">
                 {formatCurrency(lastMonthValue)}
               </span>
+              , current month is{" "}
+              <span className="font-bold">
+                {formatCurrency(currentMonthValue)}
+              </span>
             </p>
           )}
-          {!loadingTotalLastMonth && lastMonthValue === 0 && (
+          {/* {!loadingTotal && lastMonthValue === 0 && (
             <p className="text-sm text-blue-600 italic">
               You didn't spend anything last month!
             </p>
-          )}
-          {loadingTotalLastMonth && (
+          )} */}
+          {loadingTotal && (
             <p className="text-sm text-blue-600 italic">
-              Loading total expenses last month ...
+              Loading total expenses last month and current month ...
             </p>
           )}
         </div>

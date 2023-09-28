@@ -39,14 +39,21 @@ function AddCategoryPlan({
   );
   const [errors, setErrors] = useState(null);
   const [lastMonthValue, setLastMonthValue] = useState(null);
-  const [loadingTotalLastMonth, setLoadingTotalLastMonth] = useState(false);
+  const [currentMonthValue, setCurrentMonthValue] = useState(null);
+  const [loadingTotal, setLoadingTotal] = useState(false);
   const [loadingCategories, setLoadingCategories] = useState(false);
   const [processingSave, setProcessingSave] = useState(false);
 
   const getCategories = async () => {
     try {
       setLoadingCategories(true);
-      const data = await CategoriesService.getCategories({ type: "expenses" });
+      const data = await CategoriesService.getCategories({
+        type: "expenses",
+        ignore_exists: true,
+        month: month.id + 1,
+        year: year.id,
+      });
+
       setCategories(data.data.categories);
 
       if (category) setCategoryChosen(category);
@@ -59,26 +66,40 @@ function AddCategoryPlan({
 
   const getReport = async () => {
     try {
-      setLoadingTotalLastMonth(true);
-      const responseData = await ReportsService.getReports({
+      setLoadingTotal(true);
+      const responseDataLastMonth = await ReportsService.getReports({
         year: year.id,
         month: month.id,
         report_type: "categories",
         wallet: walletSelected?.id,
       });
 
-      if (responseData.data.reports[categoryChosen.name])
+      if (responseDataLastMonth.data.reports[categoryChosen.name])
         setLastMonthValue(
-          responseData.data.reports[categoryChosen.name].amount
+          responseDataLastMonth.data.reports[categoryChosen.name].amount
         );
       else setLastMonthValue(0);
+
+      const responseDataCurrentMonth = await ReportsService.getReports({
+        year: year.id,
+        month: month.id + 1,
+        report_type: "categories",
+        wallet: walletSelected?.id,
+      });
+
+      if (responseDataCurrentMonth.data.reports[categoryChosen.name])
+        setCurrentMonthValue(
+          responseDataCurrentMonth.data.reports[categoryChosen.name].amount
+        );
+      else setCurrentMonthValue(0);
     } catch (e) {
       toast.error(e.response.data.message);
     }
-    setLoadingTotalLastMonth(false);
+    setLoadingTotal(false);
   };
 
   useEffect(() => {
+    setLoadingTotal(true);
     setLoadingCategories(true);
     getCategories();
   }, []);
@@ -152,32 +173,29 @@ function AddCategoryPlan({
     >
       {categoryChosen && (
         <>
-          {loadingTotalLastMonth && !lastMonthValue && (
+          {loadingTotal && (
             <p className="text-sm text-blue-600 italic">
-              Loading total expenses last month ...
+              Loading total expenses last month and current month ...
             </p>
           )}
-          {!loadingTotalLastMonth && lastMonthValue >= 0 && (
+          {!loadingTotal && (
             <>
               <div className="flex items-center gap-2">
                 <FontAwesomeIcon
                   icon={faInfoCircle}
                   className="text-blue-600"
                 />
-                {lastMonthValue > 0 && (
-                  <p className="text-sm text-blue-600 italic">
-                    Total expenses of all transactions belong to this category
-                    last month is{" "}
-                    <span className="font-bold">
-                      {formatCurrency(lastMonthValue)}
-                    </span>
-                  </p>
-                )}
-                {lastMonthValue === 0 && (
-                  <p className="text-sm text-blue-600 italic">
-                    You didn't spend anything of this category last month!
-                  </p>
-                )}
+                <p className="text-sm text-blue-600 italic">
+                  Total expenses of all transactions belong to this category
+                  last month is{" "}
+                  <span className="font-bold">
+                    {formatCurrency(lastMonthValue)}
+                  </span>
+                  , current month is{" "}
+                  <span className="font-bold">
+                    {formatCurrency(currentMonthValue)}
+                  </span>
+                </p>
               </div>
             </>
           )}

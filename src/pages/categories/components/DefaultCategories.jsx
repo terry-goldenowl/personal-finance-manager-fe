@@ -5,7 +5,7 @@ import Loading from "../../../components/others/Loading";
 function DefaultCategories({ categories, loading, onUpdateSuccess }) {
   return (
     <div className="lg:border-r lg:border-r-purple-400 py-3 lg:w-3/5 w-full">
-      <div className="mb-4 border-l-4 border-l-purple-500 ps-4 py-1 bg-purple-200">
+      <div className="mb-4 border-l-8 border-l-purple-500 ps-4 py-1 bg-purple-200 rounded-lg">
         <h3 className="text-2xl">Default categories</h3>
       </div>
 

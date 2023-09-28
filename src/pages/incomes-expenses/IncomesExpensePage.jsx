@@ -124,7 +124,9 @@ function IncomesExpensePage() {
       <div className="mb-4 flex justify-between items-center flex-col lg:flex-row gap-4">
         <div className="flex gap-4 items-center justify-between lg:justify-start lg:w-3/5 w-full">
           <h2 className="sm:text-4xl text-3xl">Transactions</h2>
-          <SelectWallet />
+          <div className="w-40">
+            <SelectWallet />
+          </div>
         </div>
         <div
           className="flex border-2 border-purple-500 rounded-2xl relative lg:w-1/3 md:w-1/2 w-4/5"
@@ -172,6 +174,8 @@ function IncomesExpensePage() {
           setIsAdding={setIsAddingTx}
           type={typeAddTx}
           onAddingSuccess={handleModifySuccess}
+          month={month}
+          year={year}
         />
       )}
     </div>

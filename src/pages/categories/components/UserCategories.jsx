@@ -5,7 +5,7 @@ import Loading from "../../../components/others/Loading";
 function UserCategories({ categories, onUpdateSuccess, loading }) {
   return (
     <div className="lg:w-2/5 w-full py-3">
-      <div className="mb-4 border-l-4 border-l-blue-500 ps-4 py-1 bg-blue-200">
+      <div className="mb-4 border-l-8 border-l-blue-500 ps-4 py-1 bg-blue-200 rounded-lg">
         <h3 className="text-2xl">Your categories</h3>
       </div>
 
