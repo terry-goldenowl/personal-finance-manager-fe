@@ -11,7 +11,7 @@ function DefaultCategoryItem({ category, onUpdateSuccess }) {
   return (
     <>
       <div
-        className="flex flex-col justify-start items-center p-3 rounded-xl hover:shadow-blue-200 hover:shadow-xl relative"
+        className="flex flex-col justify-start items-center p-3 rounded-xl hover:bg-white hover:shadow-blue-200 hover:shadow-xl relative"
         onMouseEnter={() => setIsHover(true)}
         onMouseLeave={() => setIsHover(false)}
       >

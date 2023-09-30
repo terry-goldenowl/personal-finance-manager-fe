@@ -45,7 +45,7 @@ function MonthPlanItem({ monthPlan, onUpdateSuccess, onSeeCategoryPlans }) {
   return (
     <motion.div
       className={
-        " rounded-3xl p-4 bg-white mb-6 " +
+        " rounded-3xl p-4 bg-white mb-6 overflow-hidden " +
         (monthPlan.month === new Date().getMonth() + 1
           ? "border-2 shadow-md border-blue-500"
           : "border shadow-md")
@@ -55,7 +55,7 @@ function MonthPlanItem({ monthPlan, onUpdateSuccess, onSeeCategoryPlans }) {
       }}
     >
       <div className="mb-3 flex justify-between items-center md:flex-row flex-col gap-2">
-        <div className="md:bg-gradient-to-br md:from-blue-700 md:to-blue-400 md:px-6 md:py-1 md:rounded-r-full md:relative md:-left-4 shadow-lg">
+        <div className="md:bg-gradient-to-br md:from-blue-700 md:to-blue-400 md:px-6 md:py-1 md:rounded-r-full md:relative md:-left-4 md:shadow-lg">
           <p className="text-3xl uppercase md:text-white text-blue-600">
             {getMonthName(monthPlan.month - 1)}{" "}
             <span className="text-xl">{monthPlan.year}</span>

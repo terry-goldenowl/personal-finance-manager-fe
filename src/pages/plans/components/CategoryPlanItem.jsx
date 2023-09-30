@@ -52,7 +52,7 @@ function CategoryPlanItem({ categoryPlan, onUpdateSuccess }) {
   return (
     <>
       <div
-        className="flex gap-3 items-center mb-1 py-1 sm:px-4 px-0 rounded-xl hover:bg-white hover:bg-opacity-80 relative"
+        className="flex gap-3 items-center mb-1 py-1 sm:px-4 px-0 rounded-xl hover:bg-blue-200 hover:bg-opacity-80 relative"
         onMouseEnter={() => setIsHovering(true)}
         onMouseLeave={() => setIsHovering(false)}
       >
