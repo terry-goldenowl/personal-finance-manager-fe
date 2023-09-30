@@ -30,24 +30,27 @@ function Input({
         </label>
       )}
 
-      <input
-        type={type}
-        name={name}
-        onChange={onChange}
-        onBlur={onBlur}
-        value={value}
-        accept={accept}
-        className={
-          "block border-gray-300 ring-inset ring-gray-300 focus:ring-purple-400 w-full outline-none shadow-sm " +
-          sizeStyle +
-          " " +
-          style +
-          " " +
-          (error ? "ring-red-500" : "ring-gray-300")
-        }
-        placeholder={placeholder}
-        disabled={disable}
-      />
+      <div>
+        <input
+          type={type}
+          name={name}
+          onChange={onChange}
+          onBlur={onBlur}
+          value={value}
+          accept={accept}
+          className={
+            "block border-gray-300 ring-inset ring-gray-300 focus:ring-purple-400 w-full outline-none shadow-sm " +
+            sizeStyle +
+            " " +
+            style +
+            " " +
+            (error ? "ring-red-500" : "ring-gray-300")
+          }
+          placeholder={placeholder}
+          disabled={disable}
+        />
+      </div>
+
       <p className="text-red-500 text-end italic text-sm">{error}</p>
     </div>
   );

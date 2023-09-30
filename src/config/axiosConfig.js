@@ -20,7 +20,7 @@ instance.interceptors.request.use(
       config.headers.Authorization = `Bearer ${token}`;
     }
 
-    return { ...config, signal: controller.signal };
+    return config;
   },
   (error) => {
     return Promise.reject(error);

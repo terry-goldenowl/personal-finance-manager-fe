@@ -98,7 +98,7 @@ function CategoryPlans({ _month, _year }) {
           />
         </div>
       </div>
-      <div className="border-2 border-blue-400 rounded-xl sm:p-6 p-3 bg-blue-200 shadow-xl shadow-blue-200">
+      <div className="border-2 border-blue-400 rounded-3xl sm:p-6 p-3 bg-white shadow-xl shadow-blue-200">
         <div className="mb-4">
           {!loading && year && (
             <div className="md:bg-gradient-to-br md:from-blue-700 md:to-blue-400 md:px-6 md:py-1 md:rounded-r-full md:w-fit md:relative md:-left-6 md:shadow-lg">

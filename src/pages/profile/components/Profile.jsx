@@ -11,27 +11,21 @@ import ConfirmDeleteModal from "../../../components/modal/ConfirmDeleteModal";
 import EmailVerification from "../../auth/components/EmailVerification";
 import { useDispatch, useSelector } from "react-redux";
 import { authActions } from "../../../stores/auth";
+import UpdatePassword from "./UpdatePassword";
 
 function Profile({ onClose }) {
   const { user, roles } = useSelector((state) => state.auth);
 
-  const [preview, setPreview] = useState(
-    user.photo ? user.photo : profile
-  );
-
+  const [preview, setPreview] = useState(user.photo ? user.photo : profile);
   const [photo, setPhoto] = useState();
   const [name, setName] = useState(user.name);
   const [email, setEmail] = useState(user.email);
-  const [password, setPassword] = useState("");
-  const [newPassword, setNewPassword] = useState("");
-  const [passwordConfirm, setPasswordConfirm] = useState("");
   const [errors, setErrors] = useState(null);
   const [isUpdatingPassword, setIsUpdatingPassword] = useState(false);
   const [isConfirmDelete, setIsConfirmDelete] = useState(false);
   const [isVerifyEmail, setIsVerifyEmail] = useState(false);
   const [isEmailVerified, setIsEmailVerified] = useState(true);
   const [isUpdating, setIsUpdating] = useState(false);
-  const [isSavingPassword, setIsSavingPassword] = useState(false);
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -145,69 +139,6 @@ function Profile({ onClose }) {
     }
   };
 
-  const handleUpdatePassword = async () => {
-    try {
-      let haveErrors = false;
-      setErrors(null);
-
-      if (password.length === 0) {
-        haveErrors = true;
-        setErrors((prev) => {
-          return {
-            ...prev,
-            password: "Old password is required!",
-          };
-        });
-      }
-
-      if (newPassword.length < 8 || newPassword.length > 32) {
-        haveErrors = true;
-        setErrors((prev) => {
-          return {
-            ...prev,
-            newPassword:
-              "Password must be at least 8 and as most 32 characters!",
-          };
-        });
-      }
-
-      if (newPassword !== passwordConfirm) {
-        haveErrors = true;
-        setErrors((prev) => {
-          return {
-            ...prev,
-            passwordConfirm: "New password confirmation does not match",
-          };
-        });
-      }
-
-      if (haveErrors) return;
-
-      setIsSavingPassword(true);
-      const data = {
-        password,
-        newPassword,
-        newPassword_confirmation: passwordConfirm,
-      };
-
-      const responseData = await UsersServices.updatePassword(data);
-
-      if (responseData.status === "success") {
-        toast.success("Update password successfully! Please login again.");
-        dispatch(authActions.logout());
-        navigate("/login");
-
-        await AuthService.logout();
-      } else {
-        toast.error(responseData.error);
-        setErrors(responseData.error);
-      }
-    } catch (e) {
-      toast.error(e.response.data.message);
-    }
-    setIsSavingPassword(false);
-  };
-
   const handleDeleteUser = async () => {
     try {
       const responseData = await UsersServices.deleteUser();
@@ -261,13 +192,13 @@ function Profile({ onClose }) {
               </div>
             ))}
           </div>
-          <div className="mb-3">
+          <div className="">
             {preview && (
-              <div className="overflow-hidden mb-3 flex justify-center">
+              <div className="overflow-hidden mb-3 flex justify-center p-2">
                 <img
                   src={preview}
                   alt=""
-                  className="object-cover h-60 w-60 rounded-full"
+                  className="object-cover h-60 w-60 rounded-full shadow-md"
                 />
               </div>
             )}
@@ -322,53 +253,7 @@ function Profile({ onClose }) {
           </div>
         </div>
         {isUpdatingPassword && (
-          <div className="lg:w-1/2 w-full sm:px-3 px-1">
-            <Input
-              type={"password"}
-              name={"password"}
-              value={password}
-              label={"Old Password"}
-              onChange={(e) => setPassword(e.target.value)}
-              error={errors?.password}
-              size="small"
-              required
-            />
-            <Input
-              type={"password"}
-              name={"newPassword"}
-              value={newPassword}
-              label={"New Password"}
-              onChange={(e) => setNewPassword(e.target.value)}
-              error={errors?.newPassword}
-              size="small"
-              required
-            />
-            <Input
-              type={"password"}
-              name={"password_confirmation"}
-              value={passwordConfirm}
-              label={"Password Confirmation"}
-              onChange={(e) => setPasswordConfirm(e.target.value)}
-              error={errors?.passwordConfirm}
-              size="small"
-              required
-            />
-
-            <div className="flex justify-between mt-3">
-              <button
-                className="text-sm bg-gray-200 rounded-full py-1 px-3 hover:bg-blue-500 hover:text-white"
-                onClick={() => setIsUpdatingPassword(false)}
-              >
-                Back
-              </button>
-              <button
-                className="py-1 px-3 rounded-full bg-blue-500 text-white hover:bg-blue-600 text-sm"
-                onClick={handleUpdatePassword}
-              >
-                {isSavingPassword ? "Updating password" : "Update password"}
-              </button>
-            </div>
-          </div>
+          <UpdatePassword onClose={() => setIsUpdatingPassword(false)} />
         )}
         {isConfirmDelete && (
           <ConfirmDeleteModal

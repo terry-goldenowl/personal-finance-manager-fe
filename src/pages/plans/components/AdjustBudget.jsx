@@ -82,7 +82,7 @@ function AdjustBudget({ onClose, plan, onUpdateSuccess }) {
       )}
       {!plan.category_id && (
         <p className="text-3xl mb-3 text-center sm:text-start text-purple-600">
-          {getMonthName(plan.month) + " " + plan.year}
+          {getMonthName(plan.month - 1) + " " + plan.year}
         </p>
       )}
 

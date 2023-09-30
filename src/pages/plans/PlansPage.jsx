@@ -12,7 +12,7 @@ function PlansPage() {
 
   const btnStyle = (vb) => {
     if (viewBy === vb) return "bg-blue-600 text-white font-bold";
-    else return "text-blue-600 bg-blue-200";
+    else return "text-blue-600 bg-blue-200  hover:bg-blue-200";
   };
 
   const handleSeeCategoryPlans = (month, year) => {
@@ -42,7 +42,7 @@ function PlansPage() {
           <div className="mb-4 flex justify-center w-full p-2 bg-blue-200 rounded-xl gap-2">
             <button
               className={
-                "py-2 w-1/2 rounded-xl hover:font-bold hover:bg-blue-200 " + btnStyle("months")
+                "py-2 w-1/2 rounded-xl hover:font-bold " + btnStyle("months")
               }
               onClick={() => setViewBy("months")}
             >
@@ -50,7 +50,7 @@ function PlansPage() {
             </button>
             <button
               className={
-                "py-2 w-1/2 rounded-xl hover:font-bold hover:bg-blue-200 " +
+                "py-2 w-1/2 rounded-xl hover:font-bold " +
                 btnStyle("categories")
               }
               onClick={handleClickByCategoryPlans}
