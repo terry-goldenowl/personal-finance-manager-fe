@@ -50,7 +50,7 @@ function EmailVerification({ onSuccess, onClose, email }) {
         onBlur={(e) => setCode(e.target.value)}
         error={error?.verification_code}
         label={
-          "Your email haven't been verified yet! Please enter the code that we have sent to your email in mailtrap to verify."
+          "Your email haven't been verified yet! Please enter the code that we have sent to your email to verify."
         }
         style="text-center"
       />

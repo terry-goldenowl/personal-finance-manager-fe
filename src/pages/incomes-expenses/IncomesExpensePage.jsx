@@ -144,7 +144,7 @@ function IncomesExpensePage() {
             id="add-income-btn"
             onClick={() => handleClickAddTx("incomes")}
           >
-            Add incomes
+            Add income
           </button>
         </div>
       </div>

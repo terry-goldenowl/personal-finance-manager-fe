@@ -17,9 +17,8 @@ function CategoryItem({ category, onUpdateSuccess }) {
       );
 
       if (responseData.status === "success") {
-        toast.success("Delete category successfully!");
         setIsConfirmDelete(false);
-        onUpdateSuccess();
+        onUpdateSuccess("delete");
       } else {
         toast.error(responseData.error);
       }
