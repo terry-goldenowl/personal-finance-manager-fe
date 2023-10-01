@@ -74,9 +74,9 @@ function AddCategoryPlan({
         wallet: walletSelected?.id,
       });
 
-      if (responseDataLastMonth.data.reports[categoryChosen.name])
+      if (responseDataLastMonth.data.reports[categoryChosen.id])
         setLastMonthValue(
-          responseDataLastMonth.data.reports[categoryChosen.name].amount
+          responseDataLastMonth.data.reports[categoryChosen.id].amount
         );
       else setLastMonthValue(0);
 
@@ -87,9 +87,9 @@ function AddCategoryPlan({
         wallet: walletSelected?.id,
       });
 
-      if (responseDataCurrentMonth.data.reports[categoryChosen.name])
+      if (responseDataCurrentMonth.data.reports[categoryChosen.id])
         setCurrentMonthValue(
-          responseDataCurrentMonth.data.reports[categoryChosen.name].amount
+          responseDataCurrentMonth.data.reports[categoryChosen.id].amount
         );
       else setCurrentMonthValue(0);
     } catch (e) {
