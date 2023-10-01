@@ -42,17 +42,18 @@ function AddTransaction({
   const [processingSave, setProcessingSave] = useState(false);
 
   useEffect(() => {
+    if (
+      type === "expenses" ||
+      (transaction && transaction.category.type === "expenses")
+    )
+      setLoadingPlan(true);
     setLoadingCategories(true);
     getCategories();
   }, []);
 
   useEffect(() => {
-    if (
-      categorySelected &&
-      walletSelected &&
-      categorySelected.type === "expenses"
-    ) {
-      getTotalOfCategory();
+    if (categorySelected && walletSelected) {
+      if (categorySelected.type === "expenses") getTotalOfCategory();
     }
   }, [walletSelected, categorySelected, date]);
 
@@ -82,7 +83,8 @@ function AddTransaction({
   const getCategories = async () => {
     try {
       setLoadingCategories(true);
-      const data = await CategoriesService.getCategories({ type });
+      const chosenType = transaction ? transaction.category.type : type;
+      const data = await CategoriesService.getCategories({ type: chosenType });
       setCategories(data.data.categories);
     } catch (e) {
       toast.error(e.response.data.message);
@@ -183,6 +185,8 @@ function AddTransaction({
     }
   };
 
+  console.log(planData);
+
   return (
     <>
       <ModalWithNothing
@@ -227,7 +231,8 @@ function AddTransaction({
                 required
                 error={(errors && errors.title) || null}
               />
-              {type === "expenses" && (
+              {(type === "expenses" ||
+                (transaction && transaction.category.type === "expenses")) && (
                 <>
                   {loadingPlan && (
                     <p className="text-sm text-blue-600 italic">
@@ -270,7 +275,7 @@ function AddTransaction({
                           )}
                         </div>
                       )}
-                      {planData === undefined && (
+                      {!planData && (
                         <p className="text-sm text-blue-600 italic">
                           You didn't set plan for this category this month
                         </p>
