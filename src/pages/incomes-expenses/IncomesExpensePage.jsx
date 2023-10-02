@@ -165,6 +165,8 @@ function IncomesExpensePage() {
           onSearch={handleSearchChange}
           loading={loadingTransactions}
           onDateChange={handleDateChange}
+          month={month}
+          year={year}
         />
       </div>
 

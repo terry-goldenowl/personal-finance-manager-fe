@@ -185,8 +185,6 @@ function AddTransaction({
     }
   };
 
-  console.log(planData);
-
   return (
     <>
       <ModalWithNothing
