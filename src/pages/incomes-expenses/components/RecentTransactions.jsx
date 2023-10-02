@@ -12,8 +12,12 @@ function RecentTransactions({
   onSearch,
   loading,
   onDateChange,
+  month,
+  year,
 }) {
-  const [date, setDate] = useState(new Date());
+  const [date, setDate] = useState(
+    new Date(year, month - 1, new Date().getDate())
+  );
   const [isAll, setIsAll] = useState(true);
 
   const handleDateChange = (event) => {
@@ -25,10 +29,10 @@ function RecentTransactions({
     if (isAll) {
       onDateChange(null);
     } else {
-      setDate(new Date());
-      onDateChange(new Date().getDate());
+      setDate(new Date(year, month - 1, new Date().getDate()));
+      onDateChange(new Date(year, month - 1, new Date().getDate()).getDate());
     }
-  }, [isAll]);
+  }, [isAll, month, year]);
 
   return (
     <div className="lg:w-7/12 sm:w-full">
