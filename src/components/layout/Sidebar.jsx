@@ -14,7 +14,7 @@ import Profile from "../../pages/profile/components/Profile";
 import { useSelector } from "react-redux";
 import "../../styles/sidebar.css";
 
-function Sidebar({ onLogout, isLogging }) {
+function Sidebar({ onLogout }) {
   const [isWalletsShown, setIsWalletsShown] = useState(false);
   const [isProfileShown, setIsProfileShown] = useState(false);
 

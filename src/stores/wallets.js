@@ -4,7 +4,7 @@ import { toast } from "react-toastify";
 
 export const fetchWallets = createAsyncThunk(
   "wallet/fetchWallets",
-  async (arg, thunkAPI) => {
+  async () => {
     try {
       const responseData = await WalletsService.getWallets();
       return responseData.data.wallets;
@@ -32,7 +32,7 @@ const walletsSlice = createSlice({
     setLoadingWallet: (state, action) => {
       state.loadingWallets = action.payload;
     },
-    resetWallets: (state, action) => {
+    resetWallets: (state) => {
       state.wallets = [];
       state.walletChosen = null;
     },

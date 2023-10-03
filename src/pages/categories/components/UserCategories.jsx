@@ -27,7 +27,7 @@ function UserCategories({ categories, onUpdateSuccess, loading }) {
           categories.filter((category) => category.type === "expenses")
             .length === 0 && (
             <p className="text-md text-gray-600 text-center py-3">
-              You didn't create any category!
+              You didn&apos;t create any category!
             </p>
           )}
       </div>
@@ -49,7 +49,7 @@ function UserCategories({ categories, onUpdateSuccess, loading }) {
           categories.filter((category) => category.type === "incomes")
             .length === 0 && (
             <p className="text-md text-gray-600 text-center py-3">
-              You didn't create any category!
+              You didn&apos;t create any category!
             </p>
           )}
       </div>

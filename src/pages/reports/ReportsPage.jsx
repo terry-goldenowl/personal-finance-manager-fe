@@ -14,8 +14,6 @@ import { faFileExcel } from "@fortawesome/free-regular-svg-icons";
 import { motion } from "framer-motion";
 import TransactionsService from "../../services/transactions";
 import { toast } from "react-toastify";
-import axios from "axios";
-import { controller } from "../../config/axiosConfig";
 
 function ReportsPage() {
   const location = useLocation();

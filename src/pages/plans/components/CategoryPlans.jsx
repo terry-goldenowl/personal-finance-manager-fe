@@ -10,7 +10,7 @@ import Loading from "../../../components/others/Loading";
 import { useSelector } from "react-redux";
 import { toast } from "react-toastify";
 
-function CategoryPlans({ _month, _year }) {
+function CategoryPlans({ _month }) {
   const [isAddingPlan, setIsAddingPlan] = useState(false);
   const [month, setMonth] = useState(
     _month

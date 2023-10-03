@@ -138,9 +138,12 @@ function AddTransaction({
           title,
           amount,
           date: format(new Date(date), "yyyy/MM/dd"),
-          image: photo !== "" && photo,
           description,
         };
+
+        if (photo !== "") {
+          data = { ...data, image: photo };
+        }
 
         if (photo === null && transaction) {
           data = { ...data, is_image_cleared: 1 };
@@ -280,7 +283,7 @@ function AddTransaction({
                       )}
                       {!planData && (
                         <p className="text-sm text-blue-600 italic">
-                          You didn't set plan for this category this month
+                          You didn&apos;t set plan for this category this month
                         </p>
                       )}
                     </>

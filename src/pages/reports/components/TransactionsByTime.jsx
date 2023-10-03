@@ -14,7 +14,7 @@ const sortOrderOptions = [
   { id: 2, name: "Ascendent" },
 ];
 
-function TransactionsByTime({ reports, month, year, period, reportType }) {
+function TransactionsByTime({ reports, month, year, period }) {
   const walletChosen = useSelector((state) => state.wallet.walletChosen);
   const [sortBy, setSortBy] = useState(sortOptions[0]);
   const [sortOrder, setSortOrder] = useState(sortOrderOptions[0]);
