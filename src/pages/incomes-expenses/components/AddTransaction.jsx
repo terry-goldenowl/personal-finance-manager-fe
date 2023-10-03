@@ -72,6 +72,7 @@ function AddTransaction({
       setFormattedAmount(
         (transaction.amount + "").replace(/\B(?=(\d{3})+(?!\d))/g, ",")
       );
+      setPhoto("");
       setDate(new Date(transaction.date));
       setDescription(transaction.description || "");
     } else {
@@ -131,15 +132,19 @@ function AddTransaction({
 
       if (!haveErrors) {
         setProcessingSave(true);
-        const data = {
+        let data = {
           wallet_id: walletSelected.id,
           category_id: categorySelected.id,
           title,
           amount,
           date: format(new Date(date), "yyyy/MM/dd"),
-          image: photo,
+          image: photo !== "" && photo,
           description,
         };
+
+        if (photo === null && transaction) {
+          data = { ...data, is_image_cleared: 1 };
+        }
 
         let responseData;
         if (!transaction) {

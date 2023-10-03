@@ -17,6 +17,7 @@ import AdminPage from "./pages/admin/AdminPage";
 import DefaultCategoriesPage from "./pages/admin/DefaultCategoriesPage";
 import UsersPage from "./pages/admin/UsersPage";
 import AuthorizedRoute from "./components/routes/AuthorizedRoute";
+import NotFound from "./pages/others/NotFound";
 
 function App() {
   const router = createBrowserRouter([
@@ -75,6 +76,7 @@ function App() {
             },
           ],
         },
+        {},
       ],
     },
     {
@@ -93,6 +95,10 @@ function App() {
           element: <ResetPasswordPage />,
         },
       ],
+    },
+    {
+      path: "*",
+      element: <NotFound />,
     },
   ]);
 

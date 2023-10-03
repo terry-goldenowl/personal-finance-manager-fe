@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { FileUploader } from "react-drag-drop-files";
+import { motion } from "framer-motion";
 
 function ImageChoserPreview({
   image,
@@ -42,6 +43,11 @@ function ImageChoserPreview({
     }
   };
 
+  const handleClearImage = () => {
+    setImage(null);
+    setPreview(null);
+  };
+
   return (
     <>
       <div className="mb-3">
@@ -69,7 +75,15 @@ function ImageChoserPreview({
 
       {/* PHOTO PREVIEW */}
       {preview && (
-        <div className="overflow-hidden mb-3 flex justify-center">
+        <div className="overflow-hidden mb-3 flex justify-center relative">
+          <div className="absolute top-0 p-2">
+            <motion.button
+              className="bg-slate-300 text-slate-600 text-xs uppercase px-2 rounded-full py-1 bg-opacity-70 hover:bg-opacity-80 hover:font-bold"
+              onClick={handleClearImage}
+            >
+              Clear
+            </motion.button>
+          </div>
           <img
             src={preview}
             alt=""
