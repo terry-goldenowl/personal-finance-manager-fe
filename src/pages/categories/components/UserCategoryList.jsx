@@ -7,6 +7,7 @@ function UserCategoryList({ categories, onUpdateSuccess }) {
       {categories &&
         categories.map((category) => (
           <UserCategoryItem
+            key={Math.random()}
             category={category}
             onUpdateSuccess={onUpdateSuccess}
           />

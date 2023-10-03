@@ -7,7 +7,6 @@ import TransactionsService from "../../services/transactions";
 import { Line } from "react-chartjs-2";
 import ReportsService from "../../services/reports";
 import { Chart, registerables } from "chart.js";
-import { motion } from "framer-motion";
 import CategoriesService from "../../services/categories";
 import { toast } from "react-toastify";
 import StatisticItem from "./components/StatisticItem";

@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import Modal from "../../../components/modal/Modal";
 import AuthService from "../../../services/auth";
-import AuthInput from "./AuthInput";
 import { toast } from "react-toastify";
 import Input from "../../../components/elements/Input";
 

@@ -238,7 +238,7 @@ function Report({
       {!loading && !report && (
         <>
           <p className="text-center text-3xl mt-12 text-gray-400 font-light">
-            You didn't make any transactions in this period!
+            You didn&apos;t make any transactions in this period!
           </p>
         </>
       )}

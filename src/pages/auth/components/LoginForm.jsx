@@ -32,7 +32,7 @@ function LoginForm({ onForgetting, onLogin, submitting, error }) {
           }
           return errors;
         }}
-        onSubmit={(values, { setSubmitting }) => {
+        onSubmit={(values) => {
           onLogin(values);
         }}
       >
@@ -43,7 +43,6 @@ function LoginForm({ onForgetting, onLogin, submitting, error }) {
           handleChange,
           handleBlur,
           handleSubmit,
-          isSubmitting,
         }) => (
           <form onSubmit={handleSubmit} className="mt-3" method="post">
             <Input

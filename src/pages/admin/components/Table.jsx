@@ -99,7 +99,6 @@ function Table({ data, onUpdateSuccess }) {
     getTableProps,
     getTableBodyProps,
     headerGroups,
-    rows,
     prepareRow,
     state,
     setGlobalFilter,
@@ -109,7 +108,7 @@ function Table({ data, onUpdateSuccess }) {
     canNextPage,
     canPreviousPage,
     pageOptions,
-    state: { pageIndex, pageSize },
+    state: { pageIndex },
   } = useTable(
     {
       columns,
@@ -148,11 +147,12 @@ function Table({ data, onUpdateSuccess }) {
         >
           <thead>
             {headerGroups.map((headerGroup) => (
-              <tr {...headerGroup.getHeaderGroupProps()}>
+              <tr {...headerGroup.getHeaderGroupProps()} key={Math.random()}>
                 {headerGroup.headers.map((column) => (
                   <th
                     {...column.getHeaderProps(column.getSortByToggleProps())}
                     className="py-3 text-left px-5"
+                    key={Math.random()}
                   >
                     {column.render("Header")}
                     <span>
@@ -177,10 +177,15 @@ function Table({ data, onUpdateSuccess }) {
                     (index % 2 === 0 ? "bg-gray-100" : "") +
                     " hover:bg-purple-200"
                   }
+                  key={Math.random()}
                 >
                   {row.cells.map((cell) => {
                     return (
-                      <td {...cell.getCellProps()} className="px-5 py-3">
+                      <td
+                        {...cell.getCellProps()}
+                        className="px-5 py-3"
+                        key={Math.random()}
+                      >
                         {cell.render("Cell")}
                       </td>
                     );

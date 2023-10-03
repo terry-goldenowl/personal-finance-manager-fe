@@ -18,7 +18,7 @@ const authSlice = createSlice({
       Cookies.set("token", action.payload.token);
       Cookies.set("roles", JSON.stringify(action.payload.roles));
     },
-    logout: (state, action) => {
+    logout: (state) => {
       state.isAuthenticated = false;
       state.user = null;
       state.roles = [];

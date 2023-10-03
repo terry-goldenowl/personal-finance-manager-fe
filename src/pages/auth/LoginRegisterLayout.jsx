@@ -30,7 +30,7 @@ function LoginRegisterLayout({ children }) {
           <h2 className="w-full md:text-4xl text-2xl text-white mb-2 leading-tight">
             We help you to manage your finance efficiently!
           </h2>
-          <h5 className="text-white text-2xl">Let's join.</h5>
+          <h5 className="text-white text-2xl">Let&apos;s join.</h5>
           <div className="flex justify-end mt-1">
             <button
               className="bg-purple-600 py-2 px-6 text-white rounded-full md:absolute block right-16 bottom-4 hover:bg-purple-700"

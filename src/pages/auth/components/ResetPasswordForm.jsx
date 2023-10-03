@@ -30,7 +30,7 @@ function ResetPasswordForm({ onSubmit, error, submitting }) {
           }
           return errors;
         }}
-        onSubmit={(values, { setSubmitting }) => {
+        onSubmit={(values) => {
           onSubmit(values);
         }}
       >
@@ -41,7 +41,6 @@ function ResetPasswordForm({ onSubmit, error, submitting }) {
           handleChange,
           handleBlur,
           handleSubmit,
-          isSubmitting,
         }) => (
           <form onSubmit={handleSubmit} className="mt-6" method="post">
 

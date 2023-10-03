@@ -29,7 +29,7 @@ export default function SelectWithImage({
                   <span className="flex items-center">
                     <div className="h-5 w-5 flex-shrink-0">
                       <img
-                        src={selected && selected.image}
+                        src={selected ? selected.image : null}
                         alt=""
                         className="object-cover h-full w-full rounded-full"
                       />

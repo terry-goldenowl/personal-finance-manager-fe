@@ -47,7 +47,7 @@ function RegisterForm({ submitting, error, setError, onSubmit }) {
           }
           return errors;
         }}
-        onSubmit={(values, { setSubmitting }) => {
+        onSubmit={(values) => {
           onSubmit(values);
         }}
       >
@@ -58,7 +58,6 @@ function RegisterForm({ submitting, error, setError, onSubmit }) {
           handleChange,
           handleBlur,
           handleSubmit,
-          isSubmitting,
         }) => (
           <form onSubmit={handleSubmit} className="mt-6" method="post">
             <Input
