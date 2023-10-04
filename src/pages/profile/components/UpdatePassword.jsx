@@ -21,6 +21,7 @@ function UpdatePassword({ onClose }) {
 
   const handleUpdatePassword = async () => {
     try {
+      setIsSavingPassword(true);
       let haveErrors = false;
       setErrors(null);
 
@@ -29,7 +30,7 @@ function UpdatePassword({ onClose }) {
         setErrors((prev) => {
           return {
             ...prev,
-            password: "Old password is required!",
+            password: "Current password is required!",
           };
         });
       }
@@ -88,7 +89,7 @@ function UpdatePassword({ onClose }) {
         type={"password"}
         name={"password"}
         value={password}
-        label={"Old Password"}
+        label={"Current Password"}
         onChange={(e) => setPassword(e.target.value)}
         error={errors?.password}
         size="small"
@@ -134,7 +135,7 @@ function UpdatePassword({ onClose }) {
           className="py-1 px-3 rounded-full bg-blue-500 text-white hover:bg-blue-600 text-sm"
           onClick={handleUpdatePassword}
         >
-          {isSavingPassword ? "Updating password" : "Update password"}
+          {isSavingPassword ? "Updating password..." : "Update password"}
         </button>
       </div>
     </div>
