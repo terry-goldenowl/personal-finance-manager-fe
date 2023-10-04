@@ -76,14 +76,12 @@ function Profile({ onClose }) {
 
       if (verifyResponse.status === "success") {
         setIsVerifyEmail(true);
-      } else {
-        toast.error(
-          "Fail to send verification code to your new email! Try later or use another email."
-        );
       }
     } catch (e) {
       toast.error(e.response.data.message);
+      setErrors(e.response.data.error);
     }
+    setIsUpdating(false);
   };
 
   const handleUpdate = async () => {
@@ -104,9 +102,9 @@ function Profile({ onClose }) {
         toast.error(responseData.error);
       }
     } catch (e) {
-      setIsUpdating(false);
       toast.error(e.response.data.message);
     }
+    setIsUpdating(false);
   };
 
   const handleAccept = async () => {

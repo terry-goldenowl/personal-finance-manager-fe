@@ -1,27 +1,30 @@
 import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React from "react";
+import categories from "../../../assets/images/categories.png";
+import plan from "../../../assets/images/money-bag.png";
+import report from "../../../assets/images/seo-report.png";
+import expenses from "../../../assets/images/spending.png";
 
 function Benefits({ setShownBenefits }) {
   const benefits = [
-    "Income and Expense Tracking",
-    "Expense Categorizations",
-    "Expense Planing",
-    "Financial Goal Setting",
-    "Financial Analysis",
-    "Debt and Loan Management",
+    { name: "Income and Expense Tracking", image: expenses },
+    { name: "Expense Categorizations", image: categories },
+    { name: "Expense Planing (Budgeting)", image: plan },
+    { name: "Financial Reporting", image: report },
   ];
 
   return (
     <div>
       <h2 className="text-purple-500 text-3xl text-center">Benefits</h2>
-      <div className="grid grid-cols-2 grid-flow-row gap-3 mt-4">
+      <div className="grid grid-cols-2 grid-flow-row gap-3 mt-4 auto-rows-fr">
         {benefits.map((benefit) => (
           <div
-            className="p-3 bg-purple-200 rounded-xl text-xl text-center flex justify-center items-center hover:bg-purple-300"
+            className="p-3 bg-purple-200 rounded-xl text-center flex flex-col justify-center items-center gap-2 hover:bg-purple-300"
             key={Math.random()}
           >
-            {benefit}
+            <img src={benefit.image} alt="" className="w-14 h-14" />
+            <p className=" text-lg">{benefit.name}</p>
           </div>
         ))}
       </div>

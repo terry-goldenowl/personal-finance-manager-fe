@@ -362,7 +362,7 @@ function ReportsPage() {
               disabled={!reports || (reports && reports.length === 0)}
             >
               <FontAwesomeIcon icon={faFileExcel} />{" "}
-              <p>{isExporting ? "Exporting" : "Export as excel"}</p>
+              <p>{isExporting ? "Exporting..." : "Export as excel"}</p>
             </motion.button>
           )}
         </div>
