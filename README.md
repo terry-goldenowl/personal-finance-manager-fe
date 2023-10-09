@@ -115,7 +115,7 @@ This section should list any major frameworks/libraries used to bootstrap your p
 ![image](https://github.com/terry-goldenowl/personal-finance-manager-fe/assets/138744655/844695dc-6a1f-48f2-a43e-15bdf1cd0b10)
 
 ## DB Diagram
-[![](https://mermaid.ink/img/pako:eNqN0dEKgjAUBuBXOZxre4HdjZIKTEMXEQxiuFNKmTHdRczePaUiMot2ez7O_7PjMC01IUMyk1ztjSrkCdq3SvwYmmY0ahyseRD4gkGmqt6wdDDmwp9G8ebLWMQ8TPhYzKOQQWpI1fSJFlEoZttlwH-YZ84Au_cbSAQGEm1FGnalkTikX9F_4LcOg_4p_i3T978T0MOCTKFy3R7MdRsk1hkVJLGjWplDx66tU7Yuk8spRVYbSx7as27_63FiZDt1rOh6AzyDmkE?type=png)](https://mermaid.live/edit#pako:eNqN0dEKgjAUBuBXOZxre4HdjZIKTEMXEQxiuFNKmTHdRczePaUiMot2ez7O_7PjMC01IUMyk1ztjSrkCdq3SvwYmmY0ahyseRD4gkGmqt6wdDDmwp9G8ebLWMQ8TPhYzKOQQWpI1fSJFlEoZttlwH-YZ84Au_cbSAQGEm1FGnalkTikX9F_4LcOg_4p_i3T978T0MOCTKFy3R7MdRsk1hkVJLGjWplDx66tU7Yuk8spRVYbSx7as27_63FiZDt1rOh6AzyDmkE)
+![mermaid-diagram-2023-10-09-181023](https://github.com/terry-goldenowl/personal-finance-manager-fe/assets/138744655/955866ce-64fe-476b-b2ab-3ba48235c7b3)
 
 <!-- GETTING STARTED -->
 ## Getting Started
@@ -166,6 +166,7 @@ Here's how you can install the repository and run project locally:
   * Make and manage plans for month and categories of a month
   * See reports
   * Make manage your own categories
+  * Make and manage goals and add additions to goal
 
 * Admin role:
   * See some statistics
