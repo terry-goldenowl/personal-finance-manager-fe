@@ -85,7 +85,7 @@ function MonthPlans({ onSeeCategoryPlans }) {
           />
         </div>
         <button
-          className="rounded-lg bg-blue-600 text-white px-6 py-1.5 hover:bg-blue-700"
+          className="rounded-lg bg-purple-600 text-white px-6 py-1.5 hover:bg-purple-700"
           onClick={() => setIsAddingPlan(true)}
         >
           Create plan

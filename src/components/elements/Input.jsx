@@ -18,7 +18,7 @@ function Input({
 }) {
   const sizeStyle =
     size === "medium"
-      ? "rounded-xl py-2 px-4 text-xl ring-2"
+      ? "rounded-lg py-2 px-4 text-xl ring-2"
       : "rounded-md py-1.5 px-3 text-sm ring-1";
 
   return (
