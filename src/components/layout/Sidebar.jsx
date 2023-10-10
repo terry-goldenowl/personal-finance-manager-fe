@@ -5,6 +5,7 @@ import { faCircleInfo } from "@fortawesome/free-solid-svg-icons";
 import categories from "../../assets/images/categories.png";
 import plan from "../../assets/images/money-bag.png";
 import report from "../../assets/images/seo-report.png";
+import target from "../../assets/images/target.png";
 import expenses from "../../assets/images/spending.png";
 import avatar from "../../assets/images/profile.png";
 import users from "../../assets/images/teamwork.png";
@@ -43,6 +44,12 @@ function Sidebar({ onLogout }) {
         },
         {
           id: 4,
+          name: "Goals",
+          image: target,
+          link: "/goals",
+        },
+        {
+          id: 5,
           name: "Categories",
           image: categories,
           link: "/categories",
@@ -51,19 +58,19 @@ function Sidebar({ onLogout }) {
     } else {
       return [
         {
-          id: 5,
+          id: 6,
           name: "Dashboard",
           image: expenses,
           link: "/admin",
         },
         {
-          id: 6,
+          id: 7,
           name: "Users",
           image: users,
           link: "/admin/users",
         },
         {
-          id: 7,
+          id: 8,
           name: "Default categories",
           image: categories,
           link: "/admin/categories",
@@ -82,7 +89,7 @@ function Sidebar({ onLogout }) {
 
   return (
     <div
-      className="sidebar w-screen bg-white lg:w-40 px-5 sm:py-5 py-4 lg:px-3 shadow-lg flex lg:flex-col lg:justify-center flex-row sm:justify-center justify-start gap-5 items-center lg:rounded-br-3xl h-fit sticky top-0 left-0 bg-opacity-90"
+      className="sidebar w-screen lg:h-screen bg-white lg:w-40 px-5 sm:py-5 py-4 lg:px-3 shadow-lg flex lg:flex-col lg:justify-center flex-row sm:justify-center justify-start gap-5 items-center lg:rounded-br-3xl h-fit sticky top-0 left-0 bg-opacity-90"
       style={{ zIndex: 25 }}
     >
       <div className="lg:mb-6 mb-0 flex flex-col items-center relative">
@@ -103,7 +110,7 @@ function Sidebar({ onLogout }) {
         </div>
       </div>
       <ul
-        className="flex lg:flex-col flex-row sm:gap-3 gap-0 overflow-x-scroll lg:justify-center w-full"
+        className="flex lg:flex-col flex-row sm:gap-3 gap-0 overflow-x-scroll lg:justify-start w-full"
         id="sidebar"
       >
         {sidebarItems.map((item) => (
