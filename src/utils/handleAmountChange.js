@@ -12,6 +12,6 @@ export default function (value, setAmount, setFormattedAmount, setErrors) {
     });
   } else {
     setFormattedAmount(cleanAmount.replace(/\B(?=(\d{3})+(?!\d))/g, ","));
-    setAmount(cleanAmount);
+    setAmount(parseInt(cleanAmount));
   }
 }

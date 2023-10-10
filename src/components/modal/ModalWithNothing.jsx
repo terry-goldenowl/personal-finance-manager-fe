@@ -19,7 +19,7 @@ export default function ModalWithNothing({ onClose, children, width }) {
         </div>
       </motion.div>
       <div
-        className={"opacity-25 fixed inset-0 bg-black z-40"}
+        className={"opacity-50 fixed inset-0 bg-black z-40"}
         onClick={onClose}
       ></div>
     </div>,

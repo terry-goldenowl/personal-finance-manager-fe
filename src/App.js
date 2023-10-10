@@ -18,6 +18,7 @@ import DefaultCategoriesPage from "./pages/admin/DefaultCategoriesPage";
 import UsersPage from "./pages/admin/UsersPage";
 import AuthorizedRoute from "./components/routes/AuthorizedRoute";
 import NotFound from "./pages/others/NotFound";
+import GoalsPage from "./pages/goals/GoalsPage";
 
 function App() {
   const router = createBrowserRouter([
@@ -53,12 +54,12 @@ function App() {
               element: <AuthorizedRoute allowedRoles={["user"]} />,
               children: [
                 {
-                  path: "/reports",
-                  element: <ReportsPage />,
-                },
-                {
                   path: "/",
                   element: <IncomesExpensePage />,
+                },
+                {
+                  path: "/reports",
+                  element: <ReportsPage />,
                 },
                 {
                   path: "/transactions",
@@ -71,6 +72,10 @@ function App() {
                 {
                   path: "/plans",
                   element: <PlansPage />,
+                },
+                {
+                  path: "/goals",
+                  element: <GoalsPage />,
                 },
               ],
             },
@@ -105,7 +110,7 @@ function App() {
   return (
     <Provider store={store}>
       <ToastContainer position="top-center" autoClose="4000" />
-      <RouterProvider router={router} />;
+      <RouterProvider router={router} />
     </Provider>
   );
 }

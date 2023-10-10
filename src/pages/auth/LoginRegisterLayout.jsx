@@ -121,7 +121,7 @@ function LoginRegisterLayout({ children }) {
               {children}
             </div>
             <div
-              className="border-blue-400 rounded-3xl p-6 bg-white benefits-card w-11/12"
+              className="border-blue-400 rounded-3xl sm:p-6 p-4 bg-white benefits-card w-11/12"
               style={{
                 boxShadow: "0 0 30px rgb(216, 180, 254)",
               }}
