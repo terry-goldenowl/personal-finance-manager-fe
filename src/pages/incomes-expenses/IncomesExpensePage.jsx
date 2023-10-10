@@ -129,22 +129,22 @@ function IncomesExpensePage() {
           </div>
         </div>
         <div
-          className="flex border-2 border-purple-500 rounded-2xl relative lg:w-1/3 md:w-1/2 w-4/5"
+          className="flex border-2 border-purple-500 rounded-2xl relative lg:w-1/4 md:w-1/2 w-4/5"
           id="add-transactions-container"
         >
           <button
-            className="py-2 xl:px-8 px-4 text-center rounded-xl font-semibold bg-purple-500 text-white hover:bg-purple-600 w-1/2"
-            id="add-expense-btn"
-            onClick={() => handleClickAddTx("expenses")}
-          >
-            Add expense
-          </button>
-          <button
-            className="py-2 xl:px-8 px-4 rounded-xl font-semibold text-purple-600 w-1/2"
+            className="py-2 xl:px-8 px-4 rounded-s-xl font-semibold text-purple-600 w-1/2 hover:bg-purple-100"
             id="add-income-btn"
             onClick={() => handleClickAddTx("incomes")}
           >
             Add income
+          </button>
+          <button
+            className="py-2 xl:px-8 px-4 text-center rounded-e-xl font-semibold bg-purple-500 text-white hover:bg-purple-600 w-1/2"
+            id="add-expense-btn"
+            onClick={() => handleClickAddTx("expenses")}
+          >
+            Add expense
           </button>
         </div>
       </div>

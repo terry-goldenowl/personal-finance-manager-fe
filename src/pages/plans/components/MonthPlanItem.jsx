@@ -47,7 +47,7 @@ function MonthPlanItem({ monthPlan, onUpdateSuccess, onSeeCategoryPlans }) {
       className={
         " rounded-3xl p-4 bg-white mb-6 overflow-hidden " +
         (monthPlan.month === new Date().getMonth() + 1
-          ? "border-2 shadow-md border-blue-500"
+          ? "border-2 shadow-md border-purple-500"
           : "border shadow-md")
       }
       whileHover={{
@@ -55,25 +55,25 @@ function MonthPlanItem({ monthPlan, onUpdateSuccess, onSeeCategoryPlans }) {
       }}
     >
       <div className="mb-3 flex justify-between items-center md:flex-row flex-col gap-2">
-        <div className="md:bg-gradient-to-br md:from-blue-700 md:to-blue-400 md:px-6 md:py-1 md:rounded-r-full md:relative md:-left-4 md:shadow-lg">
-          <p className="text-3xl uppercase md:text-white text-blue-600">
+        <div className="md:bg-gradient-to-br md:from-purple-700 md:to-purple-400 md:px-6 md:py-1 md:rounded-r-full md:relative md:-left-4 md:shadow-lg">
+          <p className="text-2xl uppercase md:text-white text-purple-600">
             {getMonthName(monthPlan.month - 1)}{" "}
-            <span className="text-xl">{monthPlan.year}</span>
+            <span className="text-lg">{monthPlan.year}</span>
           </p>
         </div>
 
         <div className="flex gap-1">
           <button
-            className="py-1.5 px-4 rounded-md bg-blue-100 text-blue-600 text-sm hover:bg-blue-200 font-bold"
-            onClick={() => setIsAdjusting(true)}
-          >
-            Adjust budget
-          </button>
-          <button
-            className="py-1.5 px-4 rounded-md bg-blue-100 text-blue-600 text-sm hover:bg-blue-200 font-bold"
+            className="py-1.5 px-4 rounded-md bg-purple-100 text-purple-600 text-sm hover:bg-purple-200 font-bold"
             onClick={handleClickSeeCategoryPlans}
           >
             See category plans
+          </button>
+          <button
+            className="py-1.5 px-4 rounded-md bg-purple-100 text-purple-600 text-sm hover:bg-purple-200 font-bold"
+            onClick={() => setIsAdjusting(true)}
+          >
+            Adjust budget
           </button>
           <button
             className="py-1.5 px-4 rounded-md bg-red-100 text-red-600 text-sm hover:bg-red-200 font-bold"
@@ -112,22 +112,22 @@ function MonthPlanItem({ monthPlan, onUpdateSuccess, onSeeCategoryPlans }) {
           )}
         </div>
         <div className="flex gap-3 items-center">
-          <div className="h-3 bg-blue-100 rounded-full grow shadow-sm">
+          <div className="h-3 bg-purple-100 rounded-full grow shadow-sm">
             <div
               className={
                 "h-full rounded-full " +
                 (percentage > 100
                   ? "bg-red-600"
                   : percentage > 50
-                  ? "bg-blue-600"
-                  : "bg-blue-400")
+                  ? "bg-purple-600"
+                  : "bg-purple-400")
               }
               style={{ width: (percentage > 100 ? 100 : percentage) + "%" }}
             ></div>
           </div>
           <p
             className={`text-xl ${
-              percentage <= 100 ? "text-blue-600" : "text-red-600"
+              percentage <= 100 ? "text-purple-600" : "text-red-600"
             } font-bold`}
           >
             {percentage + "%"}

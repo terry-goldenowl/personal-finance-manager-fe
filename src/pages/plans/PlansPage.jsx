@@ -11,8 +11,8 @@ function PlansPage() {
   const [categoryPlans, setCategoryPlans] = useState(null);
 
   const btnStyle = (vb) => {
-    if (viewBy === vb) return "bg-blue-600 text-white font-bold";
-    else return "text-blue-600 bg-blue-200  hover:bg-blue-200";
+    if (viewBy === vb) return "bg-purple-600 text-white font-bold";
+    else return "text-purple-600 bg-purple-200  hover:bg-purple-200";
   };
 
   const handleSeeCategoryPlans = (month, year) => {
@@ -39,7 +39,7 @@ function PlansPage() {
       </div>
       <div className="flex flex-col items-center">
         <div className="xl:w-3/5 sm:w-full lg:w-4/5 w-full">
-          <div className="mb-4 flex justify-center w-full p-2 bg-blue-200 rounded-xl gap-2">
+          <div className="mb-4 flex justify-center w-full p-2 bg-purple-200 rounded-xl gap-2">
             <button
               className={
                 "py-2 w-1/2 rounded-xl hover:font-bold " + btnStyle("months")

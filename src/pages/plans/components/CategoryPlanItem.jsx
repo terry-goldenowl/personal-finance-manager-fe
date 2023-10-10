@@ -52,7 +52,7 @@ function CategoryPlanItem({ categoryPlan, onUpdateSuccess }) {
   return (
     <>
       <div
-        className="flex gap-3 items-center mb-1 py-1 sm:px-4 px-0 rounded-xl hover:bg-blue-200 hover:bg-opacity-80 relative"
+        className="flex gap-3 items-center mb-1 py-1 sm:px-4 px-0 rounded-xl hover:bg-purple-200 hover:bg-opacity-80 relative"
         onMouseEnter={() => setIsHovering(true)}
         onMouseLeave={() => setIsHovering(false)}
       >
@@ -68,15 +68,15 @@ function CategoryPlanItem({ categoryPlan, onUpdateSuccess }) {
             {categoryPlan.category.name}
           </p>
         </div>
-        <div className="h-2 bg-blue-50 rounded-full grow shadow-sm overflow-hidden">
+        <div className="h-2 bg-purple-50 rounded-full grow shadow-sm overflow-hidden">
           <div
             className={
               "h-full rounded-full " +
               (percentage > 100
                 ? "bg-red-600"
                 : percentage > 50
-                ? "bg-blue-600"
-                : "bg-blue-400")
+                ? "bg-purple-600"
+                : "bg-purple-400")
             }
             style={{
               width: (percentage > 100 ? 100 : Math.round(percentage)) + "%",
@@ -86,7 +86,7 @@ function CategoryPlanItem({ categoryPlan, onUpdateSuccess }) {
         <div className="w-10">
           <p
             className={`text-lg ${
-              percentage <= 100 ? "text-blue-600" : "text-red-600"
+              percentage <= 100 ? "text-purple-600" : "text-red-600"
             } font-bold`}
           >
             {Math.round(percentage) + "%"}
@@ -115,7 +115,7 @@ function CategoryPlanItem({ categoryPlan, onUpdateSuccess }) {
               <div className="flex justify-between mb-1">
                 <p>Remaining: </p>
 
-                <p className="font-bold text-blue-600">
+                <p className="font-bold text-purple-600">
                   {formatCurrency(categoryPlan.amount - categoryPlan.actual)}
                 </p>
               </div>
@@ -133,7 +133,7 @@ function CategoryPlanItem({ categoryPlan, onUpdateSuccess }) {
             )}
             <div className="flex gap-1">
               <motion.button
-                className="py-1 px-2 bg-blue-500 hover:bg-blue-600 text-white rounded-md w-1/2 text-sm"
+                className="py-1 px-2 bg-purple-500 hover:bg-purple-600 text-white rounded-md w-1/2 text-sm"
                 onClick={handleClickUpdate}
                 initial={{ scaleY: 0, translateY: 10, opacity: 0 }}
                 animate={{ scaleY: 1, translateY: 0, opacity: 1 }}

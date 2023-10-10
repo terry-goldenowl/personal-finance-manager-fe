@@ -98,11 +98,11 @@ function CategoryPlans({ _month }) {
           />
         </div>
       </div>
-      <div className="border-2 border-blue-400 rounded-3xl sm:p-6 p-3 bg-white shadow-xl shadow-blue-200">
+      <div className="border-2 border-purple-400 rounded-3xl sm:p-6 p-3 bg-white shadow-xl shadow-purple-200">
         <div className="mb-4">
           {!loading && year && (
-            <div className="md:bg-gradient-to-br md:from-blue-700 md:to-blue-400 md:px-6 md:py-1 md:rounded-r-full md:w-fit md:relative md:-left-6 md:shadow-lg">
-              <p className="text-3xl uppercase md:text-white text-blue-500">
+            <div className="md:bg-gradient-to-br md:from-purple-700 md:to-purple-400 md:px-6 md:py-1 md:rounded-r-full md:w-fit md:relative md:-left-6 md:shadow-lg">
+              <p className="text-3xl uppercase md:text-white text-purple-500">
                 {month.name + " " + year.name}
               </p>
             </div>
@@ -131,7 +131,7 @@ function CategoryPlans({ _month }) {
         </div>
         <div className="flex lg:justify-end justify-center">
           <button
-            className="flex items-center gap-2 rounded-md bg-blue-700 text-white py-1 px-4 hover:bg-blue-800"
+            className="flex items-center gap-2 rounded-md bg-purple-700 text-white py-1 px-4 hover:bg-purple-800"
             onClick={() => setIsAddingPlan(true)}
           >
             <FontAwesomeIcon icon={faPlusCircle} />

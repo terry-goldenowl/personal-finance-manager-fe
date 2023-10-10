@@ -89,7 +89,7 @@ function Sidebar({ onLogout }) {
 
   return (
     <div
-      className="sidebar w-screen lg:h-screen bg-white lg:w-40 px-5 sm:py-5 py-4 lg:px-3 shadow-lg flex lg:flex-col lg:justify-center flex-row sm:justify-center justify-start gap-5 items-center lg:rounded-br-3xl h-fit sticky top-0 left-0 bg-opacity-90"
+      className="sidebar w-screen lg:h-screen bg-white lg:w-40 px-5 sm:py-5 py-4 lg:px-3 shadow-lg flex lg:flex-col lg:justify-start flex-row sm:justify-center justify-start gap-5 items-center lg:rounded-br-3xl h-fit sticky top-0 left-0 bg-opacity-90"
       style={{ zIndex: 25 }}
     >
       <div className="lg:mb-6 mb-0 flex flex-col items-center relative">
