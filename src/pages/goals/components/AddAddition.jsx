@@ -104,49 +104,56 @@ function AddAddition({ type, onClose, goal, onUpdateSuccess }) {
       onAccept={handleAddAddition}
       processing={isSavingAddition}
     >
-      <div>
-        <SelectWithImage
-          data={filteredWallets}
-          label={
-            type === "addition"
-              ? "Wallet to get money"
-              : "Wallet to receive money"
-          }
-          selected={wallet}
-          setSelected={setWallet}
-          required
-        />
-        <p className="text-green-600 text-sm text-end">
-          Balance:{" "}
-          <span className="font-bold">{formatCurrency(wallet.balance)}</span>
+      {filteredWallets.length > 0 && (
+        <div>
+          <SelectWithImage
+            data={filteredWallets}
+            label={
+              type === "addition"
+                ? "Wallet to get money"
+                : "Wallet to receive money"
+            }
+            selected={wallet}
+            setSelected={setWallet}
+            required
+          />
+          <p className="text-green-600 text-sm text-end">
+            Balance:{" "}
+            <span className="font-bold">{formatCurrency(wallet.balance)}</span>
+          </p>
+          <Input
+            label={"Amount"}
+            name={"amount"}
+            type={"text"}
+            onChange={(e) =>
+              handleAmountChange(
+                e.target.value,
+                setAmount,
+                setFormattedAmount,
+                setErrors
+              )
+            }
+            required
+            size="sm"
+            value={formattedAmount}
+            error={errors && errors.amount}
+          />
+          <Input
+            label={"Note"}
+            name={"name"}
+            type={"text"}
+            onChange={(e) => setNote(e.target.value)}
+            size="sm"
+            value={note}
+            error={errors && errors.note}
+          />
+        </div>
+      )}
+      {filteredWallets.length === 0 && (
+        <p className="text-center ">
+          You have no suitable wallets to make additions to this goal!
         </p>
-        <Input
-          label={"Amount"}
-          name={"amount"}
-          type={"text"}
-          onChange={(e) =>
-            handleAmountChange(
-              e.target.value,
-              setAmount,
-              setFormattedAmount,
-              setErrors
-            )
-          }
-          required
-          size="sm"
-          value={formattedAmount}
-          error={errors && errors.amount}
-        />
-        <Input
-          label={"Note"}
-          name={"name"}
-          type={"text"}
-          onChange={(e) => setNote(e.target.value)}
-          size="sm"
-          value={note}
-          error={errors && errors.note}
-        />
-      </div>
+      )}
     </Modal>
   );
 }

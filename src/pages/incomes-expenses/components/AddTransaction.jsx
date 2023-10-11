@@ -11,7 +11,8 @@ import formatCurrency from "../../../utils/currencyFormatter";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faInfoCircle } from "@fortawesome/free-solid-svg-icons";
 import PlansService from "../../../services/plans";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchWallets } from "../../../stores/wallets";
 
 function AddTransaction({
   setIsAdding,
@@ -40,6 +41,8 @@ function AddTransaction({
   const [loadingPlan, setLoadingPlan] = useState(false);
   const [loadingCategories, setLoadingCategories] = useState(false);
   const [processingSave, setProcessingSave] = useState(false);
+
+  const dispatch = useDispatch();
 
   useEffect(() => {
     if (
@@ -162,6 +165,7 @@ function AddTransaction({
         if (responseData.status === "success") {
           setIsAdding(false);
           onAddingSuccess(transaction ? "update" : "create");
+          dispatch(fetchWallets());
         }
       }
     } catch (e) {
