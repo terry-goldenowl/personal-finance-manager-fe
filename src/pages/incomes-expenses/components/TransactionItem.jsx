@@ -6,11 +6,14 @@ import ConfirmDeleteModal from "../../../components/modal/ConfirmDeleteModal";
 import TransactionsService from "../../../services/transactions";
 import { toast } from "react-toastify";
 import { motion } from "framer-motion";
+import { useDispatch } from "react-redux";
+import { fetchWallets } from "../../../stores/wallets";
 
 function TransactionItem({ transaction, index, onModifySuccess }) {
   const [isViewingDetail, setIsViewingDetail] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const dispatch = useDispatch();
 
   const handleDeleteTransaction = async () => {
     try {
@@ -20,6 +23,7 @@ function TransactionItem({ transaction, index, onModifySuccess }) {
       if (data.status === "success") {
         setIsDeleting(false);
         setIsViewingDetail(false);
+        dispatch(fetchWallets());
         onModifySuccess("delete");
       }
     } catch (e) {
