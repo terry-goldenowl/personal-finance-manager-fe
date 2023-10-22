@@ -13,6 +13,7 @@ export default function SelectWithImage({
   setSelected,
   required,
   loading = false,
+  helperText = null,
 }) {
   return (
     <div className="mb-2">
@@ -109,6 +110,11 @@ export default function SelectWithImage({
                 </Listbox.Options>
               </Transition>
             </div>
+            {helperText && (
+              <p className="text-gray-500 text-end italic text-sm">
+                {helperText}
+              </p>
+            )}
           </>
         )}
       </Listbox>

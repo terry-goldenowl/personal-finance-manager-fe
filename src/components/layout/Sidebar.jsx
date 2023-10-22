@@ -54,23 +54,29 @@ function Sidebar({ onLogout }) {
           image: categories,
           link: "/categories",
         },
+        {
+          id: 6,
+          name: "Events",
+          image: categories,
+          link: "/events",
+        },
       ];
     } else {
       return [
         {
-          id: 6,
+          id: 1,
           name: "Dashboard",
           image: expenses,
           link: "/admin",
         },
         {
-          id: 7,
+          id: 2,
           name: "Users",
           image: users,
           link: "/admin/users",
         },
         {
-          id: 8,
+          id: 3,
           name: "Default categories",
           image: categories,
           link: "/admin/categories",
