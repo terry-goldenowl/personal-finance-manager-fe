@@ -13,6 +13,7 @@ import { faInfoCircle } from "@fortawesome/free-solid-svg-icons";
 import PlansService from "../../../services/plans";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchWallets } from "../../../stores/wallets";
+import EventsService from "../../../services/events";
 
 function AddTransaction({
   setIsAdding,
@@ -27,6 +28,8 @@ function AddTransaction({
 
   const [categories, setCategories] = useState([]);
   const [categorySelected, setCategorySelected] = useState(null);
+  const [events, setEvents] = useState([]);
+  const [eventSelected, setEventSelected] = useState(null);
   const [walletSelected, setWalletSelected] = useState(walletChosen);
   const [title, setTitle] = useState("");
   const [amount, setAmount] = useState();
@@ -40,6 +43,7 @@ function AddTransaction({
   const [planData, setPlanData] = useState(null);
   const [loadingPlan, setLoadingPlan] = useState(false);
   const [loadingCategories, setLoadingCategories] = useState(false);
+  const [loadingEvents, setLoadingEvents] = useState(false);
   const [processingSave, setProcessingSave] = useState(false);
 
   const dispatch = useDispatch();
@@ -51,7 +55,9 @@ function AddTransaction({
     )
       setLoadingPlan(true);
     setLoadingCategories(true);
+    setLoadingEvents(true);
     getCategories();
+    getEvents();
   }, []);
 
   useEffect(() => {
@@ -94,6 +100,17 @@ function AddTransaction({
       toast.error(e.response.data.message);
     }
     setLoadingCategories(false);
+  };
+
+  const getEvents = async () => {
+    try {
+      setLoadingEvents(true);
+      const data = await EventsService.getEvents();
+      setEvents(data.data.events);
+    } catch (e) {
+      toast.error(e.response.data.message);
+    }
+    setLoadingEvents(false);
   };
 
   const getTotalOfCategory = async () => {
@@ -317,6 +334,16 @@ function AddTransaction({
 
             {/* RIGHT SIDE INPUTS (OPTIONAL)*/}
             <div className="p-3 lg:w-1/2 sm:w-full">
+              <SelectWithImage
+                data={events}
+                label={"Event"}
+                selected={eventSelected}
+                setSelected={setEventSelected}
+                loading={loadingEvents}
+                helperText={
+                  !loadingEvents && events.length === 0 && "No event found!"
+                }
+              />
               <ImageChoserPreview
                 image={photo}
                 setImage={setPhoto}

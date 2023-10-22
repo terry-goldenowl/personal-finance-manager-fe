@@ -19,6 +19,7 @@ import UsersPage from "./pages/admin/UsersPage";
 import AuthorizedRoute from "./components/routes/AuthorizedRoute";
 import NotFound from "./pages/others/NotFound";
 import GoalsPage from "./pages/goals/GoalsPage";
+import EventsPage from "./pages/events/EventsPage";
 
 function App() {
   const router = createBrowserRouter([
@@ -76,6 +77,10 @@ function App() {
                 {
                   path: "/goals",
                   element: <GoalsPage />,
+                },
+                {
+                  path: "/events",
+                  element: <EventsPage />,
                 },
               ],
             },
