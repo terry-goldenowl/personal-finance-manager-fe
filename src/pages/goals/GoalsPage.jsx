@@ -11,7 +11,7 @@ import { fetchWallets } from "../../stores/wallets";
 function GoalsPage() {
   const [isAddingGoal, setIsAddingGoal] = useState(false);
   const [loadingGoals, setLoadingGoals] = useState(false);
-  const [status, setStatus] = useState("in-progress");
+  const [status, setStatus] = useState(2);
   const [isCongratulating, setIsCongratulating] = useState(false);
   const [goals, setGoals] = useState([]);
   const [countAll, setCountAll] = useState();
