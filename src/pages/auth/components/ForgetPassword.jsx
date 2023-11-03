@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import Modal from "../../../components/modal/Modal";
-import AuthInput from "./AuthInput";
+import Input from "../../../components/elements/Input";
 
 function ForgetPassword({ onAccept, onClose, error, setError, isSendingLink }) {
   const [email, setEmail] = useState("");
@@ -29,7 +29,7 @@ function ForgetPassword({ onAccept, onClose, error, setError, isSendingLink }) {
       onClose={onClose}
       processing={isSendingLink}
     >
-      <AuthInput
+      <Input
         type={"email"}
         name={"email"}
         value={email}
