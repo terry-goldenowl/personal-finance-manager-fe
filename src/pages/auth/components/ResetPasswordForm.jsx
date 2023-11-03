@@ -1,6 +1,6 @@
 import React from "react";
 import { Formik } from "formik";
-import AuthInput from "./AuthInput";
+import Input from "../../../components/elements/Input";
 
 function ResetPasswordForm({ onSubmit, error, submitting }) {
   return (
@@ -13,6 +13,14 @@ function ResetPasswordForm({ onSubmit, error, submitting }) {
         }}
         validate={(values) => {
           const errors = {};
+
+          if (!values.email) {
+            errors.email = "Required";
+          } else if (
+            !/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(values.email)
+          ) {
+            errors.email = "Invalid email address";
+          }
 
           if (!values.newPassword) {
             errors.newPassword = "Required";
@@ -43,8 +51,20 @@ function ResetPasswordForm({ onSubmit, error, submitting }) {
           handleSubmit,
         }) => (
           <form onSubmit={handleSubmit} className="mt-6" method="post">
+            <Input
+              type={"text"}
+              name={"email"}
+              onChange={handleChange}
+              onBlur={handleBlur}
+              value={values.email}
+              label={"Email"}
+              error={
+                (errors.email && touched.email && errors.email) ||
+                (error && error.email)
+              }
+            />
 
-            <AuthInput
+            <Input
               type={"password"}
               name={"newPassword"}
               onChange={handleChange}
@@ -59,7 +79,7 @@ function ResetPasswordForm({ onSubmit, error, submitting }) {
               }
             />
 
-            <AuthInput
+            <Input
               type={"password"}
               name={"newPassword_confirmation"}
               onChange={handleChange}
