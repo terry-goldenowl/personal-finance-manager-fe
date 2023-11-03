@@ -15,9 +15,7 @@ function DefaultCategories({ categories, loading, onUpdateSuccess }) {
         {loading && <Loading />}
         {!loading && (
           <DefaultCategoryList
-            categories={categories.filter(
-              (category) => category.type === "expenses"
-            )}
+            categories={categories.filter((category) => category.type === 2)}
             onUpdateSuccess={onUpdateSuccess}
           />
         )}
@@ -28,9 +26,7 @@ function DefaultCategories({ categories, loading, onUpdateSuccess }) {
         {loading && <Loading />}
         {!loading && (
           <DefaultCategoryList
-            categories={categories.filter(
-              (category) => category.type === "incomes"
-            )}
+            categories={categories.filter((category) => category.type === 1)}
             onUpdateSuccess={onUpdateSuccess}
           />
         )}

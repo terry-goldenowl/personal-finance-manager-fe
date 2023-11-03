@@ -14,18 +14,14 @@ function UserCategories({ categories, onUpdateSuccess, loading }) {
 
         {loading && <Loading />}
         {!loading &&
-          categories.filter((category) => category.type === "expenses").length >
-            0 && (
+          categories.filter((category) => category.type === 2).length > 0 && (
             <UserCategoryList
-              categories={categories.filter(
-                (category) => category.type === "expenses"
-              )}
+              categories={categories.filter((category) => category.type === 2)}
               onUpdateSuccess={onUpdateSuccess}
             />
           )}
         {!loading &&
-          categories.filter((category) => category.type === "expenses")
-            .length === 0 && (
+          categories.filter((category) => category.type === 2).length === 0 && (
             <p className="text-md text-gray-600 text-center py-3">
               You didn&apos;t create any category!
             </p>
@@ -36,18 +32,14 @@ function UserCategories({ categories, onUpdateSuccess, loading }) {
 
         {loading && <Loading />}
         {!loading &&
-          categories.filter((category) => category.type === "incomes").length >
-            0 && (
+          categories.filter((category) => category.type === 1).length > 0 && (
             <UserCategoryList
-              categories={categories.filter(
-                (category) => category.type === "incomes"
-              )}
+              categories={categories.filter((category) => category.type === 1)}
               onUpdateSuccess={onUpdateSuccess}
             />
           )}
         {!loading &&
-          categories.filter((category) => category.type === "incomes")
-            .length === 0 && (
+          categories.filter((category) => category.type === 1).length === 0 && (
             <p className="text-md text-gray-600 text-center py-3">
               You didn&apos;t create any category!
             </p>

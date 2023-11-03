@@ -74,7 +74,7 @@ function AddAddition({ type, onClose, goal, onUpdateSuccess }) {
           onClose();
 
           if (goal.total_contributions + data.amount >= goal.amount) {
-            onUpdateSuccess(goal, "finished");
+            onUpdateSuccess(goal, 4);
           } else {
             onUpdateSuccess();
           }

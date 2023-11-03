@@ -94,7 +94,7 @@ function GoalItem({ goal, status, onUpdateSuccess }) {
 
             <div className="flex justify-between items-center gap-2 mb-4">
               <p className="bg-yellow-500 rounded-md px-3 text-sm uppercase w-fit">
-                {status === "in-progress" && (
+                {status === 2 && (
                   <>
                     <span className="font-bold text-purple-600">
                       {Math.round(
@@ -106,7 +106,7 @@ function GoalItem({ goal, status, onUpdateSuccess }) {
                     <span className="text-xs font-bold">days left</span>
                   </>
                 )}
-                {status === "not-started" && (
+                {status === 1 && (
                   <>
                     <span className="text-xs font-bold">Start in</span>{" "}
                     <span className="font-bold text-purple-600">
@@ -119,7 +119,7 @@ function GoalItem({ goal, status, onUpdateSuccess }) {
                     <span className="text-xs font-bold">days</span>
                   </>
                 )}
-                {(status === "finished" || status === "not-completed") && (
+                {(status === 4 || status === 3) && (
                   <>
                     <span className="text-xs font-bold">Finished </span>{" "}
                     <span className="font-bold text-purple-600">
@@ -133,7 +133,7 @@ function GoalItem({ goal, status, onUpdateSuccess }) {
                   </>
                 )}
               </p>
-              {status !== "not-started" && (
+              {status !== 1 && (
                 <button
                   className=" text-purple-600 whitespace-nowrap rounded-md text-sm uppercase py-1 hover:underline"
                   onClick={() => setIsViewingAdditions(true)}
@@ -147,7 +147,7 @@ function GoalItem({ goal, status, onUpdateSuccess }) {
               )}
             </div>
 
-            {status !== "not-started" && (
+            {status !== 1 && (
               <p className="text-sm mb-3">
                 <span className="text-xl bg-purple-100 text-purple-600 py-1 px-3 rounded-md font-bold">
                   {formatCurrency(goal.total_contributions)}
@@ -158,7 +158,7 @@ function GoalItem({ goal, status, onUpdateSuccess }) {
                 </span>
               </p>
             )}
-            {status === "not-started" && (
+            {status === 1 && (
               <>
                 <p className="text-sm mb-3">
                   Target amount:{" "}
@@ -194,7 +194,7 @@ function GoalItem({ goal, status, onUpdateSuccess }) {
             >
               Update
             </button>
-            {status !== "not-started" && (
+            {status !== 1 && (
               <button
                 className="bg-purple-200 text-purple-500 rounded-md whitespace-nowrap text-sm sm:px-4 px-2 py-1 hover:font-bold"
                 onClick={() => setIsAddingWithdrawal(true)}
@@ -202,7 +202,7 @@ function GoalItem({ goal, status, onUpdateSuccess }) {
                 Withdraw
               </button>
             )}
-            {(status === "in-progress" || status === "not-completed") && (
+            {(status === 2 || status === 3) && (
               <button
                 className="bg-purple-600 text-white rounded-md whitespace-nowrap text-sm sm:px-4 px-2 py-1 hover:bg-purple-700"
                 onClick={() => setIsAddingAddition(true)}
@@ -210,7 +210,7 @@ function GoalItem({ goal, status, onUpdateSuccess }) {
                 Add to goal
               </button>
             )}
-            {status === "finished" &&
+            {status === 4 &&
               goal.total_contributions > goal.amount && (
                 <button
                   className="bg-purple-600 text-white rounded-md whitespace-nowrap text-sm px-4 py-1 hover:bg-purple-700"

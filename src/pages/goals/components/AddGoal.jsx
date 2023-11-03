@@ -13,11 +13,11 @@ import formatCurrency from "../../../utils/currencyFormatter";
 
 function AddGoal({ goal = null, status, onClose, onUpdateSuccess }) {
   const types = [
-    { id: 1, name: "Saving goals", value: "saving" },
+    { id: 1, name: "Saving goals", value: 1 },
     {
       id: 2,
       name: "Debt Reduction goals",
-      value: "debt-reduction",
+      value: 2,
     },
   ];
   const [type, setType] = useState(types[0]);
@@ -81,7 +81,7 @@ function AddGoal({ goal = null, status, onClose, onUpdateSuccess }) {
           description: description,
           type: type.value,
           is_important: isImportant ? 1 : 0,
-          status: status,
+          status: status
         };
 
         if (image !== "") {
@@ -172,7 +172,7 @@ function AddGoal({ goal = null, status, onClose, onUpdateSuccess }) {
         value={name}
         error={errors && errors.name}
       />
-      {goal && status !== "not-started" && (
+      {goal && status !== 1 && (
         <div className="flex items-center gap-2">
           <FontAwesomeIcon icon={faInfoCircle} className="text-blue-600" />
           <p className="text-sm text-blue-600 italic">
@@ -209,7 +209,7 @@ function AddGoal({ goal = null, status, onClose, onUpdateSuccess }) {
         size="sm"
         value={format(new Date(dateBegin), "yyyy-MM-dd")}
         error={errors && errors.date_begin}
-        disable={goal && status !== "not-started"}
+        disable={goal && status !== 1}
       />
       <Input
         label={"Ending Date"}

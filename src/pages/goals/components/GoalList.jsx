@@ -16,28 +16,16 @@ function GoalList({ goals, status, setStatus, onUpdateSuccess, loading }) {
     <div>
       <div className="mb-4">
         <div className="flex border-b border-b-purple-200 lg:justify-start justify-center">
-          <button
-            className={statusType("not-started")}
-            onClick={() => setStatus("not-started")}
-          >
+          <button className={statusType(1)} onClick={() => setStatus(1)}>
             Not started
           </button>
-          <button
-            className={statusType("in-progress")}
-            onClick={() => setStatus("in-progress")}
-          >
+          <button className={statusType(2)} onClick={() => setStatus(2)}>
             In progress
           </button>
-          <button
-            className={statusType("finished")}
-            onClick={() => setStatus("finished")}
-          >
+          <button className={statusType(3)} onClick={() => setStatus(3)}>
             Finished
           </button>
-          <button
-            className={statusType("not-completed")}
-            onClick={() => setStatus("not-completed")}
-          >
+          <button className={statusType(4)} onClick={() => setStatus(4)}>
             Not completed
           </button>
         </div>

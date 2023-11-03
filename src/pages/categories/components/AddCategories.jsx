@@ -7,8 +7,8 @@ import CategoriesService from "../../../services/categories";
 import { toast } from "react-toastify";
 
 const types = [
-  { id: 1, name: "expenses" },
-  { id: 2, name: "incomes" },
+  { id: 1, name: "incomes", value: 1 },
+  { id: 2, name: "expenses", value: 2 },
 ];
 
 function AddCategories({ onClose, onAddSuccess, category = null }) {
@@ -21,7 +21,7 @@ function AddCategories({ onClose, onAddSuccess, category = null }) {
   useEffect(() => {
     if (category) {
       setName(category.name);
-      setType(types.find((t) => t.name === category.type));
+      setType(types.find((t) => t.id === category.type));
     }
   }, []);
 
@@ -46,7 +46,7 @@ function AddCategories({ onClose, onAddSuccess, category = null }) {
       }
 
       if (!haveErrors) {
-        let data = { name, type: type.name };
+        let data = { name, type: type.value };
         if (image) {
           data = { ...data, image };
         }
